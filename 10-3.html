@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>10-3 Media Query</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            font-size: 20px;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: "Microsoft YaHei", sans-serif;
+        }
+
+        .box {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #ff7f50;
+            color: #fff;
+            font-size: 2.4rem;
+            font-weight: bold;
+            letter-spacing: 0.2rem;
+            text-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            transition: background 0.5s ease;
+        }
+
+        @media (max-width: 1200px) {
+            .box {
+                background: #f4b942;
+            }
+        }
+
+        @media (max-width: 900px) {
+            .box {
+                background: #48c6ef;
+                font-size: 2rem;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .box {
+                background: #52c41a;
+                font-size: 1.5rem;
+                letter-spacing: 0.1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="box">刘晗</div>
+</body>
+</html>

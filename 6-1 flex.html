@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .flex{
+            /* 容器 */
+            display: flex;
+            /* 子元素在一行显示 */
+            /* flex-wrap: wrap; */
+        }
+        .flex li{
+            /* 项目item */
+            float: left;
+            border: 1px solid #333;
+            width: 49%;
+            text-align: center;
+            line-height: 400px;
+            list-style: none;
+            flex-grow: 1;
+            display: flex;
+        }
+        .flex li:nth-child(1){
+            align-items: center;
+            /* 水平居中 */
+            justify-content: center;
+        }
+        .box{
+            width: 50%;
+            height: 50%;
+            background:#7edc6f;
+        }
+        .flex li:nth-child(2){
+            /* 垂直三分之一 */
+            padding: 10px;
+            justify-content: center;
+        }
+        .a{
+            width: 30%;
+            height: 30%;
+            background:#d666d5;
+        }
+        .flex li:nth-child(2){
+            /* 垂直三分之一 */
+            padding: 25px;
+            justify-content: center;
+        }
+        .b{
+            width: 30%;
+            height: 30%;
+            background:#d666d5;
+        }
+    </style>
+</head>
+<body>
+    <h2>刘晗 flex</h2>
+    <ul class="flex">
+        <li>
+            <div class="box"></div>
+        </li>
+        <li>
+            <div class="a"></div>
+        </li>
+        <li>
+            <div class="b"></div>
+        </li>
+        <li>4</li>
+    </ul>
+</body>
+</html>

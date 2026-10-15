@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>刘晗的《高级网页设计》课堂实践 — 索引</title>
+  <style>
+    :root{
+      --bg-1:#071428; --bg-2:#081726; --card:#07142899; --accent:#7ee3c7; --accent-2:#84a0ff; --muted:#9fb0c8; --glass: rgba(255,255,255,0.04);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial; background:radial-gradient(1200px 600px at 10% 10%, rgba(124,58,237,0.08), transparent 8%), radial-gradient(800px 400px at 90% 90%, rgba(14,165,164,0.05), transparent 8%), linear-gradient(180deg,var(--bg-1) 0%, var(--bg-2) 100%);color:#eaf6ff;line-height:1.5; -webkit-font-smoothing:antialiased}
+    .wrap{max-width:980px;margin:44px auto;padding:28px}
+    header{display:flex;align-items:center;gap:18px}
+    .logo{width:72px;height:72px;border-radius:14px;background:linear-gradient(135deg,var(--accent),var(--accent-2));display:flex;align-items:center;justify-content:center;font-weight:800;color:#06202a;font-size:20px;box-shadow:0 6px 20px rgba(2,6,23,0.6)}
+    h1{margin:0;font-size:24px;letter-spacing:0.2px}
+    .subtitle{color:var(--muted);margin-top:6px;font-size:13px}
+    p.lead{margin:8px 0 18px;color:var(--muted)}
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;margin-top:20px}
+    .card{background:var(--card);border:1px solid var(--glass);padding:16px;border-radius:12px;transition:transform .22s,box-shadow .22s;backdrop-filter: blur(6px)}
+    .card:hover{transform:translateY(-8px);box-shadow:0 18px 40px rgba(2,6,23,0.65)}
+    a.link{display:block;color:var(--accent);font-weight:700;text-decoration:none}
+    a.link::before{content:'🔗';margin-right:8px;opacity:0.9}
+    .meta{color:var(--muted);font-size:13px;margin-top:8px}
+    .prompt{margin-top:22px;padding:16px;background:linear-gradient(180deg, rgba(255,255,255,0.015), rgba(255,255,255,0.01));border-radius:10px;border:1px dashed rgba(255,255,255,0.03);backdrop-filter: blur(4px)}
+    pre{white-space:pre-wrap;margin:0;color:#dbeafe;background:transparent;font-family:inherit}
+    footer{margin-top:28px;color:var(--muted);font-size:13px;text-align:center}
+    .tag{display:inline-block;background:rgba(0,0,0,0.12);color:var(--muted);padding:6px 10px;border-radius:999px;font-size:12px;margin-left:8px}
+    .hero-note{margin-top:12px;color:var(--muted);font-size:13px}
+    @media (max-width:520px){.wrap{padding:16px}h1{font-size:18px}.logo{width:56px;height:56px}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="logo">刘晗</div>
+      <div>
+        <h1>刘晗的《高级网页设计》课堂实践</h1>
+        <p class="lead">索引页面 — 本目录下所有练习页面的超链接（原生代码，无 CDN）</p>
+      </div>
+    </header>
+
+    <section aria-labelledby="pages">
+      <h2 id="pages" style="font-size:16px;margin-top:18px;margin-bottom:8px">全部页面导航</h2>
+      <div class="grid">
+        <article class="card">
+          <a class="link" href="1.html">1.html</a>
+          <div class="meta">基础页面</div>
+        </article>
+        <article class="card">
+          <a class="link" href="2-1.html">2-1.html</a>
+          <div class="meta">练习 2-1</div>
+        </article>
+        <article class="card">
+          <a class="link" href="2-2.html">2-2.html</a>
+          <div class="meta">练习 2-2</div>
+        </article>
+        <article class="card">
+          <a class="link" href="3-1.html">3-1.html</a>
+          <div class="meta">练习 3-1</div>
+        </article>
+        <article class="card">
+          <a class="link" href="3-2%20css.html">3-2 css.html</a>
+          <div class="meta">练习 3-2（CSS）</div>
+        </article>
+        <article class="card">
+          <a class="link" href="4-1%20css2.html">4-1 css2.html</a>
+          <div class="meta">练习 4-1（CSS2）</div>
+        </article>
+        <article class="card">
+          <a class="link" href="5-1%20层叠与继承.html">5-1 层叠与继承.html</a>
+          <div class="meta">练习 5-1</div>
+        </article>
+        <article class="card">
+          <a class="link" href="5-2%20盒模型.html">5-2 盒模型.html</a>
+          <div class="meta">练习 5-2</div>
+        </article>
+        <article class="card">
+          <a class="link" href="6-1%20flex.html">6-1 flex.html</a>
+          <div class="meta">练习 6-1</div>
+        </article>
+        <article class="card">
+          <a class="link" href="6-2.html">6-2.html</a>
+          <div class="meta">练习 6-2</div>
+        </article>
+        <article class="card">
+          <a class="link" href="7-1%20上图下文.html">7-1 上图下文.html</a>
+          <div class="meta">练习 7-1</div>
+        </article>
+        <article class="card">
+          <a class="link" href="7-2%20左图右文.html">7-2 左图右文.html</a>
+          <div class="meta">练习 7-2</div>
+        </article>
+        <article class="card">
+          <a class="link" href="8-1 css3选择器.html">8-1 css3选择器.html</a>
+          <div class="meta">练习 8-1</div>
+        </article>
+        <article class="card">
+          <a class="link" href="9-1 transiton.html">9-1 transiton.html</a>
+          <div class="meta">练习 9-1</div>
+        </article>
+        <article class="card">
+          <a class="link" href="11-1.html">11-1.html</a>
+          <div class="meta">练习 11-1（长度单位）</div>
+        </article>
+        <article class="card">
+          <a class="link" href="11-2.html">11-2.html</a>
+          <div class="meta">练习 11-2（CSS3 3D 动画）</div>
+        </article>
+        <article class="card">
+          <a class="link" href="img/">img/</a>
+          <div class="meta">图片资源目录</div>
+        </article>
+      </div>
+    </section>
+
+    <section class="prompt" aria-labelledby="prompt-title">
+      <h3 id="prompt-title" style="margin-top:0;font-size:15px">页面包含的提示词（原文）</h3>
+      <pre>“创建一个新页面，包括本目录下的所有网页的超链接，使用原生代码，不使用cdn，新页面名称为index.html，主题为刘晗的《高级网页设计》课堂实践，美化页面，页面中包括本提示词。”</pre>
+    </section>
+
+    <footer>
+      © 本页为课堂实践索引 — 刘晗的《高级网页设计》
+    </footer>
+  </div>
+</body>
+</html>

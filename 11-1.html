@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Web 前端的长度单位</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", "Microsoft YaHei", sans-serif;
+      background: #f5f7fa;
+      color: #2c3e50;
+      padding: 32px 20px;
+      line-height: 1.6;
+    }
+    .liu_container { max-width: 960px; margin: 0 auto; }
+    h1 { text-align: center; font-size: 28px; margin-bottom: 8px; }
+    .liu_subtitle { text-align: center; color: #7f8c8d; margin-bottom: 32px; }
+    .liu_grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+    .liu_card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+      transition: transform 0.2s;
+    }
+    .liu_card:hover { transform: translateY(-4px); box-shadow: 0 6px 20px rgba(0,0,0,0.12); }
+    .liu_unit_name { font-size: 20px; font-weight: 700; color: #3498db; margin-bottom: 4px; }
+    .liu_unit_type { display: inline-block; font-size: 12px; color: #fff; padding: 2px 8px; border-radius: 4px; margin-bottom: 10px; }
+    .liu_type_abs { background: #e74c3c; }
+    .liu_type_rel { background: #27ae60; }
+    .liu_type_vw  { background: #9b59b6; }
+    .liu_desc { font-size: 14px; color: #555; margin-bottom: 12px; }
+    .liu_demo_box {
+      background: #eef6ff;
+      border: 1px dashed #3498db;
+      border-radius: 8px;
+      padding: 10px;
+      text-align: center;
+      font-size: 13px;
+      color: #3498db;
+    }
+    .liu_demo_bar { height: 24px; border-radius: 4px; background: linear-gradient(90deg, #3498db, #2ecc71); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 12px; margin-top: 4px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 13px; }
+    th, td { border: 1px solid #ddd; padding: 6px 10px; text-align: left; }
+    th { background: #3498db; color: #fff; }
+    tr:nth-child(even) { background: #f9fbfd; }
+  </style>
+</head>
+<body>
+  <div class="liu_container">
+    <h1>Web 前端的长度单位</h1>
+    <p class="liu_subtitle">CSS 中常用的长度单位分类与示例</p>
+
+    <div class="liu_grid">
+      <div class="liu_card">
+        <div class="liu_unit_name">px（像素）</div>
+        <span class="liu_unit_type liu_type_abs">绝对单位</span>
+        <p class="liu_desc">最常用的单位，1px 表示屏幕上的一个物理像素点。</p>
+        <div class="liu_demo_box">宽度: 150px</div>
+      </div>
+
+      <div class="liu_card">
+        <div class="liu_unit_name">%</div>
+        <span class="liu_unit_type liu_type_rel">相对单位</span>
+        <p class="liu_desc">相对于父元素的百分比，常用于流式布局。</p>
+        <div class="liu_demo_bar" style="width: 75%;">75%</div>
+      </div>
+
+      <div class="liu_card">
+        <div class="liu_unit_name">em</div>
+        <span class="liu_unit_type liu_type_rel">相对单位</span>
+        <p class="liu_desc">相对于当前元素字体大小的倍数。此处 font-size: 20px。</p>
+        <div style="font-size: 20px; margin-top: 4px;">
+          <span style="display: inline-block; width: 2em; background: #ffeaa7; border-radius: 4px;">2em</span>
+        </div>
+      </div>
+
+      <div class="liu_card">
+        <div class="liu_unit_name">rem</div>
+        <span class="liu_unit_type liu_type_rel">相对单位</span>
+        <p class="liu_desc">相对于根元素 (html) 字体大小的倍数，避免嵌套影响。</p>
+        <div style="margin-top: 4px;">
+          <span style="display: inline-block; width: 2rem; background: #dfe6e9; border-radius: 4px; text-align: center;">2rem</span>
+        </div>
+      </div>
+
+      <div class="liu_card">
+        <div class="liu_unit_name">vw / vh</div>
+        <span class="liu_unit_type liu_type_vw">视口单位</span>
+        <p class="liu_desc">相对于视口宽/高度的百分比。1vw = 视口宽度的 1%。</p>
+        <div class="liu_demo_bar" style="width: 50vw; max-width: 100%;">50vw</div>
+      </div>
+
+      <div class="liu_card">
+        <div class="liu_unit_name">vmin / vmax</div>
+        <span class="liu_unit_type liu_type_vw">视口单位</span>
+        <p class="liu_desc">取视口宽高中较小/较大值的百分比。</p>
+        <div class="liu_demo_box">50vmin × 自动</div>
+      </div>
+
+      <div class="liu_card">
+        <div class="liu_unit_name">pt / pc</div>
+        <span class="liu_unit_type liu_type_abs">绝对单位</span>
+        <p class="liu_desc">印刷单位。1pt = 1/72 英寸，1pc = 12pt。多用于打印样式。</p>
+        <div class="liu_demo_box" style="font-size: 12pt;">12pt 文字</div>
+      </div>
+
+      <div class="liu_card">
+        <div class="liu_unit_name">ch / ex</div>
+        <span class="liu_unit_type liu_type_rel">相对单位</span>
+        <p class="liu_desc">ch 基于 "0" 字符宽度，ex 基于小写字母 "x" 的高度。</p>
+        <div class="liu_demo_box">ch: 0 0 0 0 0</div>
+      </div>
+    </div>
+
+    <div class="liu_card" style="margin-top: 28px;">
+      <h2 style="margin-bottom: 12px; font-size: 20px;">单位对照表</h2>
+      <table>
+        <tr><th>单位</th><th>类型</th><th>参考基准</th><th>常见用途</th></tr>
+        <tr><td>px</td><td>绝对</td><td>物理像素</td><td>边框、字号、定位</td></tr>
+        <tr><td>%</td><td>相对</td><td>父元素尺寸</td><td>流式布局、响应式宽度</td></tr>
+        <tr><td>em</td><td>相对</td><td>当前元素 font-size</td><td>行高、内边距缩放</td></tr>
+        <tr><td>rem</td><td>相对</td><td>根元素 font-size</td><td>统一字号、间距系统</td></tr>
+        <tr><td>vw / vh</td><td>视口</td><td>视口宽 / 高</td><td>全屏布局、大标题</td></tr>
+        <tr><td>vmin / vmax</td><td>视口</td><td>视口宽高的最小/最大值</td><td>保持比例的元素</td></tr>
+        <tr><td>pt</td><td>绝对</td><td>1/72 英寸</td><td>打印样式</td></tr>
+      </table>
+    </div>
+  </div>
+</body>
+</html>

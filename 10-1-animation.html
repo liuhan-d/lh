@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CSS Animation</title>
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background: #f3f3f3;
+    }
+
+    .box {
+      width: 220px;
+      height: 220px;
+      background: #ff0000; /* 初始颜色 */
+      animation: colorChange 8s ease-in-out infinite;
+      border-radius: 20px;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    }
+
+/* 扩展：自定义动画 */
+    @keyframes colorChange {
+      0%   { background: #ff0000; }   /* 红 */
+      25%  { background: #00ff00; }   /* 绿 */
+      50%  { background: #0000ff; }   /* 蓝 */
+      75%  { background: #ffff00; }   /* 黄 */
+      100% { background: #ff0000; }   /* 回到红 */
+    }
+  </style>
+</head>
+<body>
+  <div class="box"></div>
+</body>
+</html>

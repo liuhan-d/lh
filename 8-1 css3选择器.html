@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .main{
+            /* 背景颜色#f2f3f4 */
+            background-color: #f2f3f4;
+            /* 设置为flex布局 */
+            display: flex;
+            /* 设置换行 */
+            flex-wrap: wrap;
+            /* 设置外边距为10px */
+            margin: 10px;
+            
+        }
+        .box{
+            /* 设置宽度为200px */
+            width: 150px;
+            /* 设置高度为100px */
+            height: 159px;
+            /* 设置边框为1px实线，颜色为#ccc */
+            border: 1px solid #ccc;
+            /* 设置外边距为10px */
+            margin: 10px;
+            background-color: white;
+            font-size: 14px;
+            display: flex;
+            /* 水平垂直居中 */
+            justify-content: center;
+            align-items: center;
+            transition:all 0.6s;
+            box-sizing: border-box;
+            /* width包括padding和border */
+        }
+        .box:first-child:hover{
+            background-color: black;
+            color: white;
+            font-size: 100px;
+            border-width: 30px;
+        }
+        .box:nth-child(2):hover{
+            /* 阴影 */
+            box-shadow: 10px 10px 20px  rgba(0,0,0,0.5);
+        }
+        .box:nth-child(3):hover{
+            text-shadow: 100px 0px 20px rgba(0,0,0,0.5);
+        }
+        .box:nth-of-type(4):hover{
+            border-radius: 50%;
+        }
+        .box:nth-of-type(5){
+            /* 线性渐变 */
+            background: linear-gradient(#000,#fff);
+        }
+        .box:nth-of-type(6):hover{
+            /* 径向渐变 */
+            background: radial-gradient(#fff,#000);
+        }
+        /* 相邻兄弟选择器 */
+        /* ~兄弟选择器 */
+        .box:nth-of-type(6)+.box:hover{
+            /* 放大 */
+            transform: scale(1.5);
+            /* 缩小 */
+            /* transform: scale(0.5); */
+        }
+        .box:nth-of-type(8):hover{
+            /* 旋转 */
+            transform: translateX(-100px);
+        }
+        .box:nth-of-type(9):hover{
+            /* 旋转 */
+            transform: rotateZ(-180deg);
+        }
+        .box:nth-of-type(10):hover{
+            /* 旋转 */
+            transform: skewX(-45deg);
+        }
+         .box:nth-last-child(2):hover::before{
+            content: "1";
+            color: red;
+        }
+        /*最后一个*/
+        .box:last-child:hover::after{
+            content: "刘晗";
+            color: #fff;
+            font-size: 15px;
+            display: block;
+            width: 40px;
+            height: 40px;
+            margin: 10px;
+            background-color: #000;
+            border-radius: 20px;
+            /* 扩展：黑底白字居中圆角的你的名字，有距离 */
+            /* background-color: #000;
+            border-radius: 20px;
+            position: absolute;
+            right: 8px;
+            bottom: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.3); */ 
+        }
+        .box:nth-of-type(3n):hover{
+            border: 3px solid #f00;
+        }
+        /* 扩展：鼠标在偶数的盒子上时有变化，变化效果自拟定 */
+        .box:nth-of-type(2n):hover{
+            background-color: rgb(185, 39, 185);
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div class="main">
+        <div class="box">1</div>
+        <div class="box">2</div>
+        <div class="box">3</div>
+        <div class="box">4</div>
+        <div class="box">5</div>
+        <div class="box">6</div>
+        <div class="box">7</div>
+        <div class="box">8</div>
+        <div class="box">9</div>
+        <div class="box">10</div>
+        <div class="box">11</div>
+        <div class="box">12</div>
+    </div>
+</body>
+</html>
