@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h2>刘晗的JavaScript</h2>
+    <script>
+        document.write("<h3>hello world,刘晗</h3>");
+        console.log("hello world,liuhan");
+
+        //prompt和confirm，点击按钮后触发，避免弹窗挡住页面
+        function testDialog(){
+            alert("hello world");
+            var name = prompt("请输入您的姓名");
+            alert("您的姓名是：" + name);
+            var age = confirm("您确定是18岁以上吗？");
+            if(age){
+                alert("您是18岁以上");
+            }else{
+                alert("您不是18岁以上");
+            }
+        }
+    </script>
+    <button onclick="testDialog()">点我测试弹窗</button>
+</body>
+</html>

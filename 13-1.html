@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>练习 13-1 — Font Awesome 图标（字体图标方式）</title>
+  <link rel="stylesheet" href="cdn/fontawesome/css/all.min.css">
+  <style>
+    :root{--bg:#0b1220;--panel:#111c31;--line:#1f2d47;--txt:#e8eef9;--muted:#93a3bd;--accent:#7ee3c7;--accent-2:#84a0ff}
+    *{box-sizing:border-box}
+    body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;background:radial-gradient(900px 500px at 15% 0%,rgba(126,227,199,.10),transparent 60%),linear-gradient(180deg,var(--bg),#0a0f1a);color:var(--txt);line-height:1.5}
+    .wrap{max-width:1040px;margin:0 auto;padding:28px 22px 48px}
+    header{display:flex;align-items:center;gap:14px;margin-bottom:6px}
+    .back{color:var(--accent);text-decoration:none;font-weight:700;border:1px solid var(--line);padding:8px 14px;border-radius:10px;background:var(--panel)}
+    .back:hover{background:#17243c}
+    h1{margin:0;font-size:22px}
+    .sub{color:var(--muted);font-size:13px;margin-top:4px}
+    .note{margin:18px 0 26px;padding:14px 16px;border:1px dashed var(--line);border-radius:12px;background:rgba(255,255,255,.03);color:var(--muted);font-size:13px}
+    .note code{color:var(--accent)}
+    h2{font-size:15px;margin:26px 0 12px;color:var(--accent-2);letter-spacing:.3px}
+    h2 span{color:var(--muted);font-weight:400;font-size:12px;margin-left:8px}
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:12px}
+    .card{display:flex;flex-direction:column;align-items:center;gap:9px;padding:16px 8px;background:var(--panel);border:1px solid var(--line);border-radius:12px;transition:transform .2s,box-shadow .2s,border-color .2s}
+    .card:hover{transform:translateY(-5px);box-shadow:0 14px 28px rgba(2,6,23,.55);border-color:var(--accent-2)}
+    .ic{display:flex;align-items:center;justify-content:center;height:34px;font-size:28px;color:var(--accent)}
+    .card:hover .ic{color:#fff}
+    .nm{font-size:12px;color:var(--muted);font-family:ui-monospace,Consolas,monospace;word-break:break-all;text-align:center}
+    footer{margin-top:30px;color:var(--muted);font-size:12px;text-align:center}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <a class="back" href="index.html">← 返回首页</a>
+      <div>
+        <h1>Font Awesome 图标 — 字体图标方式</h1>
+        <div class="sub">练习 13-1 ｜ 资源来源：本地 <code>cdn/fontawesome/</code>（CSS + webfonts 字体文件）</div>
+      </div>
+    </header>
+
+    <div class="note">
+      说明：Font Awesome 采用「字体图标」方案——先把图标做成字体（<code>webfonts/fa-*.woff2</code>），再通过 CSS 给 <code>&lt;i&gt;</code> 元素指定字体与字符编码（如 <code>.fa-home::before{content:"\f015"}</code>）来显示图标。
+      使用时引入 <code>cdn/fontawesome/css/all.min.css</code>，在标签上写 <code>class="fa-solid fa-图标名"</code> 即可，图标本质上是文字，可像文字一样用 CSS 控制大小、颜色。
+    </div>
+
+    <h2>实心图标 <span>fa-solid</span></h2>
+    <div class="grid">
+      <div class="card"><i class="ic fa-solid fa-home"></i><span class="nm">home</span></div>
+      <div class="card"><i class="ic fa-solid fa-search"></i><span class="nm">search</span></div>
+      <div class="card"><i class="ic fa-solid fa-heart"></i><span class="nm">heart</span></div>
+      <div class="card"><i class="ic fa-solid fa-star"></i><span class="nm">star</span></div>
+      <div class="card"><i class="ic fa-solid fa-user"></i><span class="nm">user</span></div>
+      <div class="card"><i class="ic fa-solid fa-gear"></i><span class="nm">gear</span></div>
+      <div class="card"><i class="ic fa-solid fa-bell"></i><span class="nm">bell</span></div>
+      <div class="card"><i class="ic fa-solid fa-envelope"></i><span class="nm">envelope</span></div>
+      <div class="card"><i class="ic fa-solid fa-lock"></i><span class="nm">lock</span></div>
+      <div class="card"><i class="ic fa-solid fa-cloud"></i><span class="nm">cloud</span></div>
+      <div class="card"><i class="ic fa-solid fa-sun"></i><span class="nm">sun</span></div>
+      <div class="card"><i class="ic fa-solid fa-moon"></i><span class="nm">moon</span></div>
+      <div class="card"><i class="ic fa-solid fa-camera"></i><span class="nm">camera</span></div>
+      <div class="card"><i class="ic fa-solid fa-music"></i><span class="nm">music</span></div>
+      <div class="card"><i class="ic fa-solid fa-phone"></i><span class="nm">phone</span></div>
+      <div class="card"><i class="ic fa-solid fa-calendar"></i><span class="nm">calendar</span></div>
+      <div class="card"><i class="ic fa-solid fa-folder"></i><span class="nm">folder</span></div>
+      <div class="card"><i class="ic fa-solid fa-file"></i><span class="nm">file</span></div>
+      <div class="card"><i class="ic fa-solid fa-download"></i><span class="nm">download</span></div>
+      <div class="card"><i class="ic fa-solid fa-upload"></i><span class="nm">upload</span></div>
+      <div class="card"><i class="ic fa-solid fa-trash"></i><span class="nm">trash</span></div>
+      <div class="card"><i class="ic fa-solid fa-pen"></i><span class="nm">pen</span></div>
+      <div class="card"><i class="ic fa-solid fa-check"></i><span class="nm">check</span></div>
+      <div class="card"><i class="ic fa-solid fa-xmark"></i><span class="nm">xmark</span></div>
+      <div class="card"><i class="ic fa-solid fa-bars"></i><span class="nm">bars</span></div>
+      <div class="card"><i class="ic fa-solid fa-plus"></i><span class="nm">plus</span></div>
+      <div class="card"><i class="ic fa-solid fa-minus"></i><span class="nm">minus</span></div>
+      <div class="card"><i class="ic fa-solid fa-arrow-right"></i><span class="nm">arrow-right</span></div>
+      <div class="card"><i class="ic fa-solid fa-arrow-left"></i><span class="nm">arrow-left</span></div>
+      <div class="card"><i class="ic fa-solid fa-chevron-down"></i><span class="nm">chevron-down</span></div>
+      <div class="card"><i class="ic fa-solid fa-chevron-up"></i><span class="nm">chevron-up</span></div>
+      <div class="card"><i class="ic fa-solid fa-play"></i><span class="nm">play</span></div>
+      <div class="card"><i class="ic fa-solid fa-pause"></i><span class="nm">pause</span></div>
+      <div class="card"><i class="ic fa-solid fa-wifi"></i><span class="nm">wifi</span></div>
+      <div class="card"><i class="ic fa-solid fa-battery-full"></i><span class="nm">battery-full</span></div>
+      <div class="card"><i class="ic fa-solid fa-cart-shopping"></i><span class="nm">cart-shopping</span></div>
+      <div class="card"><i class="ic fa-solid fa-credit-card"></i><span class="nm">credit-card</span></div>
+      <div class="card"><i class="ic fa-solid fa-location-dot"></i><span class="nm">location-dot</span></div>
+      <div class="card"><i class="ic fa-solid fa-clock"></i><span class="nm">clock</span></div>
+      <div class="card"><i class="ic fa-solid fa-triangle-exclamation"></i><span class="nm">triangle-exclamation</span></div>
+      <div class="card"><i class="ic fa-solid fa-circle-info"></i><span class="nm">circle-info</span></div>
+      <div class="card"><i class="ic fa-solid fa-bolt"></i><span class="nm">bolt</span></div>
+      <div class="card"><i class="ic fa-solid fa-award"></i><span class="nm">award</span></div>
+      <div class="card"><i class="ic fa-solid fa-bookmark"></i><span class="nm">bookmark</span></div>
+      <div class="card"><i class="ic fa-solid fa-flag"></i><span class="nm">flag</span></div>
+      <div class="card"><i class="ic fa-solid fa-gift"></i><span class="nm">gift</span></div>
+      <div class="card"><i class="ic fa-solid fa-key"></i><span class="nm">key</span></div>
+      <div class="card"><i class="ic fa-solid fa-link"></i><span class="nm">link</span></div>
+      <div class="card"><i class="ic fa-solid fa-comment"></i><span class="nm">comment</span></div>
+      <div class="card"><i class="ic fa-solid fa-paper-plane"></i><span class="nm">paper-plane</span></div>
+      <div class="card"><i class="ic fa-solid fa-share-nodes"></i><span class="nm">share-nodes</span></div>
+      <div class="card"><i class="ic fa-solid fa-shield"></i><span class="nm">shield</span></div>
+      <div class="card"><i class="ic fa-solid fa-face-smile"></i><span class="nm">face-smile</span></div>
+      <div class="card"><i class="ic fa-solid fa-thumbs-up"></i><span class="nm">thumbs-up</span></div>
+      <div class="card"><i class="ic fa-solid fa-umbrella"></i><span class="nm">umbrella</span></div>
+      <div class="card"><i class="ic fa-solid fa-code"></i><span class="nm">code</span></div>
+      <div class="card"><i class="ic fa-solid fa-terminal"></i><span class="nm">terminal</span></div>
+      <div class="card"><i class="ic fa-solid fa-database"></i><span class="nm">database</span></div>
+      <div class="card"><i class="ic fa-solid fa-globe"></i><span class="nm">globe</span></div>
+      <div class="card"><i class="ic fa-solid fa-layer-group"></i><span class="nm">layer-group</span></div>
+      <div class="card"><i class="ic fa-solid fa-box"></i><span class="nm">box</span></div>
+      <div class="card"><i class="ic fa-solid fa-pen-to-square"></i><span class="nm">pen-to-square</span></div>
+      <div class="card"><i class="ic fa-solid fa-print"></i><span class="nm">print</span></div>
+      <div class="card"><i class="ic fa-solid fa-rocket"></i><span class="nm">rocket</span></div>
+      <div class="card"><i class="ic fa-solid fa-floppy-disk"></i><span class="nm">floppy-disk</span></div>
+      <div class="card"><i class="ic fa-solid fa-scissors"></i><span class="nm">scissors</span></div>
+      <div class="card"><i class="ic fa-solid fa-sliders"></i><span class="nm">sliders</span></div>
+      <div class="card"><i class="ic fa-solid fa-tag"></i><span class="nm">tag</span></div>
+      <div class="card"><i class="ic fa-solid fa-bullseye"></i><span class="nm">bullseye</span></div>
+      <div class="card"><i class="ic fa-solid fa-arrow-trend-up"></i><span class="nm">arrow-trend-up</span></div>
+      <div class="card"><i class="ic fa-solid fa-video"></i><span class="nm">video</span></div>
+      <div class="card"><i class="ic fa-solid fa-wrench"></i><span class="nm">wrench</span></div>
+    </div>
+
+    <h2>常规图标 <span>fa-regular</span></h2>
+    <div class="grid">
+      <div class="card"><i class="ic fa-regular fa-heart"></i><span class="nm">heart</span></div>
+      <div class="card"><i class="ic fa-regular fa-star"></i><span class="nm">star</span></div>
+      <div class="card"><i class="ic fa-regular fa-user"></i><span class="nm">user</span></div>
+      <div class="card"><i class="ic fa-regular fa-bell"></i><span class="nm">bell</span></div>
+      <div class="card"><i class="ic fa-regular fa-envelope"></i><span class="nm">envelope</span></div>
+      <div class="card"><i class="ic fa-regular fa-folder"></i><span class="nm">folder</span></div>
+      <div class="card"><i class="ic fa-regular fa-file"></i><span class="nm">file</span></div>
+      <div class="card"><i class="ic fa-regular fa-comment"></i><span class="nm">comment</span></div>
+      <div class="card"><i class="ic fa-regular fa-face-smile"></i><span class="nm">face-smile</span></div>
+      <div class="card"><i class="ic fa-regular fa-bookmark"></i><span class="nm">bookmark</span></div>
+      <div class="card"><i class="ic fa-regular fa-flag"></i><span class="nm">flag</span></div>
+      <div class="card"><i class="ic fa-regular fa-clock"></i><span class="nm">clock</span></div>
+      <div class="card"><i class="ic fa-regular fa-circle-info"></i><span class="nm">circle-info</span></div>
+      <div class="card"><i class="ic fa-regular fa-thumbs-up"></i><span class="nm">thumbs-up</span></div>
+      <div class="card"><i class="ic fa-regular fa-calendar"></i><span class="nm">calendar</span></div>
+      <div class="card"><i class="ic fa-regular fa-moon"></i><span class="nm">moon</span></div>
+      <div class="card"><i class="ic fa-regular fa-sun"></i><span class="nm">sun</span></div>
+      <div class="card"><i class="ic fa-regular fa-circle-check"></i><span class="nm">circle-check</span></div>
+      <div class="card"><i class="ic fa-regular fa-copy"></i><span class="nm">copy</span></div>
+      <div class="card"><i class="ic fa-regular fa-credit-card"></i><span class="nm">credit-card</span></div>
+      <div class="card"><i class="ic fa-regular fa-life-ring"></i><span class="nm">life-ring</span></div>
+      <div class="card"><i class="ic fa-regular fa-square"></i><span class="nm">square</span></div>
+      <div class="card"><i class="ic fa-regular fa-circle"></i><span class="nm">circle</span></div>
+      <div class="card"><i class="ic fa-regular fa-circle-user"></i><span class="nm">circle-user</span></div>
+      <div class="card"><i class="ic fa-regular fa-clipboard"></i><span class="nm">clipboard</span></div>
+      <div class="card"><i class="ic fa-regular fa-paper-plane"></i><span class="nm">paper-plane</span></div>
+    </div>
+
+    <h2>品牌图标 <span>fa-brands</span></h2>
+    <div class="grid">
+      <div class="card"><i class="ic fa-brands fa-github"></i><span class="nm">github</span></div>
+      <div class="card"><i class="ic fa-brands fa-facebook-f"></i><span class="nm">facebook-f</span></div>
+      <div class="card"><i class="ic fa-brands fa-x-twitter"></i><span class="nm">x-twitter</span></div>
+      <div class="card"><i class="ic fa-brands fa-linkedin-in"></i><span class="nm">linkedin-in</span></div>
+      <div class="card"><i class="ic fa-brands fa-youtube"></i><span class="nm">youtube</span></div>
+      <div class="card"><i class="ic fa-brands fa-instagram"></i><span class="nm">instagram</span></div>
+      <div class="card"><i class="ic fa-brands fa-google"></i><span class="nm">google</span></div>
+      <div class="card"><i class="ic fa-brands fa-chrome"></i><span class="nm">chrome</span></div>
+      <div class="card"><i class="ic fa-brands fa-edge"></i><span class="nm">edge</span></div>
+      <div class="card"><i class="ic fa-brands fa-firefox-browser"></i><span class="nm">firefox-browser</span></div>
+      <div class="card"><i class="ic fa-brands fa-apple"></i><span class="nm">apple</span></div>
+      <div class="card"><i class="ic fa-brands fa-android"></i><span class="nm">android</span></div>
+      <div class="card"><i class="ic fa-brands fa-windows"></i><span class="nm">windows</span></div>
+      <div class="card"><i class="ic fa-brands fa-linux"></i><span class="nm">linux</span></div>
+      <div class="card"><i class="ic fa-brands fa-react"></i><span class="nm">react</span></div>
+      <div class="card"><i class="ic fa-brands fa-vuejs"></i><span class="nm">vuejs</span></div>
+      <div class="card"><i class="ic fa-brands fa-angular"></i><span class="nm">angular</span></div>
+      <div class="card"><i class="ic fa-brands fa-node-js"></i><span class="nm">node-js</span></div>
+      <div class="card"><i class="ic fa-brands fa-npm"></i><span class="nm">npm</span></div>
+      <div class="card"><i class="ic fa-brands fa-docker"></i><span class="nm">docker</span></div>
+      <div class="card"><i class="ic fa-brands fa-git-alt"></i><span class="nm">git-alt</span></div>
+      <div class="card"><i class="ic fa-brands fa-slack"></i><span class="nm">slack</span></div>
+      <div class="card"><i class="ic fa-brands fa-discord"></i><span class="nm">discord</span></div>
+      <div class="card"><i class="ic fa-brands fa-telegram"></i><span class="nm">telegram</span></div>
+      <div class="card"><i class="ic fa-brands fa-whatsapp"></i><span class="nm">whatsapp</span></div>
+      <div class="card"><i class="ic fa-brands fa-weixin"></i><span class="nm">weixin</span></div>
+      <div class="card"><i class="ic fa-brands fa-qq"></i><span class="nm">qq</span></div>
+      <div class="card"><i class="ic fa-brands fa-weibo"></i><span class="nm">weibo</span></div>
+      <div class="card"><i class="ic fa-brands fa-zhihu"></i><span class="nm">zhihu</span></div>
+      <div class="card"><i class="ic fa-brands fa-bilibili"></i><span class="nm">bilibili</span></div>
+      <div class="card"><i class="ic fa-brands fa-bluetooth"></i><span class="nm">bluetooth</span></div>
+    </div>
+
+    <footer>© 本页为课堂实践 — 刘晗的《高级网页设计》 ｜ Font Awesome Free 6.5.2</footer>
+  </div>
+</body>
+</html>

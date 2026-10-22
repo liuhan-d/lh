@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>练习 13-4 — 移动端底部导航（SVG 图标）</title>
+  <style>
+    :root{--w:390px;--brand:#2f6bff;--red:#ff3b30;--ink:#1f2430;--muted:#8a93a6;--line:#eceef3;--bg:#eef1f6}
+    *{box-sizing:border-box}
+    body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--ink);line-height:1.5}
+    .toolbar{display:flex;align-items:center;justify-content:center;gap:8px;padding:12px 16px;font-size:13px;color:#4a5468;flex-wrap:wrap}
+    .toolbar button{border:1px solid #d6dbe6;background:#fff;color:#4a5468;border-radius:999px;padding:5px 14px;font-size:12px;cursor:pointer;transition:.2s}
+    .toolbar button:hover{border-color:var(--brand);color:var(--brand)}
+    .toolbar button.on{background:var(--brand);border-color:var(--brand);color:#fff}
+
+    .phone{max-width:var(--w);margin:0 auto;min-height:calc(100vh - 54px);background:#fff;box-shadow:0 12px 44px rgba(20,30,60,.14);position:relative}
+    .app-header{display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(255,255,255,.96);backdrop-filter:blur(6px);z-index:5}
+    .app-header h1{font-size:17px;margin:0;flex:1;letter-spacing:.2px}
+    .back{font-size:12px;color:var(--brand);text-decoration:none;border:1px solid #e2e8f6;background:#f5f8ff;padding:6px 11px;border-radius:999px;white-space:nowrap}
+    .back:hover{background:#eaf1ff}
+
+    .content{padding:16px 16px 96px}
+    .banner{background:linear-gradient(135deg,#2f6bff,#6aa0ff);color:#fff;border-radius:16px;padding:18px;margin-bottom:18px}
+    .banner h2{margin:0 0 4px;font-size:16px}
+    .banner p{margin:0;font-size:12px;opacity:.92}
+    .sec-title{font-size:13px;color:var(--muted);margin:20px 0 10px}
+    .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+    .entry{background:#f7f9fc;border-radius:12px;padding:12px 6px;text-align:center;font-size:12px;color:#5a6478}
+    .entry .e-ico{display:block;margin:0 auto 6px;color:var(--brand)}
+    .entry .e-ico svg{width:20px;height:20px;display:block;margin:0 auto}
+    .msg{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
+    .msg:last-child{border-bottom:0}
+    .avatar{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#ffd36e,#ff8a5c);flex:none}
+    .avatar.two{background:linear-gradient(135deg,#8fd0ff,#2f6bff)}
+    .msg .m-body{flex:1;min-width:0}
+    .msg .m-title{font-size:14px;font-weight:600}
+    .msg .m-sub{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .msg .m-time{font-size:11px;color:var(--muted);flex:none}
+
+    .tabbar{position:fixed;left:0;right:0;bottom:0;max-width:var(--w);margin:0 auto;display:flex;background:#fff;border-top:1px solid var(--line);box-shadow:0 -6px 24px rgba(20,30,60,.08);padding-bottom:env(safe-area-inset-bottom)}
+    .tab{flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 0 8px;text-decoration:none;color:var(--muted);font-size:11px;transition:color .2s}
+    .tab .ico{position:relative;display:inline-flex;align-items:center;justify-content:center;line-height:1}
+    .tab .ico-svg{width:23px;height:23px;display:block;fill:currentColor}
+    .tab .txt{white-space:nowrap}
+    .tab.active{color:var(--brand)}
+    .tab:active{transform:scale(.96)}
+    .badge{position:absolute;top:-6px;right:-15px;min-width:16px;height:16px;padding:0 5px;border-radius:9px;background:var(--red);color:#fff;font-size:10px;line-height:16px;text-align:center;font-weight:700;box-sizing:border-box;border:2px solid #fff}
+    .badge.dot{min-width:9px;width:9px;height:9px;padding:0;border-radius:50%;right:-3px;top:-3px}
+
+    footer{text-align:center;color:#9aa4b8;font-size:12px;padding:20px 16px 44px}
+    @media (max-width:430px){.phone{min-height:100vh;box-shadow:none}.toolbar{padding:10px}}
+  </style>
+</head>
+<body>
+  <!-- 内联 SVG 图标精灵（symbol 定义，fill 交由 CSS 的 currentColor 控制） -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+    <symbol id="icon-shouye" viewBox="0 0 1199 1024"><path d="M599.883366 36.485018 14.397338 622.032998l237.705 0 0 383.981 222.536 0c38.057984-82.68503 101.058048-151.528038 179.386982-196.925952-0.27095-17.363968-0.420966-36.896051-0.134963-62.398976-90.196992 44.91305-164.726989 116.515021-213.204992 204.47703L306.957344 951.166101 306.957344 567.178 143.639344 567.178l455.873024-455.873024L1055.391334 567.178035 892.074344 567.178035l0 383.989L745.790344 951.167035l0 54.848 201.139 0L946.929344 622.033l237.705 0L599.883366 36.485018z"></path></symbol>
+    <symbol id="icon-faxian" viewBox="0 0 1024 1024"><path d="M512 972.8c-253.44 0-460.8-207.36-460.8-460.8S258.56 51.2 512 51.2s460.8 207.36 460.8 460.8-207.36 460.8-460.8 460.8z m0-51.2c225.28 0 409.6-184.32 409.6-409.6S737.28 102.4 512 102.4 102.4 286.72 102.4 512s184.32 409.6 409.6 409.6z m0-204.8c-143.36 0-281.6-104.96-281.6-204.8s138.24-204.8 281.6-204.8 281.6 104.96 281.6 204.8-138.24 204.8-281.6 204.8z m0-51.2c117.76 0 230.4-87.04 230.4-153.6s-112.64-153.6-230.4-153.6-230.4 87.04-230.4 153.6 112.64 153.6 230.4 153.6z m0-51.2c-56.32 0-102.4-46.08-102.4-102.4s46.08-102.4 102.4-102.4 102.4 46.08 102.4 102.4-46.08 102.4-102.4 102.4z m0-51.2c28.16 0 51.2-23.04 51.2-51.2s-23.04-51.2-51.2-51.2-51.2 23.04-51.2 51.2 23.04 51.2 51.2 51.2z"></path></symbol>
+    <symbol id="icon-tongzhi" viewBox="0 0 1024 1024"><path d="M889.828994 749.637494c-1.204099-1.548127-119.205779-166.165631-119.205779-287.435579 0-168.401814-76.202251-254.752898-162.725349-286.919536L607.897867 159.973123c0-52.980346-43.175542-95.983874-95.983874-95.983874S415.930119 107.164791 415.930119 159.973123l0 16.685369c-10.836889 7.912649-16.169326 21.845792-11.868974 35.262893 5.332437 16.857383 23.393919 25.974131 40.251302 20.641693 17.717453-5.676466 36.983034-8.428691 56.936671-8.428691l21.32975 0c115.249454 0 184.055098 89.103309 184.055098 238.239543 0 108.024861 72.933983 235.315303 110.261045 293.456073-57.452713 26.146145-183.023014 76.202251-304.809004 76.202251-121.441962 0-247.356291-50.400134-304.809004-76.546279 37.327062-57.968755 110.089031-184.915169 110.089031-293.112044 0-62.441122 11.524945-114.217369 34.574836-153.952629 8.77272-15.309256 3.612296-34.918864-11.69696-43.691584-15.48127-8.944734-34.918864-3.612296-43.691584 11.69696-28.554342 49.540064-43.175542 112.1532-43.175542 185.947253 0 121.269948-118.00168 285.199395-119.205779 286.919536-5.332437 7.568621-7.396607 16.857383-5.332437 25.974131 2.064169 8.944734 7.912649 16.685369 15.997312 20.985721 5.676466 3.096254 107.336805 57.280699 233.423148 84.458928 21.32975 66.397447 73.966068 111.29313 133.654964 111.29313s112.325214-44.895683 133.654964-111.29313c126.086343-27.178229 227.746682-81.018646 233.423148-83.942886 8.084663-4.472367 13.933143-12.040988 16.169326-20.985721C897.225601 766.666891 895.333445 757.206115 889.828994 749.637494zM501.249118 159.973123c-7.224593 0-14.277171 1.032085-21.32975 1.548127L479.919368 159.973123c0-17.545439 14.449185-31.994625 31.994625-31.994625 17.545439 0 31.994625 14.449185 31.994625 31.994625l0 0.860071c-7.224593-0.516042-14.277171-0.860071-21.32975-0.860071L501.249118 159.973123zM511.913993 928.016126c-22.361834 0-43.175542-13.417101-57.968755-35.262893 19.26558 2.064169 38.531161 3.268268 57.968755 3.268268s38.875189-1.376113 57.968755-3.268268C555.089535 914.599026 534.275827 928.016126 511.913993 928.016126z"></path></symbol>
+    <symbol id="icon-my" viewBox="0 0 1024 1024"><path d="M800 384c0-160-128-288-288-288s-288 128-288 288c0 108.8 57.6 201.6 147.2 249.6-121.6 48-214.4 153.6-240 288-3.2 16 6.4 35.2 25.6 38.4h6.4c16 0 28.8-9.6 32-25.6 28.8-150.4 160-259.2 313.6-262.4h6.4c156.8 0 284.8-128 284.8-288zM288 384c0-124.8 99.2-224 224-224s224 99.2 224 224c0 121.6-99.2 220.8-220.8 224H505.6C384 604.8 288 505.6 288 384zM723.2 675.2c-16-9.6-35.2-6.4-44.8 9.6-9.6 16-6.4 35.2 9.6 44.8 73.6 51.2 124.8 121.6 140.8 204.8 3.2 16 16 25.6 32 25.6h6.4c16-3.2 28.8-19.2 25.6-38.4-19.2-99.2-80-185.6-169.6-246.4z"></path></symbol>
+  </svg>
+
+  <div class="toolbar">
+    <span>导航自适应宽度：</span>
+    <button type="button" data-w="320px">320px</button>
+    <button type="button" data-w="390px" class="on">390px</button>
+    <button type="button" data-w="430px">430px</button>
+  </div>
+
+  <main class="phone">
+    <header class="app-header">
+      <a class="back" href="index.html">← 返回首页</a>
+      <h1>课堂演示</h1>
+    </header>
+
+    <div class="content">
+      <section class="banner">
+        <h2>下午好，刘晗 👋</h2>
+        <p>这是使用 SVG 图标实现的移动端底部导航</p>
+      </section>
+
+      <div class="sec-title">功能入口</div>
+      <div class="grid">
+        <div class="entry"><span class="e-ico"><svg class="ico-svg"><use href="#icon-faxian"></use></svg></span>发现</div>
+        <div class="entry"><span class="e-ico"><svg class="ico-svg"><use href="#icon-tongzhi"></use></svg></span>通知</div>
+        <div class="entry"><span class="e-ico"><svg class="ico-svg"><use href="#icon-shouye"></use></svg></span>首页</div>
+        <div class="entry"><span class="e-ico"><svg class="ico-svg"><use href="#icon-my"></use></svg></span>我的</div>
+      </div>
+
+      <div class="sec-title">最近消息</div>
+      <div class="msg">
+        <div class="avatar"></div>
+        <div class="m-body">
+          <div class="m-title">网页设计课程群</div>
+          <div class="m-sub">今晚 19:00 线上答疑，记得准时参加～</div>
+        </div>
+        <div class="m-time">10:24</div>
+      </div>
+      <div class="msg">
+        <div class="avatar two"></div>
+        <div class="m-body">
+          <div class="m-title">系统通知</div>
+          <div class="m-sub">你提交的 13-1.html 作业已通过审核</div>
+        </div>
+        <div class="m-time">昨天</div>
+      </div>
+      <div class="msg">
+        <div class="avatar"></div>
+        <div class="m-body">
+          <div class="m-title">前端学习资料</div>
+          <div class="m-sub">Flex 布局与 Grid 布局完整笔记.pdf</div>
+        </div>
+        <div class="m-time">周一</div>
+      </div>
+    </div>
+  </main>
+
+  <nav class="tabbar" aria-label="底部导航">
+    <a class="tab active" href="#">
+      <span class="ico"><svg class="ico-svg"><use href="#icon-shouye"></use></svg></span>
+      <span class="txt">首页</span>
+    </a>
+    <a class="tab" href="#">
+      <span class="ico"><svg class="ico-svg"><use href="#icon-faxian"></use></svg><span class="badge dot" title="有新内容"></span></span>
+      <span class="txt">发现</span>
+    </a>
+    <a class="tab" href="#">
+      <span class="ico"><svg class="ico-svg"><use href="#icon-tongzhi"></use></svg><span class="badge num">5</span></span>
+      <span class="txt">通知</span>
+    </a>
+    <a class="tab" href="#">
+      <span class="ico"><svg class="ico-svg"><use href="#icon-my"></use></svg><span class="badge num">99+</span></span>
+      <span class="txt">我的</span>
+    </a>
+  </nav>
+
+  <footer>© 本页为课堂实践 — 刘晗的《高级网页设计》 ｜ SVG 图标：font/iconfont.js 中的 symbol</footer>
+
+  <script>
+    var btns = document.querySelectorAll('.toolbar button');
+    btns.forEach(function (b) {
+      b.addEventListener('click', function () {
+        btns.forEach(function (x) { x.classList.remove('on'); });
+        b.classList.add('on');
+        document.documentElement.style.setProperty('--w', b.dataset.w);
+      });
+    });
+    document.querySelectorAll('.tab').forEach(function (t) {
+      t.addEventListener('click', function (e) {
+        e.preventDefault();
+        document.querySelectorAll('.tab').forEach(function (x) { x.classList.remove('active'); });
+        t.classList.add('active');
+      });
+    });
+  </script>
+</body>
+</html>

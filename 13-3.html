@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>练习 13-3 — 移动端底部导航（iconfont 字体图标）</title>
+  <link rel="stylesheet" href="font/iconfont.css">
+  <style>
+    :root{--w:390px;--brand:#2f6bff;--red:#ff3b30;--ink:#1f2430;--muted:#8a93a6;--line:#eceef3;--bg:#eef1f6}
+    *{box-sizing:border-box}
+    body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--ink);line-height:1.5}
+    .toolbar{display:flex;align-items:center;justify-content:center;gap:8px;padding:12px 16px;font-size:13px;color:#4a5468;flex-wrap:wrap}
+    .toolbar button{border:1px solid #d6dbe6;background:#fff;color:#4a5468;border-radius:999px;padding:5px 14px;font-size:12px;cursor:pointer;transition:.2s}
+    .toolbar button:hover{border-color:var(--brand);color:var(--brand)}
+    .toolbar button.on{background:var(--brand);border-color:var(--brand);color:#fff}
+
+    .phone{max-width:var(--w);margin:0 auto;min-height:calc(100vh - 54px);background:#fff;box-shadow:0 12px 44px rgba(20,30,60,.14);position:relative}
+    .app-header{display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(255,255,255,.96);backdrop-filter:blur(6px);z-index:5}
+    .app-header h1{font-size:17px;margin:0;flex:1;letter-spacing:.2px}
+    .back{font-size:12px;color:var(--brand);text-decoration:none;border:1px solid #e2e8f6;background:#f5f8ff;padding:6px 11px;border-radius:999px;white-space:nowrap}
+    .back:hover{background:#eaf1ff}
+
+    .content{padding:16px 16px 96px}
+    .banner{background:linear-gradient(135deg,#2f6bff,#6aa0ff);color:#fff;border-radius:16px;padding:18px;margin-bottom:18px}
+    .banner h2{margin:0 0 4px;font-size:16px}
+    .banner p{margin:0;font-size:12px;opacity:.92}
+    .sec-title{font-size:13px;color:var(--muted);margin:20px 0 10px}
+    .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+    .entry{background:#f7f9fc;border-radius:12px;padding:12px 6px;text-align:center;font-size:12px;color:#5a6478}
+    .entry .e-ico{display:block;font-size:20px;margin-bottom:6px;color:var(--brand)}
+    .iconfont{font-size:inherit}
+    .entry .e-ico .iconfont{font-size:inherit}
+    .msg{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
+    .msg:last-child{border-bottom:0}
+    .avatar{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#ffd36e,#ff8a5c);flex:none}
+    .avatar.two{background:linear-gradient(135deg,#8fd0ff,#2f6bff)}
+    .msg .m-body{flex:1;min-width:0}
+    .msg .m-title{font-size:14px;font-weight:600}
+    .msg .m-sub{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .msg .m-time{font-size:11px;color:var(--muted);flex:none}
+
+    .tabbar{position:fixed;left:0;right:0;bottom:0;max-width:var(--w);margin:0 auto;display:flex;background:#fff;border-top:1px solid var(--line);box-shadow:0 -6px 24px rgba(20,30,60,.08);padding-bottom:env(safe-area-inset-bottom)}
+    .tab{flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 0 8px;text-decoration:none;color:var(--muted);font-size:11px;transition:color .2s}
+    .tab .ico{position:relative;display:inline-flex;align-items:center;justify-content:center;font-size:23px;line-height:1}
+    .tab .txt{white-space:nowrap}
+    .tab.active{color:var(--brand)}
+    .tab:active{transform:scale(.96)}
+    .badge{position:absolute;top:-6px;right:-15px;min-width:16px;height:16px;padding:0 5px;border-radius:9px;background:var(--red);color:#fff;font-size:10px;line-height:16px;text-align:center;font-weight:700;box-sizing:border-box;border:2px solid #fff}
+    .badge.dot{min-width:9px;width:9px;height:9px;padding:0;border-radius:50%;right:-3px;top:-3px}
+
+    footer{text-align:center;color:#9aa4b8;font-size:12px;padding:20px 16px 44px}
+    @media (max-width:430px){.phone{min-height:100vh;box-shadow:none}.toolbar{padding:10px}}
+  </style>
+</head>
+<body>
+  <div class="toolbar">
+    <span>导航自适应宽度：</span>
+    <button type="button" data-w="320px">320px</button>
+    <button type="button" data-w="390px" class="on">390px</button>
+    <button type="button" data-w="430px">430px</button>
+  </div>
+
+  <main class="phone">
+    <header class="app-header">
+      <a class="back" href="index.html">← 返回首页</a>
+      <h1>课堂演示</h1>
+    </header>
+
+    <div class="content">
+      <section class="banner">
+        <h2>下午好，刘晗 👋</h2>
+        <p>这是使用 iconfont 字体图标实现的移动端底部导航</p>
+      </section>
+
+      <div class="sec-title">功能入口</div>
+      <div class="grid">
+        <div class="entry"><span class="e-ico"><i class="iconfont icon-faxian"></i></span>发现</div>
+        <div class="entry"><span class="e-ico"><i class="iconfont icon-tongzhi"></i></span>通知</div>
+        <div class="entry"><span class="e-ico"><i class="iconfont icon-bofang"></i></span>播放</div>
+        <div class="entry"><span class="e-ico"><i class="iconfont icon-sousuo"></i></span>搜索</div>
+      </div>
+
+      <div class="sec-title">最近消息</div>
+      <div class="msg">
+        <div class="avatar"></div>
+        <div class="m-body">
+          <div class="m-title">网页设计课程群</div>
+          <div class="m-sub">今晚 19:00 线上答疑，记得准时参加～</div>
+        </div>
+        <div class="m-time">10:24</div>
+      </div>
+      <div class="msg">
+        <div class="avatar two"></div>
+        <div class="m-body">
+          <div class="m-title">系统通知</div>
+          <div class="m-sub">你提交的 13-1.html 作业已通过审核</div>
+        </div>
+        <div class="m-time">昨天</div>
+      </div>
+      <div class="msg">
+        <div class="avatar"></div>
+        <div class="m-body">
+          <div class="m-title">前端学习资料</div>
+          <div class="m-sub">Flex 布局与 Grid 布局完整笔记.pdf</div>
+        </div>
+        <div class="m-time">周一</div>
+      </div>
+    </div>
+  </main>
+
+  <nav class="tabbar" aria-label="底部导航">
+    <a class="tab active" href="#">
+      <span class="ico"><i class="iconfont icon-shouye"></i></span>
+      <span class="txt">首页</span>
+    </a>
+    <a class="tab" href="#">
+      <span class="ico"><i class="iconfont icon-faxian"></i><span class="badge dot" title="有新内容"></span></span>
+      <span class="txt">发现</span>
+    </a>
+    <a class="tab" href="#">
+      <span class="ico"><i class="iconfont icon-tongzhi"></i><span class="badge num">5</span></span>
+      <span class="txt">通知</span>
+    </a>
+    <a class="tab" href="#">
+      <span class="ico"><i class="iconfont icon-my"></i><span class="badge num">99+</span></span>
+      <span class="txt">我的</span>
+    </a>
+  </nav>
+
+  <footer>© 本页为课堂实践 — 刘晗的《高级网页设计》 ｜ 字体图标：font/iconfont.css</footer>
+
+  <script>
+    var btns = document.querySelectorAll('.toolbar button');
+    btns.forEach(function (b) {
+      b.addEventListener('click', function () {
+        btns.forEach(function (x) { x.classList.remove('on'); });
+        b.classList.add('on');
+        document.documentElement.style.setProperty('--w', b.dataset.w);
+      });
+    });
+    document.querySelectorAll('.tab').forEach(function (t) {
+      t.addEventListener('click', function (e) {
+        e.preventDefault();
+        document.querySelectorAll('.tab').forEach(function (x) { x.classList.remove('active'); });
+        t.classList.add('active');
+      });
+    });
+  </script>
+</body>
+</html>
