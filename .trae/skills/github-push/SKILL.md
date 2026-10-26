@@ -51,7 +51,7 @@ git commit -m "<message>"
 ### 5. Push
 
 ```powershell
-git push -u github main
+git -c http.sslBackend=schannel push -u github main
 ```
 
 If the push fails because the remote has different history, use `git push -u github main --force` only after confirming with the user.
@@ -59,6 +59,7 @@ If the push fails because the remote has different history, use `git push -u git
 ## Notes
 
 - Repository URL: `https://github.com/liuhan-d/lh.git`
+- This machine's OpenSSL backend fails TLS verification for github.com ("unable to get local issuer certificate") — always push/ls-remote with `-c http.sslBackend=schannel` (uses the Windows certificate store); if `git` is not on PATH, use the full path `& "C:\Program Files\Git\cmd\git.exe"`
 - Remote name: `github`
 - Branch: `main`
 - The project contains HTML/CSS exercise pages for 高级网页设计 coursework

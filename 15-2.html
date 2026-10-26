@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<!-- 姓名：刘晗，建立时间：2026-10-26，使用的大模型：GLM-5.3-Flash，功能名称：JavaScript 程序结构（循环与条件） -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>15-2 JavaScript 程序结构：循环与条件</title>
+    <style>
+        :root{
+            --lh-bg1:#071428; --lh-bg2:#081726;
+            --lh-accent:#7ee3c7; --lh-accent2:#84a0ff;
+            --lh-text:#eaf6ff; --lh-muted:#9fb0c8;
+            --lh-line:rgba(255,255,255,0.09);
+        }
+        *{box-sizing:border-box}
+        body{
+            margin:0; padding:40px 16px 56px;
+            font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Microsoft YaHei",Arial;
+            color:var(--lh-text); line-height:1.6;
+            background:radial-gradient(1000px 500px at 8% 0%, rgba(124,58,237,0.10), transparent 60%),
+                       radial-gradient(900px 500px at 95% 100%, rgba(14,165,164,0.08), transparent 60%),
+                       linear-gradient(180deg, var(--lh-bg1) 0%, var(--lh-bg2) 100%);
+            min-height:100vh;
+        }
+        .lh_wrap{max-width:900px; margin:0 auto}
+
+        .lh_header{display:flex; align-items:center; gap:16px; margin-bottom:10px}
+        .lh_logo{
+            width:56px; height:56px; border-radius:14px; flex:none;
+            background:linear-gradient(135deg, var(--lh-accent), var(--lh-accent2));
+            display:flex; align-items:center; justify-content:center;
+            font-weight:800; font-size:20px; color:#06202a;
+            box-shadow:0 6px 20px rgba(2,6,23,0.6);
+        }
+        .lh_header h1{margin:0; font-size:24px}
+        .lh_sub{margin:2px 0 0; font-size:13px; color:var(--lh-muted)}
+
+        .lh_h3{
+            margin:30px 0 12px; font-size:15px;
+            border-left:3px solid var(--lh-accent); padding-left:10px;
+        }
+        .lh_card{
+            background:rgba(255,255,255,0.04); border:1px solid var(--lh-line);
+            border-radius:14px; padding:16px;
+            transition:border-color .2s, box-shadow .2s;
+        }
+        .lh_card:hover{border-color:rgba(126,227,199,0.4); box-shadow:0 12px 30px rgba(2,6,23,0.55)}
+        .lh_pre{
+            margin:0 0 12px; padding:12px 14px; border-radius:10px; overflow-x:auto;
+            background:rgba(0,0,0,0.35); border:1px solid var(--lh-line);
+            font-family:Consolas,Monaco,monospace; font-size:13px; color:#cfe8ff; line-height:1.55;
+        }
+        .lh_result{
+            margin-top:10px; padding:10px 14px; border-radius:10px;
+            background:rgba(126,227,199,0.08); border:1px solid rgba(126,227,199,0.3);
+            font-size:14px;
+        }
+        .lh_result b{color:var(--lh-accent)}
+        .lh_desc{margin:6px 0; font-size:13px; color:var(--lh-muted)}
+        .lh_btn{
+            margin-top:8px; padding:9px 20px; border:none; border-radius:999px; cursor:pointer;
+            font-size:13px; font-weight:700; color:#06202a;
+            background:linear-gradient(135deg, var(--lh-accent), var(--lh-accent2));
+            box-shadow:0 6px 16px rgba(46,140,160,0.35);
+            transition:transform .18s, box-shadow .18s;
+        }
+        .lh_btn:hover{transform:translateY(-2px); box-shadow:0 10px 22px rgba(46,140,160,0.5)}
+
+        /* 九九乘法表 */
+        .lh_mul_row{display:flex; gap:6px; margin-bottom:6px}
+        .lh_mul_cell{
+            flex:0 0 calc(100%/9 - 6px);
+            padding:5px 2px; border-radius:8px; text-align:center;
+            background:rgba(255,255,255,0.05); border:1px solid var(--lh-line);
+            font-family:Consolas,Monaco,monospace; font-size:12px; color:#cfe8ff;
+            white-space:nowrap;
+        }
+        .lh_mul_cell:nth-child(3n){color:var(--lh-accent)}
+        .lh_footer{margin-top:26px; font-size:12px; color:var(--lh-muted); opacity:.75}
+    </style>
+</head>
+<body>
+    <div class="lh_wrap">
+        <header class="lh_header">
+            <div class="lh_logo">JS</div>
+            <div>
+                <h1>JavaScript 程序结构：循环与条件</h1>
+                <p class="lh_sub">刘晗的《高级网页设计》课堂实践 · if/else、switch、for、while 与九九乘法表</p>
+            </div>
+        </header>
+
+        <div class="lh_h3">一、条件语句 if / else if / else（成绩评等级）</div>
+        <div class="lh_card">
+            <pre class="lh_pre">if (lh_score &gt;= 90){
+    lh_grade = "优秀";
+} else if (lh_score &gt;= 80){
+    lh_grade = "良好";
+} else if (lh_score &gt;= 60){
+    lh_grade = "及格";
+} else {
+    lh_grade = "不及格";
+}</pre>
+            <p class="lh_desc">从上往下依次判断条件，命中一个分支后其余分支不再执行：</p>
+            <button class="lh_btn" onclick="lh_ifDemo()">输入成绩，测试 if / else 分支</button>
+            <div class="lh_result" id="lh_if_out">点击按钮，输入一个成绩（0~100）试试。</div>
+        </div>
+
+        <div class="lh_h3">二、条件语句 switch（匹配星期几）</div>
+        <div class="lh_card">
+            <pre class="lh_pre">switch (lh_day){
+    case 1: lh_name = "星期一"; break;
+    case 2: lh_name = "星期二"; break;
+    case 3: lh_name = "星期三"; break;
+    ...
+    default: lh_name = "输入有误";
+}</pre>
+            <div class="lh_result" id="lh_switch_out"></div>
+        </div>
+
+        <div class="lh_h3">三、循环语句 for（1~100 累加求和）</div>
+        <div class="lh_card">
+            <pre class="lh_pre">var lh_sum = 0;
+for (var lh_i = 1; lh_i &lt;= 100; lh_i++){
+    lh_sum = lh_sum + lh_i;   // 循环体执行 100 次
+}</pre>
+            <div class="lh_result" id="lh_for_out"></div>
+        </div>
+
+        <div class="lh_h3">四、循环语句 while（求 5 的阶乘）</div>
+        <div class="lh_card">
+            <pre class="lh_pre">var lh_n = 5, lh_fact = 1;
+while (lh_n &gt; 0){          // 条件为 true 就一直循环
+    lh_fact = lh_fact * lh_n;
+    lh_n--;                // 别忘了改变条件，避免死循环
+}</pre>
+            <div class="lh_result" id="lh_while_out"></div>
+        </div>
+
+        <div class="lh_h3">五、综合运用：双重 for 循环（九九乘法表）</div>
+        <div class="lh_card">
+            <pre class="lh_pre">for (var lh_i = 1; lh_i &lt;= 9; lh_i++){        // 外层循环：控制行
+    for (var lh_j = 1; lh_j &lt;= lh_i; lh_j++){ // 内层循环：控制列
+        // 每行生成 lh_j × lh_i = 积
+    }
+}</pre>
+            <div id="lh_mul_out"></div>
+        </div>
+
+        <p class="lh_footer">练习 15-2 · 原生 HTML/CSS/JS，无任何框架与外部依赖</p>
+    </div>
+
+    <script>
+        // ===== 一、if / else if / else：成绩评等级 =====
+        function lh_ifDemo(){
+            var lh_input = prompt("请输入成绩（0~100）：");
+            if (lh_input === null){ return; }   // 用户点了取消
+            var lh_score = Number(lh_input);
+            var lh_grade;
+            if (lh_score >= 90){
+                lh_grade = "优秀";
+            } else if (lh_score >= 80){
+                lh_grade = "良好";
+            } else if (lh_score >= 60){
+                lh_grade = "及格";
+            } else {
+                lh_grade = "不及格";
+            }
+            document.getElementById("lh_if_out").innerHTML =
+                "成绩 <b>" + lh_score + "</b> 分，判断结果：<b>" + lh_grade + "</b>";
+        }
+
+        // ===== 二、switch：匹配星期几 =====
+        var lh_day = 3;
+        var lh_name;
+        switch (lh_day){
+            case 1: lh_name = "星期一"; break;
+            case 2: lh_name = "星期二"; break;
+            case 3: lh_name = "星期三"; break;
+            case 4: lh_name = "星期四"; break;
+            case 5: lh_name = "星期五"; break;
+            case 6: lh_name = "星期六"; break;
+            case 7: lh_name = "星期日"; break;
+            default: lh_name = "输入有误";
+        }
+        document.getElementById("lh_switch_out").innerHTML =
+            "lh_day = <b>" + lh_day + "</b>，switch 匹配结果：<b>" + lh_name + "</b>（每个 case 结束要写 break，否则会继续往下穿透执行）";
+
+        // ===== 三、for 循环：1~100 累加求和 =====
+        var lh_sum = 0;
+        for (var lh_i = 1; lh_i <= 100; lh_i++){
+            lh_sum = lh_sum + lh_i;
+        }
+        document.getElementById("lh_for_out").innerHTML =
+            "1 + 2 + 3 + … + 100 = <b>" + lh_sum + "</b>（循环体执行了 100 次）";
+
+        // ===== 四、while 循环：5 的阶乘 =====
+        var lh_n = 5, lh_fact = 1;
+        while (lh_n > 0){
+            lh_fact = lh_fact * lh_n;
+            lh_n--;
+        }
+        document.getElementById("lh_while_out").innerHTML =
+            "5! = 1 × 2 × 3 × 4 × 5 = <b>" + lh_fact + "</b>";
+
+        // ===== 五、双重 for 循环：九九乘法表 =====
+        var lh_mul = document.getElementById("lh_mul_out");
+        for (var lh_r = 1; lh_r <= 9; lh_r++){
+            var lh_row = document.createElement("div");
+            lh_row.className = "lh_mul_row";
+            for (var lh_c = 1; lh_c <= lh_r; lh_c++){
+                var lh_cell = document.createElement("div");
+                lh_cell.className = "lh_mul_cell";
+                lh_cell.innerHTML = lh_c + "×" + lh_r + "=" + (lh_c * lh_r);
+                lh_row.appendChild(lh_cell);
+            }
+            lh_mul.appendChild(lh_row);
+        }
+    </script>
+</body>
+</html>
