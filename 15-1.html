@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<!-- 姓名：刘晗，日期：2026-10-26，功能名称：数七游戏（逢七过） -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>15-1 数七游戏 · 逢七过</title>
+    <style>
+        :root{
+            --lh-bg1:#071428; --lh-bg2:#081726;
+            --lh-accent:#7ee3c7; --lh-accent2:#84a0ff;
+            --lh-text:#eaf6ff; --lh-muted:#9fb0c8;
+            --lh-line:rgba(255,255,255,0.09);
+        }
+        *{box-sizing:border-box}
+        body{
+            margin:0; padding:40px 16px 56px;
+            font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Microsoft YaHei",Arial;
+            color:var(--lh-text); line-height:1.6;
+            background:radial-gradient(1000px 500px at 8% 0%, rgba(124,58,237,0.10), transparent 60%),
+                       radial-gradient(900px 500px at 95% 100%, rgba(14,165,164,0.08), transparent 60%),
+                       linear-gradient(180deg, var(--lh-bg1) 0%, var(--lh-bg2) 100%);
+            min-height:100vh;
+        }
+        .lh_wrap{max-width:960px; margin:0 auto}
+
+        /* 头部 */
+        .lh_header{display:flex; align-items:center; gap:16px; margin-bottom:24px}
+        .lh_logo{
+            width:56px; height:56px; border-radius:14px; flex:none;
+            background:linear-gradient(135deg, var(--lh-accent), var(--lh-accent2));
+            display:flex; align-items:center; justify-content:center;
+            font-weight:800; font-size:24px; color:#06202a;
+            box-shadow:0 6px 20px rgba(2,6,23,0.6);
+        }
+        .lh_header h1{margin:0; font-size:24px}
+        .lh_sub{margin:2px 0 0; font-size:13px; color:var(--lh-muted)}
+
+        /* 图例与统计 */
+        .lh_bar{
+            display:flex; flex-wrap:wrap; align-items:center; gap:14px;
+            margin-bottom:18px; font-size:13px; color:var(--lh-muted);
+        }
+        .lh_key{display:inline-flex; align-items:center; gap:7px}
+        .lh_dot{
+            width:16px; height:16px; border-radius:5px; flex:none;
+            border:1px solid var(--lh-line); background:rgba(255,255,255,0.05);
+            font-size:10px; line-height:14px; text-align:center; color:var(--lh-accent);
+        }
+        .lh_dot_pass{border:1.5px dashed rgba(255,122,147,0.55); background:rgba(255,122,147,0.08)}
+        .lh_stat{margin-left:auto; color:var(--lh-text); font-weight:700}
+        .lh_stat b{color:var(--lh-accent); font-size:16px}
+
+        /* 100 个盒子 */
+        .lh_grid{
+            display:grid; grid-template-columns:repeat(auto-fill, minmax(72px, 1fr)); gap:10px;
+        }
+        .lh_box{
+            aspect-ratio:1/1; border-radius:12px;
+            display:flex; align-items:center; justify-content:center;
+            background:rgba(255,255,255,0.05); border:1px solid var(--lh-line);
+            font-family:Consolas,Monaco,monospace; font-size:17px; font-weight:700; color:#cfe8ff;
+            transition:transform .18s, box-shadow .18s, border-color .18s;
+        }
+        .lh_box:hover{
+            transform:translateY(-4px); border-color:rgba(126,227,199,0.45);
+            box-shadow:0 12px 26px rgba(2,6,23,0.6);
+        }
+        /* 逢七要"过"的空盒子 */
+        .lh_box_pass{
+            background:rgba(255,122,147,0.07);
+            border:1.5px dashed rgba(255,122,147,0.5);
+            cursor:default;
+        }
+        .lh_box_pass:hover{border-color:rgba(255,122,147,0.85)}
+
+        .lh_note{margin:22px 0 0; font-size:13px; color:var(--lh-muted)}
+        .lh_note code{
+            font-family:Consolas,Monaco,monospace; font-size:12px; color:#cfe8ff;
+            background:rgba(255,255,255,0.06); border:1px solid var(--lh-line);
+            padding:1px 7px; border-radius:6px;
+        }
+    </style>
+</head>
+<body>
+    <div class="lh_wrap">
+        <header class="lh_header">
+            <div class="lh_logo">7</div>
+            <div>
+                <h1>数七游戏 · 逢七过</h1>
+                <p class="lh_sub">刘晗的《高级网页设计》课堂实践 · 1~100 个盒子演示</p>
+            </div>
+        </header>
+
+        <div class="lh_bar">
+            <span class="lh_key"><span class="lh_dot">1</span>普通数字：显示数字</span>
+            <span class="lh_key"><span class="lh_dot lh_dot_pass"></span>逢七过：显示空盒子</span>
+            <span class="lh_stat" id="lh_stat">需要过的盒子：<b>…</b></span>
+        </div>
+
+        <div class="lh_grid" id="lh_grid"></div>
+
+        <p class="lh_note">数七规则：遇到 <code>7 的倍数</code>、<code>个位是 7</code>、<code>十位是 7</code> 的数字要喊"过"（拍手），所以盒子里不显示数字，只留空盒子。</p>
+    </div>
+
+    <script>
+        // 数七规则：7 的倍数、个位是 7、十位是 7，都要"过"
+        function lh_isSeven(lh_n){
+            return (lh_n % 7 === 0) || (lh_n % 10 === 7) || (parseInt(lh_n / 10, 10) === 7);
+        }
+
+        var lh_grid = document.getElementById("lh_grid");
+        var lh_count = 0;   // 统计需要"过"的盒子个数
+
+        // 生成 100 个盒子
+        for (var lh_i = 1; lh_i <= 100; lh_i++){
+            var lh_box = document.createElement("div");
+            if (lh_isSeven(lh_i)){
+                // 满足数七规则：显示空盒子
+                lh_box.className = "lh_box lh_box_pass";
+                lh_count++;
+            } else {
+                // 不满足要求：显示数字
+                lh_box.className = "lh_box";
+                lh_box.innerHTML = lh_i;
+            }
+            lh_grid.appendChild(lh_box);
+        }
+
+        // 显示统计结果
+        document.getElementById("lh_stat").innerHTML = "需要过的盒子：<b>" + lh_count + "</b> 个";
+    </script>
+</body>
+</html>

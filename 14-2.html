@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<!-- 姓名：刘晗，日期：2026-10-22，功能名称：JavaScript 六种基本数据类型 -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>14-2 JavaScript 六种基本数据类型</title>
+    <style>
+        :root{
+            --lh-bg:#faf3e3; --lh-ink:#141414;
+            --lh-yellow:#ffd23f; --lh-blue:#7eb6ff; --lh-orange:#ff9f43;
+            --lh-pink:#ff7a93; --lh-purple:#c792ff; --lh-green:#7ee3c7;
+        }
+        *{box-sizing:border-box}
+        body{
+            margin:0; padding:40px 16px 56px;
+            font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Microsoft YaHei",Arial;
+            color:var(--lh-ink); line-height:1.6; font-weight:500;
+            background-color:var(--lh-bg);
+            background-image:radial-gradient(#e8dcc0 1.4px, transparent 1.4px);
+            background-size:24px 24px;
+            min-height:100vh;
+        }
+        .lh_wrap{max-width:1000px; margin:0 auto}
+
+        /* 头部 */
+        .lh_header{display:flex; align-items:center; gap:18px; margin-bottom:8px}
+        .lh_logo{
+            width:58px; height:58px; border-radius:14px; flex:none;
+            background:var(--lh-yellow); border:3px solid var(--lh-ink);
+            box-shadow:5px 5px 0 var(--lh-ink);
+            display:flex; align-items:center; justify-content:center;
+            font-weight:800; font-size:20px; color:var(--lh-ink);
+        }
+        .lh_header h1{margin:0; font-size:26px; font-weight:800; letter-spacing:1px}
+        .lh_sub{margin:2px 0 0; font-size:13px; color:#666; font-weight:600}
+
+        /* 区块标题：黑色标签牌 */
+        .lh_h3{
+            display:inline-block; margin:36px 0 16px; padding:5px 16px;
+            font-size:15px; font-weight:800; color:var(--lh-bg);
+            background:var(--lh-ink); border-radius:9px; transform:rotate(-1deg);
+        }
+        .lh_h3 small{color:#c9c2ae; font-weight:600; margin-left:8px}
+
+        /* 卡片网格 */
+        .lh_grid{display:grid; grid-template-columns:repeat(auto-fit, minmax(272px, 1fr)); gap:18px}
+        .lh_card{
+            background:#fff; border:3px solid var(--lh-ink); border-radius:14px;
+            padding:16px; box-shadow:7px 7px 0 var(--lh-ink);
+            transition:transform .18s, box-shadow .18s;
+        }
+        .lh_card:hover{transform:translate(-3px, -3px); box-shadow:11px 11px 0 var(--lh-ink)}
+        .lh_head{display:flex; align-items:center; gap:12px; margin-bottom:12px}
+        .lh_idx{
+            width:32px; height:32px; border-radius:10px; flex:none;
+            border:3px solid var(--lh-ink); box-shadow:3px 3px 0 var(--lh-ink);
+            color:var(--lh-ink); font-weight:800; font-size:14px;
+            display:flex; align-items:center; justify-content:center;
+            background:var(--lh-yellow);
+        }
+        .lh_card:nth-child(1) .lh_idx{background:var(--lh-yellow)}
+        .lh_card:nth-child(2) .lh_idx{background:var(--lh-blue)}
+        .lh_card:nth-child(3) .lh_idx{background:var(--lh-orange)}
+        .lh_card:nth-child(4) .lh_idx{background:#e2e2e2}
+        .lh_card:nth-child(5) .lh_idx{background:var(--lh-pink)}
+        .lh_card:nth-child(6) .lh_idx{background:var(--lh-purple)}
+        .lh_en{font-size:17px; font-weight:800}
+        .lh_cn{font-size:12px; color:#666; font-weight:600}
+        .lh_row{
+            display:flex; justify-content:space-between; align-items:center; gap:10px;
+            margin:8px 0; padding-bottom:7px; border-bottom:2px dashed #e8dcc0;
+        }
+        .lh_label{font-size:12px; color:#666; font-weight:700; flex:none}
+        .lh_code{
+            background:var(--lh-bg); border:2px solid var(--lh-ink); border-radius:8px;
+            padding:2px 10px; box-shadow:2px 2px 0 var(--lh-ink);
+            font-family:Consolas,Monaco,monospace; font-size:13px; font-weight:700; color:var(--lh-ink);
+            max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+        }
+        .lh_chip{
+            display:inline-block; margin-top:12px; padding:4px 13px;
+            border:2.5px solid var(--lh-ink); border-radius:999px;
+            box-shadow:3px 3px 0 var(--lh-ink);
+            font-size:12px; font-weight:800; font-family:Consolas,Monaco,monospace;
+            background:#fff; color:var(--lh-ink);
+        }
+        .lh_c_str  {background:#b8f2d8}
+        .lh_c_num  {background:#cfe0ff}
+        .lh_c_bool {background:#ffe0b3}
+        .lh_c_undef{background:#e8e8e8}
+        .lh_c_null {background:#ffd3dc}
+        .lh_c_sym  {background:#e9d5ff}
+
+        /* typeof(null) 易错点提示 */
+        .lh_callout{
+            margin-top:18px; padding:13px 16px; border-radius:12px;
+            background:#ffe0b3; border:3px solid var(--lh-ink);
+            box-shadow:6px 6px 0 var(--lh-ink);
+            color:var(--lh-ink); font-size:14px; font-weight:600;
+        }
+        .lh_callout code{
+            font-family:Consolas,Monaco,monospace; font-size:13px; font-weight:700;
+            background:#fff; border:2px solid var(--lh-ink); border-radius:6px;
+            padding:1px 7px;
+        }
+
+        /* 底部说明与按钮 */
+        .lh_note{margin:16px 0 24px; font-size:13px; color:#666; font-weight:600}
+        .lh_btn{
+            padding:12px 28px; cursor:pointer;
+            border:3px solid var(--lh-ink); border-radius:999px;
+            font-size:14px; font-weight:800; color:var(--lh-ink);
+            background:var(--lh-yellow); box-shadow:5px 5px 0 var(--lh-ink);
+            transition:transform .15s, box-shadow .15s;
+        }
+        .lh_btn:hover{transform:translate(-2px, -2px); box-shadow:8px 8px 0 var(--lh-ink)}
+        .lh_btn:active{transform:translate(2px, 2px); box-shadow:2px 2px 0 var(--lh-ink)}
+        .lh_footer{margin-top:28px; font-size:12px; color:#999; font-weight:600}
+    </style>
+</head>
+<body>
+    <div class="lh_wrap">
+        <header class="lh_header">
+            <div class="lh_logo">JS</div>
+            <div>
+                <h1>JavaScript 六种基本数据类型</h1>
+                <p class="lh_sub">刘晗的《高级网页设计》课堂实践 · 用 typeof 逐一检测类型</p>
+            </div>
+        </header>
+
+        <script>
+            // ===== 六种基本（原始）数据类型 =====
+            var lh_str = "刘晗";              // 1. String 字符串：用引号括起来的文本
+            var lh_num = 2026;               // 2. Number 数值：整数和小数统一用 Number 表示
+            var lh_bool = true;              // 3. Boolean 布尔：只有 true 和 false 两个值
+            var lh_undef;                    // 4. Undefined 未定义：声明了变量但没有赋值
+            var lh_null = null;              // 5. Null 空：表示"空值"，需要主动赋值为 null
+            var lh_sym = Symbol("lh_id");    // 6. Symbol 符号：ES6 新增，表示独一无二的值
+
+            // ===== 引用（复杂）数据类型，用于对比 =====
+            var lh_obj = { name: "刘晗" };   // Object 对象
+            var lh_arr = [10, 20, 30];       // Array 数组
+
+            // 生成一张类型卡片的通用函数
+            function lh_card(no, en, cn, varName, valueText, chipClass, typeText){
+                var lh_html = "";
+                lh_html += "<div class='lh_card'>";
+                lh_html += "<div class='lh_head'><div class='lh_idx'>" + no + "</div><div><div class='lh_en'>" + en + "</div><div class='lh_cn'>" + cn + "</div></div></div>";
+                lh_html += "<div class='lh_row'><span class='lh_label'>变量</span><code class='lh_code'>" + varName + "</code></div>";
+                lh_html += "<div class='lh_row'><span class='lh_label'>示例值</span><code class='lh_code'>" + valueText + "</code></div>";
+                lh_html += "<span class='lh_chip " + chipClass + "'>typeof → " + typeText + "</span>";
+                lh_html += "</div>";
+                return lh_html;
+            }
+
+            // ===== 第一部分：六种基本数据类型 =====
+            document.write("<div class='lh_h3'>一、基本（原始）数据类型<small>六种</small></div>");
+            document.write("<div class='lh_grid'>");
+            document.write(lh_card(1, "String", "字符串 · 一段文本", "lh_str", "\"" + lh_str + "\"", "lh_c_str", typeof(lh_str)));
+            document.write(lh_card(2, "Number", "数值 · 整数与小数", "lh_num", lh_num, "lh_c_num", typeof(lh_num)));
+            document.write(lh_card(3, "Boolean", "布尔 · 真与假", "lh_bool", lh_bool, "lh_c_bool", typeof(lh_bool)));
+            document.write(lh_card(4, "Undefined", "未定义 · 声明未赋值", "lh_undef", lh_undef + "", "lh_c_undef", typeof(lh_undef)));
+            document.write(lh_card(5, "Null", "空值 · 主动置空", "lh_null", "null", "lh_c_null", typeof(lh_null)));
+            document.write(lh_card(6, "Symbol", "符号 · ES6 独一无二的值", "lh_sym", "Symbol(\"lh_id\")", "lh_c_sym", typeof(lh_sym)));
+            document.write("</div>");
+
+            document.write("<div class='lh_callout'>⚠ 易错点：<code>typeof(lh_null)</code> 的结果是 <code>\"object\"</code> — 这是 JavaScript 的历史遗留问题，但 null 并不是对象，它表示\"空值\"。</div>");
+
+            // ===== 第二部分：引用数据类型对比 =====
+            document.write("<div class='lh_h3'>二、引用（复杂）数据类型<small>对比参考</small></div>");
+            document.write("<div class='lh_grid'>");
+            document.write(lh_card("＋", "Object", "对象 · 键值对集合", "lh_obj", "{ name: \"刘晗\" }", "lh_c_num", typeof(lh_obj)));
+            document.write(lh_card("＋", "Array", "数组 · 有序的值列表", "lh_arr", "[10, 20, 30]", "lh_c_num", typeof(lh_arr)));
+            document.write("</div>");
+            document.write("<p class='lh_note'>数组 Array、函数 Function 都属于 Object 引用类型：基本类型存的是值本身，引用类型存的是地址。</p>");
+
+            // 点击按钮后触发，避免弹窗挡住页面：体验动态类型（同一个变量可以保存不同类型的值）
+            function lh_testType(){
+                var lh_input = prompt("请输入任意内容：");
+                alert("您输入的值是：" + lh_input + "\ntypeof 结果：" + typeof(lh_input));
+                var lh_converted = Number(lh_input);
+                alert("用 Number() 转换后：" + lh_converted + "\ntypeof 结果：" + typeof(lh_converted) + (isNaN(lh_converted) ? "（转换失败，Not a Number）" : "（转换成功）"));
+            }
+        </script>
+
+        <button class="lh_btn" onclick="lh_testType()">点我测试动态类型转换</button>
+
+        <p class="lh_footer">练习 14-2 · 原生 HTML/CSS/JS，无任何框架与外部依赖</p>
+    </div>
+</body>
+</html>
