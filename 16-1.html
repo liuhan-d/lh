@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<!-- 姓名：刘晗，建立时间：2026-10-29，使用的大模型：GLM-5.3，功能名称：JavaScript 数组主要方法的可视化演示（水果篮） -->
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>16-1 JavaScript 数组方法可视化 · 水果篮</title>
+<link rel="stylesheet" href="font/iconfont.css">
+<style>
+:root{
+    --lh-bg1:#071428; --lh-bg2:#081726;
+    --lh-accent:#7ee3c7; --lh-accent2:#84a0ff;
+    --lh-text:#eaf6ff; --lh-muted:#9fb0c8;
+    --lh-line:rgba(255,255,255,0.09);
+}
+*{box-sizing:border-box}
+body{
+    margin:0; padding:32px 16px 56px;
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Microsoft YaHei",Arial;
+    color:var(--lh-text); line-height:1.6;
+    background:radial-gradient(1000px 500px at 8% 0%, rgba(124,58,237,0.10), transparent 60%),
+               radial-gradient(900px 500px at 95% 100%, rgba(14,165,164,0.08), transparent 60%),
+               linear-gradient(180deg, var(--lh-bg1) 0%, var(--lh-bg2) 100%);
+    min-height:100vh;
+}
+.lh_wrap{max-width:960px; margin:0 auto}
+
+/* ---------- 头部 ---------- */
+.lh_header{display:flex; align-items:center; gap:16px; margin-bottom:8px}
+.lh_logo{
+    width:56px; height:56px; border-radius:14px; flex:none;
+    background:linear-gradient(135deg, var(--lh-accent), var(--lh-accent2));
+    display:flex; align-items:center; justify-content:center;
+    font-weight:800; font-size:18px; color:#06202a;
+    box-shadow:0 6px 20px rgba(2,6,23,0.6);
+}
+.lh_header h1{margin:0; font-size:23px}
+.lh_sub{margin:2px 0 0; font-size:13px; color:var(--lh-muted)}
+.lh_back{
+    margin-left:auto; flex:none; display:inline-flex; align-items:center; gap:6px;
+    padding:8px 16px; border-radius:999px; text-decoration:none;
+    color:var(--lh-accent); font-size:13px; font-weight:700;
+    border:1px solid rgba(126,227,199,0.35); background:rgba(126,227,199,0.08);
+    transition:transform .18s, box-shadow .18s;
+}
+.lh_back:hover{transform:translateY(-2px); box-shadow:0 8px 18px rgba(46,140,160,0.4)}
+.lh_back .iconfont{font-size:14px}
+
+/* ---------- 数组可视化区 ---------- */
+.lh_stage{
+    margin-top:20px; padding:22px 18px 16px; border-radius:16px;
+    background:rgba(255,255,255,0.04); border:1px solid var(--lh-line);
+}
+.lh_stage_title{display:flex; align-items:center; gap:10px; font-size:14px; margin-bottom:14px}
+.lh_stage_title .iconfont{color:var(--lh-accent)}
+.lh_len_tag{
+    margin-left:auto; font-family:Consolas,Monaco,monospace; font-size:13px;
+    color:var(--lh-accent); background:rgba(126,227,199,0.10);
+    border:1px solid rgba(126,227,199,0.3); border-radius:999px; padding:4px 12px;
+}
+.lh_array_box{
+    display:flex; flex-wrap:wrap; gap:12px; align-items:center; justify-content:center;
+    padding:18px 8px; border-radius:12px; min-height:130px;
+    background:rgba(0,0,0,0.25); border:1px dashed rgba(255,255,255,0.14);
+    position:relative;
+}
+.lh_array_box::before,.lh_array_box::after{
+    font-family:Consolas,Monaco,monospace; font-size:34px; color:var(--lh-muted);
+    font-weight:700; opacity:.55; align-self:center;
+}
+.lh_array_box::before{content:'['; margin-right:6px}
+.lh_array_box::after{content:']'; margin-left:6px}
+.lh_item{
+    position:relative; width:88px; padding:14px 6px 10px; border-radius:14px;
+    display:flex; flex-direction:column; align-items:center; gap:2px;
+    border:1px solid; text-align:center;
+    transition:transform .25s, box-shadow .25s;
+}
+.lh_item:hover{transform:translateY(-5px) rotate(-2deg); box-shadow:0 12px 26px rgba(2,6,23,0.6); z-index:2}
+.lh_item .iconfont{font-size:30px; line-height:1.2}
+.lh_item b{font-size:13px; color:var(--lh-text)}
+.lh_item em{font-style:normal; font-size:12px; font-family:Consolas,Monaco,monospace; opacity:.85}
+.lh_idx{
+    position:absolute; top:-9px; left:-7px; width:22px; height:22px; border-radius:50%;
+    background:var(--lh-accent); color:#06202a; font-size:11px; font-weight:800;
+    font-family:Consolas,Monaco,monospace; display:flex; align-items:center; justify-content:center;
+    box-shadow:0 3px 8px rgba(2,6,23,0.6);
+}
+.lh_empty{color:var(--lh-muted); font-size:13px; font-family:Consolas,Monaco,monospace}
+@keyframes lh_pop{
+    0%{transform:scale(0) rotate(-18deg); opacity:0}
+    70%{transform:scale(1.15) rotate(4deg)}
+    100%{transform:scale(1) rotate(0); opacity:1}
+}
+.lh_item.lh_new{animation:lh_pop .5s ease}
+@keyframes lh_fade{
+    0%{transform:scale(1)}
+    40%{transform:scale(1.12) rotate(8deg); filter:brightness(1.6)}
+    100%{transform:scale(0) rotate(30deg); opacity:0}
+}
+.lh_item.lh_out{animation:lh_fade .5s ease forwards}
+@keyframes lh_shake{
+    0%,100%{transform:translateX(0)}
+    25%{transform:translateX(-10px)}
+    75%{transform:translateX(10px)}
+}
+.lh_array_box.lh_shake{animation:lh_shake .35s ease 2}
+
+/* ---------- 方法按钮 ---------- */
+.lh_group{margin-top:26px}
+.lh_group h2{
+    font-size:15px; margin:0 0 12px; padding-left:10px;
+    border-left:3px solid var(--lh-accent);
+}
+.lh_group h2 small{color:var(--lh-muted); font-weight:400; font-size:12px; margin-left:8px}
+.lh_methods{display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:12px}
+.lh_mcard{
+    cursor:pointer; border-radius:12px; padding:12px 14px;
+    background:rgba(255,255,255,0.04); border:1px solid var(--lh-line);
+    transition:transform .2s, border-color .2s, box-shadow .2s;
+}
+.lh_mcard:hover{transform:translateY(-4px); border-color:rgba(126,227,199,0.45); box-shadow:0 12px 26px rgba(2,6,23,0.55)}
+.lh_mcard:active{transform:translateY(-1px)}
+.lh_mname{
+    font-family:Consolas,Monaco,monospace; font-size:15px; font-weight:700; color:var(--lh-accent);
+}
+.lh_mdesc{font-size:12px; color:var(--lh-muted); margin-top:4px}
+.lh_mtag{
+    display:inline-block; margin-top:8px; padding:2px 10px; border-radius:999px; font-size:11px;
+}
+.lh_mtag.mut{background:rgba(255,138,138,0.12); color:#ff9c9c; border:1px solid rgba(255,138,138,0.35)}
+.lh_mtag.safe{background:rgba(126,227,199,0.10); color:var(--lh-accent); border:1px solid rgba(126,227,199,0.35)}
+
+/* ---------- 控制台 ---------- */
+.lh_console_wrap{margin-top:26px}
+.lh_console_wrap h2{
+    font-size:15px; margin:0 0 12px; padding-left:10px;
+    border-left:3px solid var(--lh-accent2);
+}
+.lh_console_head{display:flex; gap:10px; align-items:center; margin-bottom:10px}
+.lh_btn{
+    padding:9px 22px; border:none; border-radius:999px; cursor:pointer;
+    font-size:13px; font-weight:700; color:#06202a;
+    background:linear-gradient(135deg, var(--lh-accent), var(--lh-accent2));
+    box-shadow:0 6px 16px rgba(46,140,160,0.35);
+    transition:transform .18s, box-shadow .18s;
+}
+.lh_btn:hover{transform:translateY(-2px); box-shadow:0 10px 22px rgba(46,140,160,0.5)}
+.lh_console{
+    height:300px; overflow-y:auto; border-radius:12px; padding:12px 14px;
+    background:rgba(0,0,0,0.38); border:1px solid var(--lh-line);
+    font-family:Consolas,Monaco,monospace; font-size:13px;
+}
+.lh_log{padding:10px 12px; border-radius:10px; border:1px solid var(--lh-line); background:rgba(255,255,255,0.03); margin-bottom:10px; animation:lh_pop .35s ease}
+.lh_code{color:#cfe8ff; font-size:13.5px}
+.lh_code::before{content:'> '; color:var(--lh-accent2)}
+.lh_ret{margin-top:6px; color:var(--lh-accent); font-size:13px; line-height:1.8}
+.lh_note{margin-top:6px; color:var(--lh-muted); font-size:12px; font-family:inherit}
+.lh_hint{color:var(--lh-muted); font-size:12px; text-align:center; padding:30px 0}
+.lh_chipbox{display:inline-flex; flex-wrap:wrap; gap:6px; vertical-align:middle}
+.lh_chip{
+    display:inline-block; padding:2px 10px; border-radius:999px; border:1px solid;
+    font-size:12px; font-family:inherit;
+}
+.lh_chip.lh_num{color:#ffd166; border-color:rgba(255,209,102,0.45)}
+
+.lh_footer{margin-top:26px; font-size:12px; color:var(--lh-muted); opacity:.75; text-align:center}
+@media (max-width:560px){
+    body{padding:20px 10px 40px}
+    .lh_header h1{font-size:18px}
+    .lh_array_box::before,.lh_array_box::after{font-size:24px}
+}
+</style>
+</head>
+<body>
+<div class="lh_wrap">
+
+    <header class="lh_header">
+        <div class="lh_logo">16-1</div>
+        <div>
+            <h1>JavaScript 数组方法可视化</h1>
+            <p class="lh_sub">把数组想象成一个「水果篮」，点下面的方法卡片，看看篮子怎么变</p>
+        </div>
+        <a class="lh_back" href="index.html"><i class="iconfont">&#xe600;</i>返回首页</a>
+    </header>
+
+    <!-- 数组舞台 -->
+    <section class="lh_stage">
+        <div class="lh_stage_title">
+            <i class="iconfont">&#xe631;</i>
+            <span>当前数组 <code style="color:var(--lh-accent)">lh_arr</code>（每格下标从 0 开始）</span>
+            <span class="lh_len_tag" id="lh_len"></span>
+        </div>
+        <div class="lh_array_box" id="lh_array"></div>
+    </section>
+
+    <!-- 方法分组 -->
+    <section class="lh_group">
+        <h2>① 添加与删除 <small>会改变原数组</small></h2>
+        <div class="lh_methods">
+            <div class="lh_mcard" data-act="push">
+                <div class="lh_mname">push()</div>
+                <div class="lh_mdesc">往篮子末尾放进一个水果</div>
+                <span class="lh_mtag mut">改变原数组</span>
+            </div>
+            <div class="lh_mcard" data-act="pop">
+                <div class="lh_mname">pop()</div>
+                <div class="lh_mdesc">从篮子末尾拿走一个水果</div>
+                <span class="lh_mtag mut">改变原数组</span>
+            </div>
+            <div class="lh_mcard" data-act="shift">
+                <div class="lh_mname">shift()</div>
+                <div class="lh_mdesc">从篮子开头拿走一个水果</div>
+                <span class="lh_mtag mut">改变原数组</span>
+            </div>
+            <div class="lh_mcard" data-act="unshift">
+                <div class="lh_mname">unshift()</div>
+                <div class="lh_mdesc">往篮子开头塞进一个水果</div>
+                <span class="lh_mtag mut">改变原数组</span>
+            </div>
+            <div class="lh_mcard" data-act="splice">
+                <div class="lh_mname">splice()</div>
+                <div class="lh_mdesc">在中间换一个水果（万能增删改）</div>
+                <span class="lh_mtag mut">改变原数组</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="lh_group">
+        <h2>② 排序与翻转 <small>会改变原数组</small></h2>
+        <div class="lh_methods">
+            <div class="lh_mcard" data-act="reverse">
+                <div class="lh_mname">reverse()</div>
+                <div class="lh_mdesc">把整个篮子倒过来</div>
+                <span class="lh_mtag mut">改变原数组</span>
+            </div>
+            <div class="lh_mcard" data-act="sort">
+                <div class="lh_mname">sort()</div>
+                <div class="lh_mdesc">按价格从便宜到贵排队</div>
+                <span class="lh_mtag mut">改变原数组</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="lh_group">
+        <h2>③ 截取、拼接与连接 <small>不改变原数组</small></h2>
+        <div class="lh_methods">
+            <div class="lh_mcard" data-act="slice">
+                <div class="lh_mname">slice(1, 3)</div>
+                <div class="lh_mdesc">从下标 1 挖出一段（不含 3）</div>
+                <span class="lh_mtag safe">返回新数组</span>
+            </div>
+            <div class="lh_mcard" data-act="concat">
+                <div class="lh_mname">concat()</div>
+                <div class="lh_mdesc">把另一个篮子接在后面</div>
+                <span class="lh_mtag safe">返回新数组</span>
+            </div>
+            <div class="lh_mcard" data-act="join">
+                <div class="lh_mname">join()</div>
+                <div class="lh_mdesc">把所有名字串成一句话</div>
+                <span class="lh_mtag safe">返回字符串</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="lh_group">
+        <h2>④ 查找与判断 <small>不改变原数组</small></h2>
+        <div class="lh_methods">
+            <div class="lh_mcard" data-act="indexOf">
+                <div class="lh_mname">indexOf()</div>
+                <div class="lh_mdesc">这个水果在篮子第几格？</div>
+                <span class="lh_mtag safe">返回下标</span>
+            </div>
+            <div class="lh_mcard" data-act="includes">
+                <div class="lh_mname">includes()</div>
+                <div class="lh_mdesc">篮子里有没有这个水果？</div>
+                <span class="lh_mtag safe">返回布尔值</span>
+            </div>
+            <div class="lh_mcard" data-act="find">
+                <div class="lh_mname">find()</div>
+                <div class="lh_mdesc">找到第一个贵过 10 元的水果</div>
+                <span class="lh_mtag safe">返回首个元素</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="lh_group">
+        <h2>⑤ 遍历、转换与归并 <small>不改变原数组</small></h2>
+        <div class="lh_methods">
+            <div class="lh_mcard" data-act="forEach">
+                <div class="lh_mname">forEach()</div>
+                <div class="lh_mdesc">从头到尾逐个摸一遍水果</div>
+                <span class="lh_mtag safe">仅遍历</span>
+            </div>
+            <div class="lh_mcard" data-act="map">
+                <div class="lh_mname">map()</div>
+                <div class="lh_mdesc">每个水果价格翻倍，得到新数组</div>
+                <span class="lh_mtag safe">返回新数组</span>
+            </div>
+            <div class="lh_mcard" data-act="filter">
+                <div class="lh_mname">filter()</div>
+                <div class="lh_mdesc">筛选出所有贵过 10 元的水果</div>
+                <span class="lh_mtag safe">返回新数组</span>
+            </div>
+            <div class="lh_mcard" data-act="reduce">
+                <div class="lh_mname">reduce()</div>
+                <div class="lh_mdesc">把所有价格加起来结账</div>
+                <span class="lh_mtag safe">返回累计值</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- 控制台 -->
+    <section class="lh_console_wrap">
+        <h2>控制台输出</h2>
+        <div class="lh_console_head">
+            <button class="lh_btn" id="lh_reset">重置篮子</button>
+            <button class="lh_btn" id="lh_clear" style="background:transparent;color:var(--lh-muted);border:1px solid var(--lh-line);box-shadow:none">清空输出</button>
+        </div>
+        <div class="lh_console" id="lh_console">
+            <div class="lh_hint">点击上方任意方法卡片，执行结果会打印在这里…</div>
+        </div>
+    </section>
+
+    <footer class="lh_footer">© 刘晗的《高级网页设计》课堂实践 · 16-1 JavaScript 数组方法</footer>
+</div>
+
+<script>
+(function(){
+    /* ---------- 水果素材库（iconfont 图标） ---------- */
+    const lh_pool = [
+        { name:'苹果',   icon:'&#xe699;', color:'#ff8b8b', price:8 },
+        { name:'香蕉',   icon:'&#xe920;', color:'#ffd166', price:3 },
+        { name:'牛油果', icon:'&#xe922;', color:'#7ee3c7', price:15 },
+        { name:'樱桃',   icon:'&#xe927;', color:'#f38bc0', price:20 },
+        { name:'山竹',   icon:'&#xe92d;', color:'#8fa8ff', price:12 }
+    ];
+    let lh_cursor = 3; // 随机取水果时从池子循环取
+
+    const lh_arr = [
+        Object.assign({}, lh_pool[0]),
+        Object.assign({}, lh_pool[1]),
+        Object.assign({}, lh_pool[2])
+    ];
+
+    const lh_arrayBox = document.getElementById('lh_array');
+    const lh_lenTag   = document.getElementById('lh_len');
+    const lh_console  = document.getElementById('lh_console');
+
+    /* ---------- 工具函数 ---------- */
+    function lh_nextFruit(){
+        const f = lh_pool[lh_cursor % lh_pool.length];
+        lh_cursor++;
+        // 克隆一份，价格略微浮动，避免引用相等
+        return { name:f.name, icon:f.icon, color:f.color, price: f.price + Math.floor(Math.random()*3) };
+    }
+    function lh_clearHint(){
+        const h = lh_console.querySelector('.lh_hint');
+        if(h) h.remove();
+    }
+    function lh_chips(list){
+        return '<span class="lh_chipbox">' + list.map(v => {
+            if(typeof v === 'object' && v !== null){
+                return '<span class="lh_chip" style="color:' + v.color + ';border-color:' + v.color + '66">' + v.name + ' ¥' + v.price + '</span>';
+            }
+            return '<span class="lh_chip lh_num">' + v + '</span>';
+        }).join('') + '</span>';
+    }
+    function lh_log(code, retHtml, note){
+        lh_clearHint();
+        const e = document.createElement('div');
+        e.className = 'lh_log';
+        e.innerHTML = '<div class="lh_code"></div><div class="lh_ret"></div>' + (note ? '<div class="lh_note"></div>' : '');
+        e.querySelector('.lh_code').textContent = code;
+        e.querySelector('.lh_ret').innerHTML = retHtml;
+        if(note) e.querySelector('.lh_note').textContent = note;
+        lh_console.prepend(e); // 最新输出放最上面
+    }
+    function lh_render(freshIdx){
+        lh_arrayBox.innerHTML = '';
+        if(lh_arr.length === 0){
+            lh_arrayBox.insertAdjacentHTML('beforeend', '<span class="lh_empty">空数组（篮子被拿空啦，试试 push / unshift）</span>');
+        }
+        lh_arr.forEach(function(f, i){
+            const d = document.createElement('div');
+            d.className = 'lh_item' + (freshIdx && freshIdx.indexOf(i) > -1 ? ' lh_new' : '');
+            d.style.background = 'linear-gradient(160deg, ' + f.color + '30, rgba(255,255,255,0.02))';
+            d.style.borderColor = f.color + '66';
+            d.innerHTML = '<span class="lh_idx">' + i + '</span><i class="iconfont">' + f.icon + '</i><b></b><em>¥' + f.price + '</em>';
+            d.querySelector('b').textContent = f.name;
+            d.querySelector('.iconfont').style.color = f.color;
+            lh_arrayBox.appendChild(d);
+        });
+        lh_lenTag.textContent = 'lh_arr.length = ' + lh_arr.length;
+    }
+    function lh_flashOut(indices, done){
+        let any = false;
+        indices.forEach(function(i){
+            const el = lh_arrayBox.children[i];
+            if(el){ el.classList.add('lh_out'); any = true; }
+        });
+        setTimeout(done, any ? 520 : 0);
+    }
+    function lh_shake(){
+        lh_arrayBox.classList.remove('lh_shake');
+        void lh_arrayBox.offsetWidth; // 触发重排以重启动画
+        lh_arrayBox.classList.add('lh_shake');
+    }
+
+    /* ---------- 各方法动作 ---------- */
+    const lh_actions = {
+        push: function(){
+            const f = lh_nextFruit();
+            const r = lh_arr.push(f);
+            lh_render([lh_arr.length - 1]);
+            lh_log("lh_arr.push({ name:'" + f.name + "', price:" + f.price + " })",
+                '返回新长度：' + r + '，末尾新增了一个「' + f.name + '」',
+                'push() 把元素追加到数组末尾，返回新长度。');
+        },
+        pop: function(){
+            lh_flashOut([lh_arr.length - 1], function(){
+                const r = lh_arr.pop();
+                lh_render();
+                lh_log('lh_arr.pop()',
+                    r ? '返回被拿走的元素：' + lh_chips([r]) : '数组已空，返回 undefined',
+                    'pop() 删除并返回数组最后一个元素。');
+            });
+        },
+        shift: function(){
+            lh_flashOut([0], function(){
+                const r = lh_arr.shift();
+                lh_render();
+                lh_log('lh_arr.shift()',
+                    r ? '返回被拿走的元素：' + lh_chips([r]) + '，后面所有水果都往前挪了一格（下标变了）' : '数组已空，返回 undefined',
+                    'shift() 删除并返回数组第一个元素，其余元素下标全部前移。');
+            });
+        },
+        unshift: function(){
+            const f = lh_nextFruit();
+            const r = lh_arr.unshift(f);
+            lh_render([0]);
+            lh_log("lh_arr.unshift({ name:'" + f.name + "', price:" + f.price + " })",
+                '返回新长度：' + r + '，开头新增了一个「' + f.name + '」，原水果下标全部 +1',
+                'unshift() 把元素添加到数组开头。');
+        },
+        splice: function(){
+            const idx = lh_arr.length > 1 ? 1 : 0;
+            lh_flashOut([idx], function(){
+                const f = lh_nextFruit();
+                const removed = lh_arr.splice(idx, 1, f);
+                lh_render([idx]);
+                lh_log("lh_arr.splice(" + idx + ", 1, { name:'" + f.name + "' })",
+                    '返回被删除的数组：' + lh_chips(removed) + '，同时在位置 ' + idx + ' 插入了「' + f.name + '」',
+                    'splice(开始下标, 删除个数, 插入的元素…) 是数组的"万能手术刀"，增删改都靠它。');
+            });
+        },
+        reverse: function(){
+            if(lh_arr.length < 2){
+                lh_log('lh_arr.reverse()', '元素太少，倒了个寂寞（至少 2 个才有效果）');
+                return;
+            }
+            lh_shake();
+            setTimeout(function(){
+                lh_arr.reverse();
+                lh_render();
+                lh_log('lh_arr.reverse()', '反转后的顺序：' + lh_chips(lh_arr.slice()), 'reverse() 原地反转数组，会改变原数组。');
+            }, 400);
+        },
+        sort: function(){
+            if(lh_arr.length < 2){
+                lh_log('lh_arr.sort((a,b) => a.price - b.price)', '元素太少，排了个寂寞');
+                return;
+            }
+            lh_shake();
+            setTimeout(function(){
+                lh_arr.sort(function(a, b){ return a.price - b.price; });
+                lh_render();
+                lh_log('lh_arr.sort((a, b) => a.price - b.price)', '按价格升序排好队：' + lh_chips(lh_arr.slice()),
+                    'sort() 默认按字符串排序，数字/对象排序要传入比较函数：返回负数 a 排前面。');
+            }, 400);
+        },
+        slice: function(){
+            if(lh_arr.length < 2){
+                lh_log('lh_arr.slice(1, 3)', '数组太短，截不到东西，返回 []', 'slice(开始, 结束) 截取 [开始, 结束) 左闭右开的片段，不改原数组。');
+                return;
+            }
+            const r = lh_arr.slice(1, 3);
+            lh_log('lh_arr.slice(1, 3)', '截取下标 1 到 2（不含 3）：' + lh_chips(r),
+                'slice() 是"复印"不是"剪贴"——原数组毫发无损。');
+        },
+        concat: function(){
+            const extra = lh_nextFruit();
+            const r = lh_arr.concat([extra]);
+            lh_log("lh_arr.concat([{ name:'" + extra.name + "' }])",
+                '返回拼好的新数组（共 ' + r.length + ' 个）：' + lh_chips(r),
+                'concat() 返回新数组，原数组不变——注意篮子本身没有被加长。');
+        },
+        join: function(){
+            if(lh_arr.length === 0){
+                lh_log("lh_arr.map(f => f.name).join(' · ')", '篮子是空的，返回空字符串');
+                return;
+            }
+            const r = lh_arr.map(function(f){ return f.name; }).join(' · ');
+            lh_log("lh_arr.map(f => f.name).join(' · ')", '得到字符串："' + r + '"',
+                'join(分隔符) 把所有元素连成一个字符串，对象需先取出要连接的值。');
+        },
+        indexOf: function(){
+            if(lh_arr.length === 0){
+                lh_log('lh_arr.indexOf(lh_arr[0])', '篮子是空的，返回 -1');
+                return;
+            }
+            const r = lh_arr.indexOf(lh_arr[0]);
+            lh_log('lh_arr.indexOf(lh_arr[0])', '返回下标：' + r,
+                'indexOf() 从头找第一个等于参数的下标，找不到返回 -1；对象按"引用"比较，所以同一个对象才找得到。');
+        },
+        includes: function(){
+            if(lh_arr.length === 0){
+                lh_log('lh_arr.includes(lh_arr[0])', '篮子是空的，返回 false');
+                return;
+            }
+            const r = lh_arr.includes(lh_arr[0]);
+            lh_log('lh_arr.includes(lh_arr[0])', '返回：' + r,
+                'includes() 判断数组是否包含某元素，返回 true / false（ES2016 新增）。');
+        },
+        find: function(){
+            const r = lh_arr.find(function(f){ return f.price > 10; });
+            lh_log('lh_arr.find(f => f.price > 10)',
+                r ? '找到第一个贵过 10 元的：' + lh_chips([r]) : '没有贵过 10 元的水果，返回 undefined',
+                'find() 返回第一个满足条件的元素，没有则返回 undefined；找所有满足的用 filter()。');
+        },
+        forEach: function(){
+            if(lh_arr.length === 0){
+                lh_log('lh_arr.forEach(f => console.log(f))', '篮子是空的，什么也没打印');
+                return;
+            }
+            const lines = lh_arr.map(function(f, i){ return i + '号格:' + f.name + '(¥' + f.price + ')'; }).join(' → ');
+            lh_log('lh_arr.forEach(f => console.log(f.name))', '依次遍历：' + lines,
+                'forEach() 对每个元素执行一次回调，没有返回值。');
+        },
+        map: function(){
+            const r = lh_arr.map(function(f){ return f.price * 2; });
+            lh_log('lh_arr.map(f => f.price * 2)', '得到翻倍后的价格数组：' + lh_chips(r),
+                'map() 把每个元素"加工"成新值，返回等长的新数组，原数组不变。');
+        },
+        filter: function(){
+            const r = lh_arr.filter(function(f){ return f.price > 10; });
+            lh_log('lh_arr.filter(f => f.price > 10)',
+                r.length ? '筛选出 ' + r.length + ' 个贵水果：' + lh_chips(r) : '没有贵过 10 元的，返回 []',
+                'filter() 筛出所有满足条件的元素组成新数组，原数组不变。');
+        },
+        reduce: function(){
+            if(lh_arr.length === 0){
+                lh_log('lh_arr.reduce((sum, f) => sum + f.price, 0)', '篮子是空的，返回初始值 0');
+                return;
+            }
+            const r = lh_arr.reduce(function(sum, f){ return sum + f.price; }, 0);
+            lh_log('lh_arr.reduce((sum, f) => sum + f.price, 0)', '结账总金额：¥' + r,
+                'reduce() 像"滚雪球"：上一次的累计值传给下一轮，最后返回一个结果。');
+        }
+    };
+
+    /* ---------- 事件绑定 ---------- */
+    document.querySelectorAll('.lh_mcard').forEach(function(card){
+        card.addEventListener('click', function(){
+            const fn = lh_actions[card.dataset.act];
+            if(fn) fn();
+        });
+    });
+    document.getElementById('lh_reset').addEventListener('click', function(){
+        lh_arr.length = 0;
+        lh_pool.slice(0, 3).forEach(function(f){ lh_arr.push(Object.assign({}, f)); });
+        lh_cursor = 3;
+        lh_render([0, 1, 2]);
+        lh_log('// 重置', '篮子恢复初始状态：苹果、香蕉、牛油果');
+    });
+    document.getElementById('lh_clear').addEventListener('click', function(){
+        lh_console.innerHTML = '<div class="lh_hint">已清空，继续点击方法卡片试试…</div>';
+    });
+
+    /* ---------- 初始渲染 ---------- */
+    lh_render();
+})();
+</script>
+</body>
+</html>

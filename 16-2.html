@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<!-- 姓名：刘晗，建立时间：2026-10-29，使用的大模型：GLM-5.3-Flash，功能名称：JavaScript 对象（创建、访问属性、方法、遍历、构造函数） -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>16-2 JavaScript 对象</title>
+    <style>
+        :root{
+            --lh-bg1:#071428; --lh-bg2:#081726;
+            --lh-accent:#7ee3c7; --lh-accent2:#84a0ff;
+            --lh-text:#eaf6ff; --lh-muted:#9fb0c8;
+            --lh-line:rgba(255,255,255,0.09);
+        }
+        *{box-sizing:border-box}
+        body{
+            margin:0; padding:40px 16px 56px;
+            font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Microsoft YaHei",Arial;
+            color:var(--lh-text); line-height:1.6;
+            background:radial-gradient(1000px 500px at 8% 0%, rgba(124,58,237,0.10), transparent 60%),
+                       radial-gradient(900px 500px at 95% 100%, rgba(14,165,164,0.08), transparent 60%),
+                       linear-gradient(180deg, var(--lh-bg1) 0%, var(--lh-bg2) 100%);
+            min-height:100vh;
+        }
+        .lh_wrap{max-width:900px; margin:0 auto}
+
+        .lh_header{display:flex; align-items:center; gap:16px; margin-bottom:10px}
+        .lh_logo{
+            width:56px; height:56px; border-radius:14px; flex:none;
+            background:linear-gradient(135deg, var(--lh-accent), var(--lh-accent2));
+            display:flex; align-items:center; justify-content:center;
+            font-weight:800; font-size:20px; color:#06202a;
+            box-shadow:0 6px 20px rgba(2,6,23,0.6);
+        }
+        .lh_header h1{margin:0; font-size:24px}
+        .lh_sub{margin:2px 0 0; font-size:13px; color:var(--lh-muted)}
+
+        .lh_h3{
+            margin:30px 0 12px; font-size:15px;
+            border-left:3px solid var(--lh-accent); padding-left:10px;
+        }
+        .lh_card{
+            background:rgba(255,255,255,0.04); border:1px solid var(--lh-line);
+            border-radius:14px; padding:16px;
+            transition:border-color .2s, box-shadow .2s;
+        }
+        .lh_card:hover{border-color:rgba(126,227,199,0.4); box-shadow:0 12px 30px rgba(2,6,23,0.55)}
+        .lh_pre{
+            margin:0 0 12px; padding:12px 14px; border-radius:10px; overflow-x:auto;
+            background:rgba(0,0,0,0.35); border:1px solid var(--lh-line);
+            font-family:Consolas,Monaco,monospace; font-size:13px; color:#cfe8ff; line-height:1.55;
+        }
+        .lh_result{
+            margin-top:10px; padding:10px 14px; border-radius:10px;
+            background:rgba(126,227,199,0.08); border:1px solid rgba(126,227,199,0.3);
+            font-size:14px;
+        }
+        .lh_result b{color:var(--lh-accent)}
+        .lh_result code{font-family:Consolas,Monaco,monospace; color:#cfe8ff}
+        .lh_desc{margin:6px 0; font-size:13px; color:var(--lh-muted)}
+        .lh_btn{
+            margin-top:8px; padding:9px 20px; border:none; border-radius:999px; cursor:pointer;
+            font-size:13px; font-weight:700; color:#06202a;
+            background:linear-gradient(135deg, var(--lh-accent), var(--lh-accent2));
+            box-shadow:0 6px 16px rgba(46,140,160,0.35);
+            transition:transform .18s, box-shadow .18s;
+        }
+        .lh_btn:hover{transform:translateY(-2px); box-shadow:0 10px 22px rgba(46,140,160,0.5)}
+        .lh_btn+.lh_btn{margin-left:10px}
+
+        /* 构造函数演示：实例卡片 */
+        .lh_inst_row{display:flex; flex-wrap:wrap; gap:12px; margin-top:12px}
+        .lh_inst{
+            flex:1 1 220px; padding:12px 14px; border-radius:12px;
+            background:rgba(132,160,255,0.08); border:1px solid rgba(132,160,255,0.3);
+            font-size:13px;
+        }
+        .lh_inst b{color:var(--lh-accent2)}
+        .lh_back{
+            display:inline-block; margin-bottom:14px; font-size:13px;
+            color:var(--lh-accent); text-decoration:none;
+        }
+        .lh_back:hover{text-decoration:underline}
+        .lh_footer{margin-top:26px; font-size:12px; color:var(--lh-muted); opacity:.75}
+    </style>
+</head>
+<body>
+    <div class="lh_wrap">
+        <a class="lh_back" href="index.html">&larr; 返回首页</a>
+
+        <header class="lh_header">
+            <div class="lh_logo">JS</div>
+            <div>
+                <h1>JavaScript 对象</h1>
+                <p class="lh_sub">刘晗的《高级网页设计》课堂实践 · 创建对象、属性访问、方法与 this、for...in 遍历、构造函数</p>
+            </div>
+        </header>
+
+        <div class="lh_h3">一、创建对象的三种方式</div>
+        <div class="lh_card">
+            <pre class="lh_pre">// 方式 1：对象字面量（最常用）
+var lh_student = {
+    lh_name: "刘晗",
+    lh_age: 20,
+    lh_major: "网页设计"
+};
+
+// 方式 2：new Object()
+var lh_car = new Object();
+lh_car.lh_brand = "红旗";
+lh_car.lh_price = 200000;
+
+// 方式 3：构造函数（批量创建同类对象）
+function lh_Person(lh_name, lh_age){
+    this.lh_name = lh_name;
+    this.lh_age = lh_age;
+}
+var lh_p = new lh_Person("小明", 19);</pre>
+            <div class="lh_result" id="lh_create_out"></div>
+        </div>
+
+        <div class="lh_h3">二、访问属性：点语法 与 方括号语法</div>
+        <div class="lh_card">
+            <pre class="lh_pre">var lh_val1 = lh_student.lh_name;      // 点语法：对象.属性名
+var lh_key = "lh_major";
+var lh_val2 = lh_student[lh_key];      // 方括号：属性名是变量时必须用它</pre>
+            <p class="lh_desc">属性名保存在变量里（或含空格等特殊字符）时，只能用方括号语法：</p>
+            <button class="lh_btn" onclick="lh_accessDemo()">点我演示两种访问方式</button>
+            <div class="lh_result" id="lh_access_out">点击按钮查看 lh_student 的属性值。</div>
+        </div>
+
+        <div class="lh_h3">三、对象的方法 与 this 关键字</div>
+        <div class="lh_card">
+            <pre class="lh_pre">var lh_student = {
+    lh_name: "刘晗",
+    lh_age: 20,
+    lh_sayHi: function(){            // 方法：属性值是函数
+        return "大家好，我是 " + this.lh_name;  // this 指当前对象
+    },
+    lh_addAge: function(){
+        this.lh_age = this.lh_age + 1;          // 通过 this 修改自身属性
+    }
+};</pre>
+            <button class="lh_btn" onclick="lh_sayHiDemo()">调用方法 sayHi()</button>
+            <button class="lh_btn" onclick="lh_addAgeDemo()">调用方法 addAge()（年龄 +1）</button>
+            <div class="lh_result" id="lh_method_out">点击按钮测试对象的方法。</div>
+        </div>
+
+        <div class="lh_h3">四、遍历对象：for...in 循环 与 Object.keys()</div>
+        <div class="lh_card">
+            <pre class="lh_pre">// for...in：依次取出每一个属性名
+for (var lh_key in lh_student){
+    // lh_key 是属性名，lh_student[lh_key] 是属性值
+}
+
+// Object.keys()：把所有属性名收集成数组
+var lh_keys = Object.keys(lh_student);</pre>
+            <div class="lh_result" id="lh_foreach_out"></div>
+        </div>
+
+        <div class="lh_h3">五、动态添加与删除属性</div>
+        <div class="lh_card">
+            <pre class="lh_pre">lh_student.lh_score = 95;          // 添加新属性：直接赋值
+delete lh_student.lh_score;        // 删除属性：delete 运算符</pre>
+            <button class="lh_btn" onclick="lh_dynamicDemo()">添加 lh_score 属性</button>
+            <button class="lh_btn" onclick="lh_deleteDemo()">delete 删除 lh_score 属性</button>
+            <div class="lh_result" id="lh_dynamic_out">点击按钮动态增删属性。</div>
+        </div>
+
+        <div class="lh_h3">六、综合运用：构造函数批量创建学生对象</div>
+        <div class="lh_card">
+            <pre class="lh_pre">function lh_Student(lh_name, lh_age, lh_score){
+    this.lh_name = lh_name;
+    this.lh_age = lh_age;
+    this.lh_score = lh_score;
+    this.lh_intro = function(){
+        return this.lh_name + "（" + this.lh_age + " 岁，" + this.lh_score + " 分）";
+    };
+}
+var lh_arr = [
+    new lh_Student("刘晗", 20, 95),
+    new lh_Student("小明", 19, 88),
+    new lh_Student("小红", 21, 92)
+];</pre>
+            <div class="lh_inst_row" id="lh_inst_out"></div>
+        </div>
+
+        <p class="lh_footer">练习 16-2 · 原生 HTML/CSS/JS，无任何框架与外部依赖</p>
+    </div>
+
+    <script>
+        // ===== 一、创建对象的三种方式 =====
+        var lh_student = {
+            lh_name: "刘晗",
+            lh_age: 20,
+            lh_major: "网页设计"
+        };
+
+        var lh_car = new Object();
+        lh_car.lh_brand = "红旗";
+        lh_car.lh_price = 200000;
+
+        function lh_Person(lh_name, lh_age){
+            this.lh_name = lh_name;
+            this.lh_age = lh_age;
+        }
+        var lh_p = new lh_Person("小明", 19);
+
+        document.getElementById("lh_create_out").innerHTML =
+            "字面量方式 → <code>{ lh_name: \"" + lh_student.lh_name + "\", lh_age: " + lh_student.lh_age + ", lh_major: \"" + lh_student.lh_major + "\" }</code><br>" +
+            "new Object() → <code>" + lh_car.lh_brand + " 汽车，售价 " + lh_car.lh_price + " 元</code><br>" +
+            "构造函数方式 → <code>" + lh_p.lh_name + "，" + lh_p.lh_age + " 岁</code>";
+
+        // ===== 二、访问属性：点语法 与 方括号语法 =====
+        function lh_accessDemo(){
+            var lh_val1 = lh_student.lh_name;          // 点语法
+            var lh_key = "lh_major";
+            var lh_val2 = lh_student[lh_key];          // 方括号语法
+            document.getElementById("lh_access_out").innerHTML =
+                "点语法 lh_student.lh_name → <b>" + lh_val1 + "</b><br>" +
+                "方括号 lh_student[\"lh_major\"]（属性名来自变量）→ <b>" + lh_val2 + "</b>";
+        }
+
+        // ===== 三、对象的方法 与 this =====
+        var lh_demo = {
+            lh_name: "刘晗",
+            lh_age: 20,
+            lh_sayHi: function(){
+                return "大家好，我是 " + this.lh_name;
+            },
+            lh_addAge: function(){
+                this.lh_age = this.lh_age + 1;
+            }
+        };
+        function lh_sayHiDemo(){
+            document.getElementById("lh_method_out").innerHTML =
+                "调用 lh_sayHi() 的返回值：<b>" + lh_demo.lh_sayHi() + "</b>（this 指向 lh_demo 对象本身）";
+        }
+        function lh_addAgeDemo(){
+            lh_demo.lh_addAge();
+            document.getElementById("lh_method_out").innerHTML =
+                "调用 lh_addAge() 后，lh_demo.lh_age = <b>" + lh_demo.lh_age + "</b>（方法内通过 this 修改了自身属性）";
+        }
+
+        // ===== 四、for...in 遍历 与 Object.keys() =====
+        (function(){
+            var lh_pairs = [];
+            var lh_keys = Object.keys(lh_student);     // 属性名数组
+            for (var lh_key in lh_student){
+                lh_pairs.push(lh_key + " = " + lh_student[lh_key]);
+            }
+            document.getElementById("lh_foreach_out").innerHTML =
+                "for...in 遍历结果：<b>" + lh_pairs.join("&nbsp;&nbsp;|&nbsp;&nbsp;") + "</b><br>" +
+                "Object.keys(lh_student) → <code>[" + lh_keys.join(", ") + "]</code>";
+        })();
+
+        // ===== 五、动态添加与删除属性 =====
+        function lh_dynamicDemo(){
+            lh_student.lh_score = 95;                  // 动态添加
+            document.getElementById("lh_dynamic_out").innerHTML =
+                "已添加：lh_student.lh_score = <b>" + lh_student.lh_score + "</b>（对象属性可以随时增减）";
+        }
+        function lh_deleteDemo(){
+            delete lh_student.lh_score;                // 删除属性
+            var lh_has = ("lh_score" in lh_student);   // in 运算符检查属性是否存在
+            document.getElementById("lh_dynamic_out").innerHTML =
+                "已执行 delete lh_student.lh_score，再用 in 检查：属性存在吗？ → <b>" + lh_has + "</b>";
+        }
+
+        // ===== 六、综合运用：构造函数批量创建学生对象 =====
+        function lh_Student(lh_name, lh_age, lh_score){
+            this.lh_name = lh_name;
+            this.lh_age = lh_age;
+            this.lh_score = lh_score;
+            this.lh_intro = function(){
+                return this.lh_name + "（" + this.lh_age + " 岁，" + this.lh_score + " 分）";
+            };
+        }
+        (function(){
+            var lh_arr = [
+                new lh_Student("刘晗", 20, 95),
+                new lh_Student("小明", 19, 88),
+                new lh_Student("小红", 21, 92)
+            ];
+            var lh_box = document.getElementById("lh_inst_out");
+            for (var lh_i = 0; lh_i < lh_arr.length; lh_i++){
+                var lh_div = document.createElement("div");
+                lh_div.className = "lh_inst";
+                lh_div.innerHTML = "<b>学生对象 " + (lh_i + 1) + "</b><br>调用方法 lh_intro() → " + lh_arr[lh_i].lh_intro();
+                lh_box.appendChild(lh_div);
+            }
+        })();
+    </script>
+</body>
+</html>

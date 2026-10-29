@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<!-- 姓名：刘晗，建立时间：2026-10-29，使用的大模型：GLM-5.3，功能名称：排行榜选项卡（每日/每周/每月/全部切换） -->
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>16-4 排行榜选项卡</title>
+<link rel="stylesheet" href="font/iconfont.css">
+<style>
+:root{
+    --lh-text:#333; --lh-muted:#666;
+    --lh-red:#d93030; --lh-grey:#a6a6a6;
+    --lh-line:#dcdcdc; --lh-tab:#f2f2f2; --lh-tab-active:#4d4d4d;
+}
+*{box-sizing:border-box}
+body{
+    margin:0; padding:40px 16px 60px;
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Microsoft YaHei",Arial;
+    color:var(--lh-text); line-height:1.6; background:#fff;
+}
+.lh_wrap{max-width:420px; margin:0 auto}
+
+/* ---------- 选项卡 ---------- */
+.lh_tabs{
+    display:flex; border:1px solid var(--lh-line); border-bottom:none;
+    background:var(--lh-tab);
+}
+.lh_tab{
+    flex:1; padding:9px 0; text-align:center; cursor:pointer;
+    font-size:14px; color:var(--lh-muted); user-select:none;
+    border-right:1px solid var(--lh-line);
+    background:linear-gradient(180deg,#fdfdfd,#efefef);
+    transition:color .2s;
+}
+.lh_tab:last-child{border-right:none}
+.lh_tab:hover{color:var(--lh-text)}
+.lh_tab.lh_active{
+    color:#fff; font-weight:700;
+    background:var(--lh-tab-active);
+}
+
+/* ---------- 榜单 ---------- */
+.lh_panel{
+    border:1px solid var(--lh-line); padding:14px 12px 16px;
+}
+.lh_list{
+    /* 竖向填充：1-5 在左栏自上而下，6-10 在右栏自上而下 */
+    display:grid; grid-template-rows:repeat(5, auto); grid-auto-flow:column;
+    gap:0 18px;
+}
+.lh_item{
+    display:flex; align-items:center; gap:8px;
+    padding:7px 2px; font-size:13px; color:var(--lh-text);
+    cursor:pointer; white-space:nowrap; overflow:hidden;
+}
+.lh_item:hover{color:#e26a00; text-decoration:underline}
+.lh_rank{
+    flex:none; width:17px; height:17px; border-radius:2px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:12px; font-weight:700; color:#fff;
+    font-family:Consolas,Monaco,monospace;
+}
+.lh_rank.lh_top{background:var(--lh-red)}
+.lh_rank.lh_low{background:var(--lh-grey)}
+.lh_name{overflow:hidden; text-overflow:ellipsis}
+
+/* ---------- 底部 ---------- */
+.lh_footer{margin-top:26px; text-align:center; font-size:13px}
+.lh_footer a{
+    color:#999; text-decoration:none;
+    display:inline-flex; align-items:center; gap:5px;
+    transition:color .2s;
+}
+.lh_footer a:hover{color:var(--lh-tab-active)}
+.lh_footer .iconfont{font-size:14px}
+</style>
+</head>
+<body>
+<div class="lh_wrap">
+
+    <div class="lh_tabs" id="lh_tabs">
+        <div class="lh_tab" data-tab="daily">每日</div>
+        <div class="lh_tab" data-tab="weekly">每周</div>
+        <div class="lh_tab" data-tab="monthly">每月</div>
+        <div class="lh_tab lh_active" data-tab="all">全部</div>
+    </div>
+    <div class="lh_panel">
+        <div class="lh_list" id="lh_list"></div>
+    </div>
+
+    <footer class="lh_footer">
+        <a href="index.html"><i class="iconfont">&#xe61f;</i>返回首页</a>
+    </footer>
+</div>
+
+<script>
+(function(){
+    /* ---------- 四个选项卡的榜单数据 ---------- */
+    const lh_data = {
+        daily: [
+            '最美的时光', '咱们结婚吧', '渗透', '继承者们', '烽火佳人',
+            '极品女士第2季', '爱闪亮', '狼烟（2013）', '钱多多炼爱记', '苍狼'
+        ],
+        weekly: [
+            '咱们结婚吧', '继承者们', '最美的时光', '爱闪亮', '渗透',
+            '狼烟（2013）', '三十年，你好', '钱多多炼爱记', '特种兵之火凤凰', '极品女士第2季'
+        ],
+        monthly: [
+            '特种兵之火凤凰', '咱们结婚吧', '继承者们', '金玉满堂', '王的女人',
+            '爱闪亮', '爱情面前谁怕谁', '英雄联盟', '小爸爸', '我们这拨人'
+        ],
+        all: [
+            '永不磨灭的番号', '特种兵之火凤凰', '新还珠格格', '咱们结婚吧', '小爸爸',
+            '心术', '乡村爱情5', '天天有喜', '一不小心爱上你', '夏日甜心'
+        ]
+    };
+
+    const lh_tabsEl = document.getElementById('lh_tabs');
+    const lh_listEl = document.getElementById('lh_list');
+
+    /* ---------- 渲染榜单：前三名红色序号，其余灰色序号 ---------- */
+    function lh_render(key){
+        const lh_names = lh_data[key];
+        let lh_html = '';
+        lh_names.forEach(function(name, i){
+            lh_html += '<div class="lh_item">'
+                     +   '<span class="lh_rank ' + (i < 3 ? 'lh_top' : 'lh_low') + '">' + (i + 1) + '</span>'
+                     +   '<span class="lh_name">' + name + '</span>'
+                     + '</div>';
+        });
+        lh_listEl.innerHTML = lh_html;
+    }
+
+    /* ---------- 点击选项卡切换 ---------- */
+    lh_tabsEl.addEventListener('click', function(e){
+        const lh_tab = e.target.closest('.lh_tab');
+        if(!lh_tab) return;
+        lh_tabsEl.querySelectorAll('.lh_tab').forEach(function(t){
+            t.classList.remove('lh_active');
+        });
+        lh_tab.classList.add('lh_active');
+        lh_render(lh_tab.dataset.tab);
+    });
+
+    /* ---------- 初始显示「全部」 ---------- */
+    lh_render('all');
+})();
+</script>
+</body>
+</html>

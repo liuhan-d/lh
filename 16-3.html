@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<!-- 姓名：刘晗，建立时间：2026-10-29，使用的大模型：GLM-5.3，功能名称：网帖翻译列表页（仿论坛帖子列表版式） -->
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>16-3 网帖翻译</title>
+<link rel="stylesheet" href="font/iconfont.css">
+<style>
+:root{
+    --lh-text:#333; --lh-muted:#999; --lh-blue:#4a6b9a;
+    --lh-line:#e8e8e8; --lh-red:#e83c3c; --lh-red-bg:#fdeaea;
+}
+*{box-sizing:border-box}
+body{
+    margin:0; padding:28px 16px 60px;
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Microsoft YaHei",Arial;
+    color:var(--lh-text); line-height:1.7; background:#fff;
+}
+.lh_wrap{max-width:920px; margin:0 auto}
+
+/* ---------- 头部 ---------- */
+.lh_header{display:flex; align-items:flex-end; gap:16px; padding:14px 4px 0; border-bottom:2px solid #f0f0f0}
+.lh_title_box{position:relative; padding-bottom:12px}
+.lh_title_box h1{margin:0; font-size:22px; font-weight:800; letter-spacing:1px}
+.lh_title_box::after{
+    content:''; position:absolute; left:0; bottom:-2px;
+    width:56px; height:3px; background:#d9d9d9;
+}
+.lh_tip{
+    margin-left:auto; margin-bottom:8px; flex:none;
+    display:inline-flex; align-items:center; gap:5px;
+    padding:4px 12px; border-radius:3px; font-size:13px;
+    color:#fff; background:#c9c9c9; text-decoration:none;
+    transition:background .2s;
+}
+.lh_tip:hover{background:#b5b5b5}
+.lh_tip .iconfont{font-size:13px}
+
+/* ---------- 帖子列表 ---------- */
+.lh_row{
+    display:flex; gap:14px; padding:18px 4px 16px;
+    border-bottom:1px solid var(--lh-line);
+    transition:background .2s;
+}
+.lh_row:hover{background:#fafafa}
+
+/* 左侧：国旗 + 红色圆形图标 */
+.lh_side{flex:none; width:34px; display:flex; flex-direction:column; align-items:center; gap:8px}
+.lh_flag{
+    width:32px; height:22px; border-radius:2px; flex:none;
+    box-shadow:0 0 0 1px rgba(0,0,0,0.08) inset;
+    display:flex; align-items:center; justify-content:center;
+    font-size:11px; line-height:1; color:#fff; overflow:hidden; position:relative;
+}
+/* 联合国 */
+.lh_flag_un{background:#3b7dd8}
+.lh_flag_un::before{
+    content:''; width:13px; height:13px; border-radius:50%;
+    border:1.5px solid #fff; position:relative;
+}
+/* 土耳其 */
+.lh_flag_tr{background:#d93030}
+.lh_flag_tr::before{
+    content:''; width:11px; height:11px; border-radius:50%; background:#fff;
+}
+.lh_flag_tr::after{
+    content:''; width:9px; height:9px; border-radius:50%; background:#d93030;
+    position:absolute; left:14px;
+}
+/* 美国 */
+.lh_flag_us{
+    background:repeating-linear-gradient(180deg,#c93434 0 3px,#fff 3px 6px);
+}
+.lh_flag_us::before{
+    content:''; position:absolute; top:0; left:0;
+    width:14px; height:11px; background:#3b4f8c;
+}
+/* 越南 */
+.lh_flag_vn{background:#d93030; color:#ffd94a; font-size:14px}
+/* 中国 */
+.lh_flag_cn{background:#de2910; color:#ffde00; font-size:15px}
+
+.lh_coin{
+    width:22px; height:22px; border-radius:50%; flex:none;
+    background:var(--lh-red); color:#fff;
+    display:flex; align-items:center; justify-content:center;
+}
+.lh_coin .iconfont{font-size:12px}
+
+/* 右侧：标题 + 元信息 */
+.lh_main{flex:1; min-width:0}
+.lh_post_title{margin:0; font-size:15px; color:#222; word-break:break-all}
+.lh_meta{
+    margin-top:8px; display:flex; flex-wrap:wrap; align-items:center; gap:6px 18px;
+    font-size:13px; color:var(--lh-muted);
+}
+.lh_meta_item{display:inline-flex; align-items:center; gap:5px}
+.lh_meta_item .iconfont{font-size:14px; color:#bbb}
+.lh_author{color:var(--lh-blue)}
+
+/* ---------- 底部 ---------- */
+.lh_footer{margin-top:26px; text-align:center; font-size:13px}
+.lh_footer a{
+    color:var(--lh-muted); text-decoration:none;
+    display:inline-flex; align-items:center; gap:5px;
+    transition:color .2s;
+}
+.lh_footer a:hover{color:var(--lh-blue)}
+.lh_footer .iconfont{font-size:14px}
+.lh_copy{margin-top:8px; font-size:12px; color:#ccc}
+</style>
+</head>
+<body>
+<div class="lh_wrap">
+
+    <header class="lh_header">
+        <div class="lh_title_box"><h1>网帖翻译</h1></div>
+        <a class="lh_tip" href="javascript:void(0)"><i class="iconfont">&#xe64a;</i>新手翻译说明</a>
+    </header>
+
+    <main>
+        <article class="lh_row">
+            <div class="lh_side">
+                <span class="lh_flag lh_flag_un"></span>
+                <span class="lh_coin"><i class="iconfont">&#xe62c;</i></span>
+            </div>
+            <div class="lh_main">
+                <p class="lh_post_title">外网网友发起"最想尝试的一道家常菜"征集，各国跟帖瞬间刷屏，评论区变成大型美食交流现场，中国网友晒出的红烧肉被顶到了最前面…</p>
+                <div class="lh_meta">
+                    <span class="lh_meta_item"><i class="iconfont">&#xe65e;</i>2026-10-29</span>
+                    <span class="lh_author">种花家一只兔</span>
+                    <span class="lh_meta_item"><i class="iconfont">&#xe86e;</i>6817</span>
+                    <span class="lh_meta_item"><i class="iconfont">&#xe759;</i>51</span>
+                </div>
+            </div>
+        </article>
+
+        <article class="lh_row">
+            <div class="lh_side">
+                <span class="lh_flag lh_flag_tr"></span>
+                <span class="lh_coin"><i class="iconfont">&#xe62c;</i></span>
+            </div>
+            <div class="lh_main">
+                <p class="lh_post_title">土耳其网友晒出自制烤肉教程，中国网友跟帖晒红烧肉回敬，双方约定明年互寄家乡特产，评论区一片"馋哭了"的表情包</p>
+                <div class="lh_meta">
+                    <span class="lh_meta_item"><i class="iconfont">&#xe65e;</i>2026-10-29</span>
+                    <span class="lh_author">熊猫永不为奴</span>
+                    <span class="lh_meta_item"><i class="iconfont">&#xe86e;</i>3927</span>
+                    <span class="lh_meta_item"><i class="iconfont">&#xe759;</i>3</span>
+                </div>
+            </div>
+        </article>
+
+        <article class="lh_row">
+            <div class="lh_side">
+                <span class="lh_flag lh_flag_us"></span>
+                <span class="lh_coin"><i class="iconfont">&#xe62c;</i></span>
+            </div>
+            <div class="lh_main">
+                <p class="lh_post_title">美国网友讨论通勤与生活成本，把每天一杯外带咖啡换成自制美式，把外卖换成便当，一年下来省出了两张机票钱，直呼早该这样了</p>
+                <div class="lh_meta">
+                    <span class="lh_meta_item"><i class="iconfont">&#xe65e;</i>2026-10-29</span>
+                    <span class="lh_author">菀菀子</span>
+                    <span class="lh_meta_item"><i class="iconfont">&#xe86e;</i>2270</span>
+                    <span class="lh_meta_item"><i class="iconfont">&#xe759;</i>13</span>
+                </div>
+            </div>
+        </article>
+
+        <article class="lh_row">
+            <div class="lh_side">
+                <span class="lh_flag lh_flag_vn">&#9733;</span>
+                <span class="lh_coin"><i class="iconfont">&#xe62c;</i></span>
+            </div>
+            <div class="lh_main">
+                <p class="lh_post_title">越南网友讨论育儿成本与课外兴趣班价格，算完一笔账后感叹"报班一时爽，账单泪两行"，各地家长纷纷在评论区晒出自家开销清单</p>
+                <div class="lh_meta">
+                    <span class="lh_meta_item"><i class="iconfont">&#xe65e;</i>2026-10-29</span>
+                    <span class="lh_author">分格里</span>
+                    <span class="lh_meta_item"><i class="iconfont">&#xe86e;</i>1664</span>
+                    <span class="lh_meta_item"><i class="iconfont">&#xe759;</i>16</span>
+                </div>
+            </div>
+        </article>
+
+        <article class="lh_row">
+            <div class="lh_side">
+                <span class="lh_flag lh_flag_cn">&#9733;</span>
+                <span class="lh_coin"><i class="iconfont">&#xe62c;</i></span>
+            </div>
+            <div class="lh_main">
+                <p class="lh_post_title">中国网友分享周末 City Walk 路线，外国网友照着打卡一圈后留言：风景太美，相机内存根本不够用，下次要带两块备用电池再来</p>
+                <div class="lh_meta">
+                    <span class="lh_meta_item"><i class="iconfont">&#xe65e;</i>2026-10-29</span>
+                    <span class="lh_author">柠檬味的风</span>
+                    <span class="lh_meta_item"><i class="iconfont">&#xe86e;</i>982</span>
+                    <span class="lh_meta_item"><i class="iconfont">&#xe759;</i>27</span>
+                </div>
+            </div>
+        </article>
+    </main>
+
+    <footer class="lh_footer">
+        <a href="index.html"><i class="iconfont">&#xe61f;</i>返回首页</a>
+        <div class="lh_copy">© 刘晗的《高级网页设计》课堂实践 · 16-3 网帖翻译</div>
+    </footer>
+</div>
+</body>
+</html>
