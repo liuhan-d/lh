@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<!-- 姓名：刘晗，建立时间：2026-11-02，使用的大模型：GLM-5.3，功能名称：fetch 获取 JSONPlaceholder todos 接口数据并展示（明亮风格） -->
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>17-2 fetch 获取接口数据</title>
+<link rel="stylesheet" href="font/iconfont.css">
+<style>
+:root{
+    --lh-bg:#f6f8fc; --lh-card:#ffffff;
+    --lh-main:#4f6ef7; --lh-main2:#7c9bff;
+    --lh-text:#1f2937; --lh-muted:#8a94a6;
+    --lh-line:#eef0f5; --lh-green:#12b76a; --lh-red:#ef4444;
+    --lh-shadow:0 2px 14px rgba(79,110,247,0.09);
+    --lh-shadow-lg:0 10px 30px rgba(79,110,247,0.16);
+}
+*{box-sizing:border-box}
+body{
+    margin:0; padding:40px 16px 64px;
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Microsoft YaHei",Arial;
+    color:var(--lh-text); line-height:1.65;
+    background:
+        radial-gradient(700px 320px at 12% -5%, rgba(124,155,255,0.16), transparent 60%),
+        radial-gradient(600px 300px at 92% 0%, rgba(18,183,106,0.07), transparent 60%),
+        var(--lh-bg);
+    min-height:100vh;
+}
+.lh_wrap{max-width:820px; margin:0 auto}
+
+/* ---------- 头部 ---------- */
+.lh_header{display:flex; align-items:center; gap:16px; margin-bottom:6px}
+.lh_logo{
+    width:58px; height:58px; border-radius:18px; flex:none;
+    background:linear-gradient(135deg, var(--lh-main), var(--lh-main2));
+    display:flex; align-items:center; justify-content:center;
+    font-weight:800; font-size:17px; color:#fff;
+    box-shadow:var(--lh-shadow-lg);
+}
+.lh_header h1{margin:0; font-size:24px; letter-spacing:.5px}
+.lh_sub{margin:2px 0 0; font-size:13px; color:var(--lh-muted); word-break:break-all}
+.lh_sub code{
+    color:var(--lh-main); font-family:Consolas,Monaco,monospace; font-size:12px;
+    background:rgba(79,110,247,0.07); padding:1px 6px; border-radius:6px;
+}
+.lh_back{
+    margin-left:auto; flex:none; display:inline-flex; align-items:center; gap:6px;
+    padding:8px 16px; border-radius:999px; text-decoration:none;
+    color:var(--lh-main); font-size:13px; font-weight:700;
+    border:1px solid rgba(79,110,247,0.25); background:#fff;
+    box-shadow:var(--lh-shadow);
+    transition:transform .18s, box-shadow .18s;
+}
+.lh_back:hover{transform:translateY(-2px); box-shadow:var(--lh-shadow-lg)}
+.lh_back .iconfont{font-size:14px}
+
+/* ---------- 状态条 ---------- */
+.lh_status{
+    margin-top:20px; padding:12px 18px; border-radius:14px;
+    background:var(--lh-card); border:1px solid var(--lh-line);
+    box-shadow:var(--lh-shadow);
+    font-family:Consolas,Monaco,monospace; font-size:12.5px; color:var(--lh-muted);
+    display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+}
+.lh_status .iconfont{color:var(--lh-main)}
+.lh_status b{color:var(--lh-main); font-weight:700}
+.lh_status.lh_err{border-color:rgba(239,68,68,0.28); background:#fef2f2}
+.lh_status.lh_err .iconfont, .lh_status.lh_err b{color:var(--lh-red)}
+
+/* ---------- 加载动画 ---------- */
+@keyframes lh_spin{to{transform:rotate(360deg)}}
+.lh_spinner{
+    width:15px; height:15px; border-radius:50%; flex:none;
+    border:2px solid rgba(79,110,247,0.2); border-top-color:var(--lh-main);
+    animation:lh_spin .8s linear infinite;
+}
+
+/* ---------- 工具栏 ---------- */
+.lh_toolbar{
+    margin-top:14px; display:flex; flex-wrap:wrap; gap:12px; align-items:center;
+    padding:12px 16px; border-radius:14px;
+    background:var(--lh-card); border:1px solid var(--lh-line); box-shadow:var(--lh-shadow);
+}
+.lh_btn{
+    padding:9px 22px; border:none; border-radius:999px; cursor:pointer;
+    font-size:13px; font-weight:700; color:#fff;
+    background:linear-gradient(135deg, var(--lh-main), var(--lh-main2));
+    box-shadow:var(--lh-shadow);
+    transition:transform .18s, box-shadow .18s;
+    display:inline-flex; align-items:center; gap:6px;
+}
+.lh_btn .iconfont{font-size:13px}
+.lh_btn:hover{transform:translateY(-2px); box-shadow:var(--lh-shadow-lg)}
+.lh_btn:disabled{opacity:.5; cursor:not-allowed; transform:none; box-shadow:none}
+.lh_stats{font-size:12px; color:var(--lh-muted)}
+.lh_stats b{color:var(--lh-main)}
+.lh_filter{
+    display:flex; gap:0; margin-left:auto;
+    border:1px solid var(--lh-line); border-radius:999px; overflow:hidden; background:#f3f5fa;
+}
+.lh_ftab{
+    padding:8px 16px; cursor:pointer; font-size:13px; color:var(--lh-muted);
+    background:transparent; border:none; transition:background .2s, color .2s;
+}
+.lh_ftab:hover{color:var(--lh-text)}
+.lh_ftab.lh_active{background:var(--lh-main); color:#fff; font-weight:700}
+
+/* ---------- 待办列表 ---------- */
+.lh_todo{
+    display:flex; align-items:center; gap:12px;
+    padding:13px 18px; border-radius:14px; margin-top:10px;
+    background:var(--lh-card); border:1px solid var(--lh-line);
+    box-shadow:var(--lh-shadow);
+    transition:transform .2s, box-shadow .2s;
+    animation:lh_pop .35s ease both;
+}
+.lh_todo:hover{transform:translateY(-3px); box-shadow:var(--lh-shadow-lg)}
+@keyframes lh_pop{
+    0%{opacity:0; transform:translateY(8px)}
+    100%{opacity:1; transform:translateY(0)}
+}
+.lh_check{
+    flex:none; width:26px; height:26px; border-radius:50%; cursor:pointer;
+    border:2px solid #d5dae6;
+    display:flex; align-items:center; justify-content:center;
+    transition:background .2s, border-color .2s;
+}
+.lh_check:hover{border-color:var(--lh-green)}
+.lh_check .iconfont{font-size:12px; color:#fff; opacity:0; transition:opacity .2s}
+.lh_check.done{background:var(--lh-green); border-color:var(--lh-green)}
+.lh_check.done .iconfont{opacity:1}
+.lh_title{flex:1; min-width:0; font-size:14px; color:var(--lh-text); word-break:break-word}
+.lh_todo.done .lh_title{color:var(--lh-muted); text-decoration:line-through}
+.lh_tags{flex:none; display:flex; gap:8px; align-items:center}
+.lh_tag{
+    font-size:11px; padding:3px 10px; border-radius:999px;
+    font-family:Consolas,Monaco,monospace; color:var(--lh-muted);
+    background:#f3f5fa; border:1px solid var(--lh-line);
+}
+.lh_tag.user{color:var(--lh-main); background:rgba(79,110,247,0.07); border-color:rgba(79,110,247,0.2)}
+
+.lh_more{margin-top:18px; text-align:center}
+.lh_more button{
+    background:#fff; border:1px solid rgba(79,110,247,0.3); color:var(--lh-main);
+    cursor:pointer; font-size:13px; font-weight:700;
+    padding:9px 28px; border-radius:999px; box-shadow:var(--lh-shadow);
+    transition:transform .18s, box-shadow .18s;
+}
+.lh_more button:hover{transform:translateY(-2px); box-shadow:var(--lh-shadow-lg)}
+.lh_empty{
+    margin-top:20px; text-align:center; font-size:13px; color:var(--lh-muted);
+    padding:48px 0; background:var(--lh-card);
+    border:1px dashed #dfe3ec; border-radius:16px;
+}
+.lh_footer{margin-top:34px; text-align:center; font-size:12px; color:#c0c6d2}
+@media (max-width:560px){
+    body{padding:24px 10px 48px}
+    .lh_header h1{font-size:19px}
+    .lh_tags{display:none}
+}
+</style>
+</head>
+<body>
+<div class="lh_wrap">
+
+    <header class="lh_header">
+        <div class="lh_logo">17-2</div>
+        <div>
+            <h1>fetch 获取接口数据</h1>
+            <p class="lh_sub">请求 <code>https://jsonplaceholder.typicode.com/todos</code>（JSONPlaceholder 免费 Fake REST API）</p>
+        </div>
+        <a class="lh_back" href="index.html"><i class="iconfont">&#xe600;</i>返回首页</a>
+    </header>
+
+    <!-- 状态条：模拟控制台 -->
+    <div class="lh_status" id="lh_status">
+        <i class="iconfont">&#xe631;</i>
+        <span id="lh_status_text">点击下方按钮，用 fetch 向接口发起 GET 请求…</span>
+    </div>
+
+    <!-- 工具栏 -->
+    <div class="lh_toolbar">
+        <button class="lh_btn" id="lh_fetch"><i class="iconfont">&#xe8a3;</i>fetch 获取数据</button>
+        <span class="lh_stats" id="lh_stats">尚未加载数据</span>
+        <div class="lh_filter" id="lh_filter">
+            <button class="lh_ftab lh_active" data-f="all">全部</button>
+            <button class="lh_ftab" data-f="todo">未完成</button>
+            <button class="lh_ftab" data-f="done">已完成</button>
+        </div>
+    </div>
+
+    <!-- 待办列表 -->
+    <main id="lh_list">
+        <div class="lh_empty">这里将展示接口返回的 200 条 todos 数据…</div>
+    </main>
+    <div class="lh_more" id="lh_more" hidden>
+        <button id="lh_morebtn">显示更多（每次 20 条）</button>
+    </div>
+
+    <footer class="lh_footer">© 刘晗的《高级网页设计》课堂实践 · 17-2 fetch 获取接口数据</footer>
+</div>
+
+<script>
+(function(){
+    const lh_API   = 'https://jsonplaceholder.typicode.com/todos';
+    const lh_list  = document.getElementById('lh_list');
+    const lh_more  = document.getElementById('lh_more');
+    const lh_moreBtn = document.getElementById('lh_morebtn');
+    const lh_status = document.getElementById('lh_status');
+    const lh_fetchBtn = document.getElementById('lh_fetch');
+    const lh_stats = document.getElementById('lh_stats');
+
+    let lh_data = [];       // 接口返回的全部数据
+    let lh_filter = 'all';  // 当前筛选：all / todo / done
+    let lh_shown = 20;      // 当前显示条数
+
+    /* ---------- 状态条 ---------- */
+    function lh_setStatus(html, err){
+        lh_status.classList.toggle('lh_err', !!err);
+        lh_status.innerHTML = '<i class="iconfont">' + (err ? '&#xe662;' : '&#xe631;') + '</i><span></span>';
+        lh_status.querySelector('span').innerHTML = html;
+    }
+
+    /* ---------- 渲染列表 ---------- */
+    function lh_renderList(reset){
+        const lh_filtered = lh_data.filter(function(t){
+            if(lh_filter === 'todo') return !t.completed;
+            if(lh_filter === 'done')  return t.completed;
+            return true;
+        });
+        if(reset){ lh_shown = 20; }
+        const lh_slice = lh_filtered.slice(0, lh_shown);
+
+        if(lh_filtered.length === 0){
+            lh_list.innerHTML = '<div class="lh_empty">没有符合条件的数据</div>';
+            lh_more.hidden = true;
+            return;
+        }
+        let lh_html = '';
+        lh_slice.forEach(function(t){
+            lh_html += '<div class="lh_todo' + (t.completed ? ' done' : '') + '" data-id="' + t.id + '">'
+                     +   '<span class="lh_check' + (t.completed ? ' done' : '') + '"><i class="iconfont">&#xec7f;</i></span>'
+                     +   '<span class="lh_title">' + lh_esc(t.title) + '</span>'
+                     +   '<span class="lh_tags"><span class="lh_tag">#' + t.id + '</span>'
+                     +   '<span class="lh_tag user">用户 ' + t.userId + '</span></span>'
+                     + '</div>';
+        });
+        lh_list.innerHTML = lh_html;
+        lh_more.hidden = lh_shown >= lh_filtered.length;
+    }
+
+    function lh_esc(s){
+        return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;')
+                        .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    /* ---------- 统计 ---------- */
+    function lh_renderStats(){
+        const lh_done = lh_data.filter(function(t){ return t.completed; }).length;
+        lh_stats.innerHTML = '共 <b>' + lh_data.length + '</b> 条 · 已完成 <b>' + lh_done + '</b> 条 · 未完成 <b>'
+                           + (lh_data.length - lh_done) + '</b> 条';
+    }
+
+    /* ---------- fetch 获取数据（async/await + try/catch） ---------- */
+    async function lh_fetchData(){
+        lh_fetchBtn.disabled = true;
+        lh_setStatus('正在请求 <b>' + lh_API + '</b> … 请稍候');
+        lh_status.insertAdjacentHTML('afterbegin', '<span class="lh_spinner"></span>');
+        try{
+            const lh_res = await fetch(lh_API);          // 1. 发起请求
+            if(!lh_res.ok) throw new Error('HTTP 状态码 ' + lh_res.status);
+            lh_data = await lh_res.json();               // 2. 解析 JSON
+            lh_renderStats();
+            lh_renderList(true);
+            lh_setStatus('请求成功（<b>' + lh_res.status + '</b>）：返回 <b>' + lh_data.length
+                       + '</b> 条 todos，已在下方展示前 20 条');
+        }catch(err){
+            lh_setStatus('请求失败：' + lh_esc(err.message) + ' —— 请检查网络后重试（fetch 只有网络错误才会 reject，'
+                       + 'HTTP 4xx/5xx 需通过 <b>res.ok</b> 自行判断）', true);
+        }finally{
+            lh_fetchBtn.disabled = false;
+        }
+    }
+
+    /* ---------- 事件绑定 ---------- */
+    lh_fetchBtn.addEventListener('click', lh_fetchData);
+
+    document.getElementById('lh_filter').addEventListener('click', function(e){
+        const lh_btn = e.target.closest('.lh_ftab');
+        if(!lh_btn) return;
+        this.querySelectorAll('.lh_ftab').forEach(function(b){ b.classList.remove('lh_active'); });
+        lh_btn.classList.add('lh_active');
+        lh_filter = lh_btn.dataset.f;
+        lh_renderList(true);
+    });
+
+    /* 点击勾选圆圈，本地切换完成状态（不动接口） */
+    lh_list.addEventListener('click', function(e){
+        const lh_check = e.target.closest('.lh_check');
+        if(!lh_check || lh_data.length === 0) return;
+        const lh_row = lh_check.closest('.lh_todo');
+        const lh_id = Number(lh_row.dataset.id);
+        const lh_item = lh_data.find(function(t){ return t.id === lh_id; });
+        if(!lh_item) return;
+        lh_item.completed = !lh_item.completed;
+        lh_row.classList.toggle('done', lh_item.completed);
+        lh_check.classList.toggle('done', lh_item.completed);
+        lh_renderStats();
+    });
+
+    /* 显示更多 */
+    lh_moreBtn.addEventListener('click', function(){
+        lh_shown += 20;
+        lh_renderList(false);
+    });
+
+    /* ---------- 页面打开即自动请求一次 ---------- */
+    lh_fetchData();
+})();
+</script>
+</body>
+</html>

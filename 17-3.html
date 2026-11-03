@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<!-- 姓名：刘晗，建立时间：2026-11-02，使用的大模型：GLM-5.3，功能名称：fetch 获取商品列表（DummyJSON products）并展示卡片 -->
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>17-3 商品列表</title>
+<link rel="stylesheet" href="font/iconfont.css">
+<style>
+:root{
+    --lh-bg:#f6f8fc; --lh-card:#ffffff;
+    --lh-main:#4f6ef7; --lh-main2:#7c9bff;
+    --lh-text:#1f2937; --lh-muted:#8a94a6;
+    --lh-line:#eef0f5; --lh-orange:#f59e0b; --lh-red:#ef4444;
+    --lh-shadow:0 2px 14px rgba(79,110,247,0.09);
+    --lh-shadow-lg:0 10px 30px rgba(79,110,247,0.16);
+}
+*{box-sizing:border-box}
+body{
+    margin:0; padding:40px 16px 64px;
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Microsoft YaHei",Arial;
+    color:var(--lh-text); line-height:1.65;
+    background:
+        radial-gradient(700px 320px at 12% -5%, rgba(124,155,255,0.16), transparent 60%),
+        radial-gradient(600px 300px at 92% 0%, rgba(245,158,11,0.06), transparent 60%),
+        var(--lh-bg);
+    min-height:100vh;
+}
+.lh_wrap{max-width:960px; margin:0 auto}
+
+/* ---------- 头部 ---------- */
+.lh_header{display:flex; align-items:center; gap:16px; margin-bottom:6px}
+.lh_logo{
+    width:58px; height:58px; border-radius:18px; flex:none;
+    background:linear-gradient(135deg, var(--lh-main), var(--lh-main2));
+    display:flex; align-items:center; justify-content:center;
+    font-weight:800; font-size:17px; color:#fff;
+    box-shadow:var(--lh-shadow-lg);
+}
+.lh_header h1{margin:0; font-size:24px; letter-spacing:.5px}
+.lh_sub{margin:2px 0 0; font-size:13px; color:var(--lh-muted)}
+.lh_sub code{
+    color:var(--lh-main); font-family:Consolas,Monaco,monospace; font-size:12px;
+    background:rgba(79,110,247,0.07); padding:1px 6px; border-radius:6px; word-break:break-all;
+}
+.lh_back{
+    margin-left:auto; flex:none; display:inline-flex; align-items:center; gap:6px;
+    padding:8px 16px; border-radius:999px; text-decoration:none;
+    color:var(--lh-main); font-size:13px; font-weight:700;
+    border:1px solid rgba(79,110,247,0.25); background:#fff;
+    box-shadow:var(--lh-shadow);
+    transition:transform .18s, box-shadow .18s;
+}
+.lh_back:hover{transform:translateY(-2px); box-shadow:var(--lh-shadow-lg)}
+.lh_back .iconfont{font-size:14px}
+
+/* ---------- 状态条 ---------- */
+.lh_status{
+    margin-top:20px; padding:12px 18px; border-radius:14px;
+    background:var(--lh-card); border:1px solid var(--lh-line);
+    box-shadow:var(--lh-shadow);
+    font-family:Consolas,Monaco,monospace; font-size:12.5px; color:var(--lh-muted);
+    display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+}
+.lh_status .iconfont{color:var(--lh-main)}
+.lh_status b{color:var(--lh-main); font-weight:700}
+.lh_status.lh_err{border-color:rgba(239,68,68,0.28); background:#fef2f2}
+.lh_status.lh_err .iconfont, .lh_status.lh_err b{color:var(--lh-red)}
+@keyframes lh_spin{to{transform:rotate(360deg)}}
+.lh_spinner{
+    width:15px; height:15px; border-radius:50%; flex:none;
+    border:2px solid rgba(79,110,247,0.2); border-top-color:var(--lh-main);
+    animation:lh_spin .8s linear infinite;
+}
+
+/* ---------- 商品网格 ---------- */
+.lh_grid{
+    margin-top:20px; display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(215px,1fr)); gap:16px;
+}
+.lh_card{
+    background:var(--lh-card); border:1px solid var(--lh-line); border-radius:16px;
+    box-shadow:var(--lh-shadow); overflow:hidden; cursor:pointer;
+    display:flex; flex-direction:column;
+    transition:transform .22s, box-shadow .22s;
+    animation:lh_pop .4s ease both;
+}
+.lh_card:hover{transform:translateY(-6px); box-shadow:var(--lh-shadow-lg)}
+@keyframes lh_pop{
+    0%{opacity:0; transform:translateY(10px)}
+    100%{opacity:1; transform:translateY(0)}
+}
+.lh_pic{
+    height:170px; background:#fafbfd; display:flex; align-items:center; justify-content:center;
+    border-bottom:1px solid var(--lh-line); position:relative;
+}
+.lh_pic img{max-width:82%; max-height:82%; object-fit:contain; transition:transform .3s}
+.lh_card:hover .lh_pic img{transform:scale(1.08)}
+.lh_badge{
+    position:absolute; top:10px; left:10px;
+    font-size:11px; font-weight:700; color:#fff;
+    background:linear-gradient(135deg,#ff7a7a,#f0526d);
+    padding:3px 9px; border-radius:999px;
+}
+.lh_body{padding:12px 14px 14px; display:flex; flex-direction:column; gap:6px; flex:1}
+.lh_cat{font-size:11px; color:var(--lh-main); text-transform:uppercase; letter-spacing:.5px}
+.lh_title{
+    font-size:14px; font-weight:700; color:var(--lh-text);
+    display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
+    min-height:42px;
+}
+.lh_row{display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-top:auto}
+.lh_brand{font-size:11px; color:var(--lh-muted); border:1px solid var(--lh-line);
+          border-radius:999px; padding:2px 8px; background:#f3f5fa}
+.lh_rating{
+    font-size:12px; color:var(--lh-orange); display:inline-flex; align-items:center; gap:4px;
+}
+.lh_rating .iconfont{font-size:12px}
+.lh_price_row{display:flex; align-items:baseline; gap:8px; margin-top:4px}
+.lh_price{font-size:20px; font-weight:800; color:var(--lh-red)}
+.lh_price::before{content:'¥'; font-size:13px}
+.lh_price_old{font-size:12px; color:var(--lh-muted); text-decoration:line-through}
+.lh_stock{font-size:11px; color:var(--lh-muted); margin-left:auto}
+.lh_stock.low{color:var(--lh-orange)}
+.lh_tip{
+    margin-top:10px; text-align:center; font-size:12px; color:var(--lh-muted);
+}
+.lh_empty{
+    margin-top:20px; text-align:center; font-size:13px; color:var(--lh-muted);
+    padding:56px 0; background:var(--lh-card);
+    border:1px dashed #dfe3ec; border-radius:16px;
+}
+.lh_footer{margin-top:34px; text-align:center; font-size:12px; color:#c0c6d2}
+@media (max-width:560px){
+    body{padding:24px 10px 48px}
+    .lh_header h1{font-size:19px}
+}
+</style>
+</head>
+<body>
+<div class="lh_wrap">
+
+    <header class="lh_header">
+        <div class="lh_logo">17-3</div>
+        <div>
+            <h1>商品列表</h1>
+            <p class="lh_sub">数据来源 <code>https://dummyjson.com/products?limit=8</code> · 点击卡片查看详情</p>
+        </div>
+        <a class="lh_back" href="index.html"><i class="iconfont">&#xe600;</i>返回首页</a>
+    </header>
+
+    <div class="lh_status" id="lh_status">
+        <i class="iconfont">&#xe631;</i>
+        <span>正在用 fetch 请求商品列表接口…</span>
+    </div>
+
+    <main class="lh_grid" id="lh_grid">
+        <div class="lh_empty">商品加载中…</div>
+    </main>
+    <p class="lh_tip" id="lh_tip" hidden>点击任意商品卡片 → 跳转 <code style="font-family:Consolas,Monaco,monospace">17-3-detail.html?id=商品ID</code> 查看详情</p>
+
+    <footer class="lh_footer">© 刘晗的《高级网页设计》课堂实践 · 17-3 商品列表</footer>
+</div>
+
+<script>
+(function(){
+    const lh_API = 'https://dummyjson.com/products?limit=8';
+    const lh_grid = document.getElementById('lh_grid');
+    const lh_status = document.getElementById('lh_status');
+    const lh_tip = document.getElementById('lh_tip');
+
+    function lh_esc(s){
+        return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;')
+                        .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+    function lh_setStatus(html, err){
+        lh_status.classList.toggle('lh_err', !!err);
+        lh_status.innerHTML = '<i class="iconfont">' + (err ? '&#xe662;' : '&#xe631;') + '</i><span></span>';
+        lh_status.querySelector('span').innerHTML = html;
+    }
+
+    /* ---------- 渲染商品卡片 ---------- */
+    function lh_render(lh_products){
+        if(lh_products.length === 0){
+            lh_grid.innerHTML = '<div class="lh_empty">接口没有返回商品数据</div>';
+            return;
+        }
+        let lh_html = '';
+        lh_products.forEach(function(p, i){
+            const lh_old = (p.discountPercentage > 0)
+                ? (p.price / (1 - p.discountPercentage / 100)).toFixed(2) : '';
+            lh_html += '<div class="lh_card" data-id="' + p.id + '" style="animation-delay:' + (i * 60) + 'ms" title="点击查看详情">'
+                     + '<div class="lh_pic">'
+                     +   (p.discountPercentage > 0 ? '<span class="lh_badge">-' + p.discountPercentage + '%</span>' : '')
+                     +   '<img src="' + lh_esc(p.thumbnail) + '" alt="' + lh_esc(p.title) + '" loading="lazy">'
+                     + '</div>'
+                     + '<div class="lh_body">'
+                     +   '<span class="lh_cat">' + lh_esc(p.category) + '</span>'
+                     +   '<div class="lh_title">' + lh_esc(p.title) + '</div>'
+                     +   '<div class="lh_row">'
+                     +     (p.brand ? '<span class="lh_brand">' + lh_esc(p.brand) + '</span>' : '')
+                     +     '<span class="lh_rating"><i class="iconfont">&#xe62c;</i>' + p.rating.toFixed(1) + '</span>'
+                     +   '</div>'
+                     +   '<div class="lh_price_row">'
+                     +     '<span class="lh_price">' + p.price.toFixed(2) + '</span>'
+                     +     (lh_old ? '<span class="lh_price_old">¥' + lh_old + '</span>' : '')
+                     +     '<span class="lh_stock' + (p.stock < 20 ? ' low' : '') + '">库存 ' + p.stock + '</span>'
+                     +   '</div>'
+                     + '</div>'
+                     + '</div>';
+        });
+        lh_grid.innerHTML = lh_html;
+    }
+
+    /* ---------- fetch 获取商品列表 ---------- */
+    async function lh_load(){
+        try{
+            lh_setStatus('正在请求 <b>' + lh_API + '</b> …');
+            lh_status.insertAdjacentHTML('afterbegin', '<span class="lh_spinner"></span>');
+            const lh_res = await fetch(lh_API);
+            if(!lh_res.ok) throw new Error('HTTP 状态码 ' + lh_res.status);
+            const lh_json = await lh_res.json();           // { total, skip, limit, products: [...] }
+            lh_render(lh_json.products);
+            lh_tip.hidden = false;
+            lh_setStatus('请求成功（<b>' + lh_res.status + '</b>）：共 <b>' + lh_json.total + '</b> 个商品，'
+                       + '按 limit=8 取回前 <b>' + lh_json.products.length + '</b> 个');
+        }catch(err){
+            lh_grid.innerHTML = '<div class="lh_empty">数据加载失败，请检查网络后刷新重试</div>';
+            lh_setStatus('请求失败：' + lh_esc(err.message), true);
+        }
+    }
+
+    /* ---------- 点击卡片跳转详情页（把 id 放进查询参数） ---------- */
+    lh_grid.addEventListener('click', function(e){
+        const lh_card = e.target.closest('.lh_card');
+        if(!lh_card || !lh_card.dataset.id) return;
+        location.href = '17-3-detail.html?id=' + lh_card.dataset.id;
+    });
+
+    lh_load();
+})();
+</script>
+</body>
+</html>

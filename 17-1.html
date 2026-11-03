@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<!-- 姓名：刘晗，建立时间：2026-11-02，使用的大模型：GLM-5.3，功能名称：JSON 展示（数据类型、parse/stringify 交互、可视化树） -->
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>17-1 JSON 展示</title>
+<link rel="stylesheet" href="font/iconfont.css">
+<style>
+:root{
+    --lh-bg1:#071428; --lh-bg2:#081726;
+    --lh-accent:#7ee3c7; --lh-accent2:#84a0ff;
+    --lh-text:#eaf6ff; --lh-muted:#9fb0c8;
+    --lh-line:rgba(255,255,255,0.09);
+}
+*{box-sizing:border-box}
+body{
+    margin:0; padding:32px 16px 56px;
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Microsoft YaHei",Arial;
+    color:var(--lh-text); line-height:1.6;
+    background:radial-gradient(1000px 500px at 8% 0%, rgba(124,58,237,0.10), transparent 60%),
+               radial-gradient(900px 500px at 95% 100%, rgba(14,165,164,0.08), transparent 60%),
+               linear-gradient(180deg, var(--lh-bg1) 0%, var(--lh-bg2) 100%);
+    min-height:100vh;
+}
+.lh_wrap{max-width:960px; margin:0 auto}
+
+/* ---------- 头部 ---------- */
+.lh_header{display:flex; align-items:center; gap:16px; margin-bottom:8px}
+.lh_logo{
+    width:56px; height:56px; border-radius:14px; flex:none;
+    background:linear-gradient(135deg, var(--lh-accent), var(--lh-accent2));
+    display:flex; align-items:center; justify-content:center;
+    font-weight:800; font-size:18px; color:#06202a;
+    box-shadow:0 6px 20px rgba(2,6,23,0.6);
+}
+.lh_header h1{margin:0; font-size:23px}
+.lh_sub{margin:2px 0 0; font-size:13px; color:var(--lh-muted)}
+.lh_back{
+    margin-left:auto; flex:none; display:inline-flex; align-items:center; gap:6px;
+    padding:8px 16px; border-radius:999px; text-decoration:none;
+    color:var(--lh-accent); font-size:13px; font-weight:700;
+    border:1px solid rgba(126,227,199,0.35); background:rgba(126,227,199,0.08);
+    transition:transform .18s, box-shadow .18s;
+}
+.lh_back:hover{transform:translateY(-2px); box-shadow:0 8px 18px rgba(46,140,160,0.4)}
+.lh_back .iconfont{font-size:14px}
+
+.lh_h2{
+    margin:30px 0 12px; font-size:15px; padding-left:10px;
+    border-left:3px solid var(--lh-accent);
+}
+.lh_h2 small{color:var(--lh-muted); font-weight:400; font-size:12px; margin-left:8px}
+
+/* ---------- JSON 六种数据类型 ---------- */
+.lh_types{display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:12px}
+.lh_type{
+    border-radius:12px; padding:14px 12px; text-align:center;
+    background:rgba(255,255,255,0.04); border:1px solid var(--lh-line);
+    transition:transform .2s, border-color .2s;
+}
+.lh_type:hover{transform:translateY(-4px)}
+.lh_type_code{
+    font-family:Consolas,Monaco,monospace; font-size:14px; font-weight:700;
+    margin-bottom:6px; word-break:break-all;
+}
+.lh_type_name{font-size:12px; color:var(--lh-muted)}
+
+/* ---------- 游乐场 ---------- */
+.lh_play{
+    display:grid; grid-template-columns:1fr 1fr; gap:14px;
+}
+@media (max-width:760px){ .lh_play{grid-template-columns:1fr} }
+.lh_pane{
+    border-radius:14px; padding:14px;
+    background:rgba(255,255,255,0.04); border:1px solid var(--lh-line);
+}
+.lh_pane_title{
+    display:flex; align-items:center; gap:8px; font-size:13px; margin-bottom:10px; color:var(--lh-muted);
+}
+.lh_pane_title .iconfont{color:var(--lh-accent)}
+.lh_textarea{
+    width:100%; height:300px; resize:vertical; border-radius:10px;
+    border:1px solid var(--lh-line); background:rgba(0,0,0,0.35); color:#cfe8ff;
+    font-family:Consolas,Monaco,monospace; font-size:13px; line-height:1.6;
+    padding:12px; outline:none;
+}
+.lh_textarea:focus{border-color:rgba(126,227,199,0.5)}
+.lh_tree_box{
+    height:300px; overflow:auto; border-radius:10px;
+    border:1px solid var(--lh-line); background:rgba(0,0,35,0.22);
+    padding:12px 14px;
+    font-family:Consolas,Monaco,monospace; font-size:13px; line-height:1.9;
+}
+.lh_hint{color:var(--lh-muted); font-size:12px; text-align:center; padding:40px 0}
+.lh_btns{display:flex; flex-wrap:wrap; gap:10px; margin-top:12px}
+.lh_btn{
+    padding:9px 18px; border:none; border-radius:999px; cursor:pointer;
+    font-size:13px; font-weight:700; color:#06202a;
+    background:linear-gradient(135deg, var(--lh-accent), var(--lh-accent2));
+    box-shadow:0 6px 16px rgba(46,140,160,0.35);
+    transition:transform .18s, box-shadow .18s;
+}
+.lh_btn:hover{transform:translateY(-2px); box-shadow:0 10px 22px rgba(46,140,160,0.5)}
+.lh_btn.lh_ghost{
+    background:transparent; color:var(--lh-muted); border:1px solid var(--lh-line); box-shadow:none;
+}
+.lh_btn.lh_ghost:hover{color:var(--lh-text)}
+
+/* ---------- 可视化树配色 ---------- */
+.lh_key{color:#84a0ff}
+.lh_colon{color:var(--lh-muted); margin:0 4px 0 2px}
+.lh_brk{color:#ffcb6b; font-weight:700}
+.lh_t_str{color:#7ee3a0}
+.lh_t_num{color:#ffd166}
+.lh_t_bool{color:#c792ea}
+.lh_t_null{color:#8fa8ff; opacity:.85}
+.lh_kids{padding-left:22px; border-left:1px dashed rgba(255,255,255,0.14); margin:2px 0 2px 4px}
+.lh_comma{color:var(--lh-muted)}
+@keyframes lh_pop{
+    0%{opacity:0; transform:translateY(6px)}
+    100%{opacity:1; transform:translateY(0)}
+}
+.lh_tree_box > *{animation:lh_pop .35s ease}
+
+/* ---------- 控制台 ---------- */
+.lh_console{
+    margin-top:14px; height:180px; overflow-y:auto; border-radius:12px; padding:12px 14px;
+    background:rgba(0,0,0,0.38); border:1px solid var(--lh-line);
+    font-family:Consolas,Monaco,monospace; font-size:13px;
+}
+.lh_log{
+    padding:8px 12px; border-radius:10px; margin-bottom:8px;
+    border:1px solid var(--lh-line); background:rgba(255,255,255,0.03);
+    animation:lh_pop .3s ease;
+}
+.lh_log.lh_err{border-color:rgba(255,120,120,0.45); background:rgba(255,90,90,0.07)}
+.lh_code{color:#cfe8ff}
+.lh_code::before{content:'> '; color:var(--lh-accent2)}
+.lh_log.lh_err .lh_code::before{content:'× '; color:#ff7a7a}
+.lh_ret{margin-top:4px; color:var(--lh-accent); word-break:break-all}
+.lh_log.lh_err .lh_ret{color:#ff9c9c}
+
+/* ---------- 实战：学生卡片 ---------- */
+.lh_students{display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:14px}
+.lh_stu{
+    border-radius:14px; padding:16px; text-align:center;
+    background:rgba(255,255,255,0.04); border:1px solid var(--lh-line);
+    transition:transform .2s, border-color .2s;
+}
+.lh_stu:hover{transform:translateY(-5px); border-color:rgba(126,227,199,0.4)}
+.lh_stu .iconfont{font-size:38px; color:var(--lh-accent2)}
+.lh_stu_name{font-size:15px; font-weight:700; margin-top:8px}
+.lh_stu_age{font-size:12px; color:var(--lh-muted); margin-top:2px}
+.lh_stu_hobbies{display:flex; flex-wrap:wrap; gap:6px; justify-content:center; margin-top:10px}
+.lh_hobby{
+    font-size:11px; padding:3px 10px; border-radius:999px;
+    color:var(--lh-accent); border:1px solid rgba(126,227,199,0.35);
+    background:rgba(126,227,199,0.08);
+}
+.lh_pass{
+    display:inline-flex; align-items:center; gap:5px; margin-top:12px;
+    font-size:12px; padding:4px 12px; border-radius:999px;
+}
+.lh_pass .iconfont{font-size:12px}
+.lh_pass.ok{color:#7ee3a0; border:1px solid rgba(126,227,160,0.35); background:rgba(126,227,160,0.08)}
+.lh_pass.no{color:#9fb0c8; border:1px solid var(--lh-line); background:rgba(255,255,255,0.03)}
+
+.lh_footer{margin-top:30px; font-size:12px; color:var(--lh-muted); opacity:.75; text-align:center}
+</style>
+</head>
+<body>
+<div class="lh_wrap">
+
+    <header class="lh_header">
+        <div class="lh_logo">17-1</div>
+        <div>
+            <h1>JSON 展示</h1>
+            <p class="lh_sub">JSON（JavaScript Object Notation）—— 轻量级的数据交换格式，就像网页世界的"通用快递箱"</p>
+        </div>
+        <a class="lh_back" href="index.html"><i class="iconfont">&#xe600;</i>返回首页</a>
+    </header>
+
+    <!-- ① JSON 支持的六种数据类型 -->
+    <section>
+        <h2 class="lh_h2">① JSON 支持的六种数据类型 <small>点击游乐场按钮试试它们长什么样</small></h2>
+        <div class="lh_types">
+            <div class="lh_type">
+                <div class="lh_type_code" style="color:#7ee3a0">"刘晗"</div>
+                <div class="lh_type_name">字符串 string</div>
+            </div>
+            <div class="lh_type">
+                <div class="lh_type_code" style="color:#ffd166">20</div>
+                <div class="lh_type_name">数字 number</div>
+            </div>
+            <div class="lh_type">
+                <div class="lh_type_code" style="color:#c792ea">true</div>
+                <div class="lh_type_name">布尔 boolean</div>
+            </div>
+            <div class="lh_type">
+                <div class="lh_type_code" style="color:#8fa8ff">null</div>
+                <div class="lh_type_name">空值 null</div>
+            </div>
+            <div class="lh_type">
+                <div class="lh_type_code" style="color:#ffcb6b">[1, 2, 3]</div>
+                <div class="lh_type_name">数组 array</div>
+            </div>
+            <div class="lh_type">
+                <div class="lh_type_code" style="color:#84a0ff">{"k": "v"}</div>
+                <div class="lh_type_name">对象 object</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ② 交互游乐场 -->
+    <section>
+        <h2 class="lh_h2">② 交互游乐场 <small>左边改 JSON 文本，点按钮看右边发生什么</small></h2>
+        <div class="lh_play">
+            <div class="lh_pane">
+                <div class="lh_pane_title"><i class="iconfont">&#xe64a;</i>JSON 字符串（文本）</div>
+                <textarea class="lh_textarea" id="lh_input" spellcheck="false"></textarea>
+                <div class="lh_btns">
+                    <button class="lh_btn" id="lh_parse"><i class="iconfont">&#xe8a3;</i> JSON.parse() 解析</button>
+                    <button class="lh_btn lh_ghost" id="lh_stringify">JSON.stringify(obj, null, 2) 美化</button>
+                    <button class="lh_btn lh_ghost" id="lh_compress">压缩成一行</button>
+                    <button class="lh_btn lh_ghost" id="lh_demo2">换个示例</button>
+                </div>
+            </div>
+            <div class="lh_pane">
+                <div class="lh_pane_title"><i class="iconfont">&#xe631;</i>解析结果（JavaScript 对象 · 可视化树）</div>
+                <div class="lh_tree_box" id="lh_tree">
+                    <div class="lh_hint">点击「JSON.parse() 解析」，JSON 字符串会在这里变成彩色的对象树…</div>
+                </div>
+            </div>
+        </div>
+        <div class="lh_console" id="lh_console">
+            <div class="lh_hint">控制台输出…</div>
+        </div>
+    </section>
+
+    <!-- ③ 实战：用 JSON 渲染学生卡片 -->
+    <section>
+        <h2 class="lh_h2">③ 实战：用 JSON 数据渲染学生卡片 <small>模拟服务器返回的 JSON 被渲染成页面</small></h2>
+        <div class="lh_students" id="lh_students"></div>
+    </section>
+
+    <footer class="lh_footer">© 刘晗的《高级网页设计》课堂实践 · 17-1 JSON 展示</footer>
+</div>
+
+<script>
+(function(){
+    const lh_input   = document.getElementById('lh_input');
+    const lh_tree    = document.getElementById('lh_tree');
+    const lh_console = document.getElementById('lh_console');
+    let lh_parsed    = null; // 最近一次成功解析出来的对象
+
+    /* ---------- 两个示例 JSON ---------- */
+    const lh_demo1 = JSON.stringify({
+        className: "高级网页设计3班",
+        teacher: "王老师",
+        room: 302,
+        open: true,
+        students: [
+            { name: "刘晗", age: 20, hobbies: ["前端", "篮球"], passed: true },
+            { name: "小李", age: 21, hobbies: ["摄影", "吉他"], passed: false, remark: null }
+        ]
+    }, null, 2);
+
+    const lh_demo2 = JSON.stringify({
+        shop: "水果便利店",
+        address: "梧桐路 16 号",
+        todayOpen: true,
+        fruits: [
+            { name: "苹果", price: 8, stock: 30 },
+            { name: "樱桃", price: 20, stock: 5 },
+            { name: "山竹", price: 12, stock: 0 }
+        ]
+    }, null, 2);
+
+    /* ---------- 工具函数 ---------- */
+    function lh_esc(s){
+        return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;')
+                        .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+    function lh_clearHint(el){
+        const h = el.querySelector('.lh_hint');
+        if(h) h.remove();
+    }
+    function lh_log(code, ret, isErr){
+        lh_clearHint(lh_console);
+        const e = document.createElement('div');
+        e.className = 'lh_log' + (isErr ? ' lh_err' : '');
+        e.innerHTML = '<div class="lh_code"></div><div class="lh_ret"></div>';
+        e.querySelector('.lh_code').textContent = code;
+        e.querySelector('.lh_ret').textContent = ret;
+        lh_console.prepend(e); // 最新在最上面
+    }
+
+    /* ---------- 把任意 JS 值渲染成彩色可视化树 ---------- */
+    function lh_jsonHTML(val, key){
+        let lh_head = '';
+        if(key !== undefined){
+            lh_head = '<span class="lh_key">"' + lh_esc(key) + '"</span><span class="lh_colon">:</span>';
+        }
+        if(Array.isArray(val)){
+            const lh_kids = val.map(function(v, i){
+                return lh_jsonHTML(v, String(i)) + '<span class="lh_comma">,</span>';
+            }).join('');
+            return '<div>' + lh_head + '<span class="lh_brk">[</span>'
+                 + '<div class="lh_kids">' + lh_kids.replace(/<span class="lh_comma">,<\/span>$/, '') + '</div>'
+                 + '<span class="lh_brk">]</span></div>';
+        }
+        if(val !== null && typeof val === 'object'){
+            const lh_kids = Object.keys(val).map(function(k){
+                return lh_jsonHTML(val[k], k) + '<span class="lh_comma">,</span>';
+            }).join('');
+            return '<div>' + lh_head + '<span class="lh_brk">{</span>'
+                 + '<div class="lh_kids">' + lh_kids.replace(/<span class="lh_comma">,<\/span>$/, '') + '</div>'
+                 + '<span class="lh_brk">}</span></div>';
+        }
+        // 基本类型
+        let lh_cls = 'lh_t_null', lh_text = 'null';
+        if(val === null){ lh_cls = 'lh_t_null'; }
+        else if(typeof val === 'string'){ lh_cls = 'lh_t_str'; lh_text = '"' + lh_esc(val) + '"'; }
+        else if(typeof val === 'boolean'){ lh_cls = 'lh_t_bool'; lh_text = String(val); }
+        else if(typeof val === 'number'){ lh_cls = 'lh_t_num'; lh_text = String(val); }
+        return '<div>' + lh_head + '<span class="' + lh_cls + '">' + lh_text + '</span></div>';
+    }
+
+    /* ---------- 解析：JSON.parse ---------- */
+    function lh_doParse(){
+        try{
+            lh_parsed = JSON.parse(lh_input.value);
+            lh_clearHint(lh_tree);
+            lh_tree.innerHTML = lh_jsonHTML(lh_parsed);
+            const lh_type = Array.isArray(lh_parsed) ? '数组' : (lh_parsed !== null && typeof lh_parsed === 'object' ? '对象' : typeof lh_parsed);
+            lh_log('JSON.parse(text)', '解析成功！得到一个' + lh_type + '（右侧已可视化）',
+                false);
+        }catch(err){
+            lh_parsed = null;
+            lh_log('JSON.parse(text)', '解析失败：' + err.message + '（JSON 对键名和字符串必须用双引号，不能有多余逗号）', true);
+        }
+    }
+
+    /* ---------- 序列化：JSON.stringify ---------- */
+    function lh_doStringify(indent){
+        if(lh_parsed === null){
+            try{ lh_parsed = JSON.parse(lh_input.value); }
+            catch(err){
+                lh_log('JSON.stringify(obj)', '请先解析出合法对象，当前文本无法解析：' + err.message, true);
+                return;
+            }
+        }
+        const lh_out = indent ? JSON.stringify(lh_parsed, null, 2) : JSON.stringify(lh_parsed);
+        lh_input.value = lh_out;
+        lh_log(indent ? 'JSON.stringify(obj, null, 2)' : 'JSON.stringify(obj)',
+            '已生成' + (indent ? '带缩进的漂亮' : '压缩成一行的') + 'JSON（' + lh_out.length + ' 个字符），写回了左侧文本框');
+    }
+
+    /* ---------- 事件绑定 ---------- */
+    document.getElementById('lh_parse').addEventListener('click', lh_doParse);
+    document.getElementById('lh_stringify').addEventListener('click', function(){ lh_doStringify(true); });
+    document.getElementById('lh_compress').addEventListener('click', function(){ lh_doStringify(false); });
+    document.getElementById('lh_demo2').addEventListener('click', function(){
+        lh_input.value = (lh_input.value === lh_demo2) ? lh_demo1 : lh_demo2;
+        lh_doParse();
+    });
+
+    /* ---------- 实战：JSON 渲染学生卡片 ---------- */
+    const lh_json = '[{"name":"刘晗","age":20,"hobbies":["前端","篮球"],"passed":true},'
+                  + '{"name":"小陈","age":21,"hobbies":["摄影","游泳"],"passed":true},'
+                  + '{"name":"小赵","age":19,"hobbies":["吉他"],"passed":false},'
+                  + '{"name":"小孙","age":22,"hobbies":["跑步","画画","旅行"],"passed":true}]';
+    const lh_data = JSON.parse(lh_json); // 这就是服务器返回 JSON 后的典型用法
+    const lh_stuBox = document.getElementById('lh_students');
+    lh_data.forEach(function(stu){
+        const d = document.createElement('article');
+        d.className = 'lh_stu';
+        d.innerHTML = '<i class="iconfont">&#xe78b;</i>'
+                    + '<div class="lh_stu_name"></div>'
+                    + '<div class="lh_stu_age"></div>'
+                    + '<div class="lh_stu_hobbies"></div>'
+                    + '<span class="lh_pass ' + (stu.passed ? 'ok' : 'no') + '"><i class="iconfont">&#xec7f;</i></span>';
+        d.querySelector('.lh_stu_name').textContent = stu.name;
+        d.querySelector('.lh_stu_age').textContent = stu.age + ' 岁';
+        stu.hobbies.forEach(function(h){
+            const chip = document.createElement('span');
+            chip.className = 'lh_hobby';
+            chip.textContent = h;
+            d.querySelector('.lh_stu_hobbies').appendChild(chip);
+        });
+        d.querySelector('.lh_pass').appendChild(document.createTextNode(stu.passed ? '已通过' : '未通过'));
+        lh_stuBox.appendChild(d);
+    });
+
+    /* ---------- 初始状态 ---------- */
+    lh_input.value = lh_demo1;
+})();
+</script>
+</body>
+</html>

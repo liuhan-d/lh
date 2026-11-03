@@ -5,3 +5,19 @@ h2{
     text-align: center;
     color: #039;
 }
+
+/* ===== 刘晗的全局公共样式（类名前缀 lh_ = 姓名缩写） ===== */
+/* 使用方式：页面 <body class="lh_page">，即可套用统一的全局基础样式 */
+body.lh_page{
+    margin:0; padding:60px 16px 60px;
+    font-family:"Microsoft YaHei","PingFang SC",system-ui,Arial;
+    color:#333; line-height:1.6;
+    background:#fff;
+}
+body.lh_page a{text-decoration:none}
+/* 全局页脚：版权 + 返回首页 */
+.lh_copy{
+    margin-top:14px; text-align:center; font-size:12px; color:#c0c0c0;
+}
+.lh_copy a{color:#c0c6d2; text-decoration:none}
+.lh_copy a:hover{color:#3377AA}
