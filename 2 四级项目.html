@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<!-- 姓名：刘晗，建立时间：2026-11-03，使用的大模型：GLM-5.3，功能名称：仿视频网站"最受欢迎的影评"列表组件 -->
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2 四级项目 · 最受欢迎的影评</title>
+<link rel="stylesheet" href="css.css">
+<style>
+:root{
+    --lh-text:#333; --lh-muted:#666699; --lh-grey:#666;
+    --lh-link:#3377AA; --lh-line:#f0f0f0;
+    --lh-blue-icon:#5b8bd0; --lh-star:#ffac2d; --lh-star-empty:#ddd;
+}
+*{box-sizing:border-box}
+/* 页面基础样式统一用全局 css.css 的 body.lh_page，这里只做本页留白微调 */
+body{padding:50px 16px 60px}
+.lh_wrap{width:1000px; max-width:100%; margin:0 auto}
+
+/* ---------- 头部 ---------- */
+.lh_head{
+    display:flex; align-items:baseline; gap:18px;
+    padding-bottom:16px; border-bottom:1px solid var(--lh-line);
+}
+.lh_head h1{
+    margin:0; font-size:21px; font-weight:700; color:#000; letter-spacing:.5px;
+}
+.lh_head a{
+    font-size:14px; color:var(--lh-muted); text-decoration:none;
+    transition:color .2s;
+}
+.lh_head a b{color:var(--lh-blue-icon); font-weight:400; margin-left:1px}
+.lh_head a:hover{color:var(--lh-link)}
+
+/* ---------- 影评条目 ---------- */
+.lh_review{
+    display:flex; gap:24px;
+    padding:28px 2px 30px;
+    border-bottom:1px solid var(--lh-line);
+    animation:lh_pop .4s ease both;
+}
+@keyframes lh_pop{
+    0%{opacity:0; transform:translateY(8px)}
+    100%{opacity:1; transform:translateY(0)}
+}
+/* 左侧海报 */
+.lh_poster{
+    flex:none; width:92px; height:130px; border-radius:3px; overflow:hidden;
+    background:#f5f5f5; box-shadow:0 2px 8px rgba(0,0,0,0.12);
+}
+.lh_poster img{width:100%; height:100%; object-fit:cover; display:block; transition:transform .3s}
+.lh_review:hover .lh_poster img{transform:scale(1.06)}
+
+/* 右侧内容 */
+.lh_body{flex:1; min-width:0}
+.lh_title{
+    margin:0 0 8px; font-size:17px; font-weight:400;
+    color:var(--lh-link); text-decoration:none;
+    display:inline-block;
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+    max-width:100%;
+}
+.lh_title:hover{text-decoration:underline}
+.lh_meta{font-size:14px; color:var(--lh-grey); margin-bottom:10px}
+.lh_meta .lh_author{color:var(--lh-grey)}
+.lh_meta .lh_movie{color:#666666; text-decoration:none}
+.lh_meta .lh_movie:hover{text-decoration:underline}
+.lh_stars{margin-left:8px; font-size:14px; letter-spacing:2px; color:var(--lh-star)}
+.lh_stars .lh_off{color:var(--lh-star-empty)}
+/* 半星：渐变裁剪 */
+.lh_stars .lh_half{
+    background:linear-gradient(90deg, var(--lh-star) 50%, var(--lh-star-empty) 50%);
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+.lh_text{
+    margin:0; font-size:14px; color:#111111; line-height:1.9;
+}
+.lh_full{
+    color:var(--lh-link); text-decoration:none; white-space:nowrap;
+}
+.lh_full:hover{text-decoration:underline}
+
+.lh_copy{margin-top:26px}
+@media (max-width:640px){
+    body{padding:24px 10px 40px}
+    .lh_head h1{font-size:17px}
+    .lh_review{gap:14px}
+    .lh_poster{width:72px; height:102px}
+}
+</style>
+</head>
+<body class="lh_page">
+<div class="lh_wrap">
+
+    <!-- 头部：最受欢迎的影评 -->
+    <div class="lh_head">
+        <h1>最受欢迎的影评</h1>
+        <a href="javascript:void(0)">更多热门影评<b>»</b></a>
+        <a href="javascript:void(0)">新片影评<b>»</b></a>
+    </div>
+
+    <!-- 影评列表（JS 渲染） -->
+    <div class="lh_list"></div>
+
+    <p class="lh_copy">© 刘晗的《高级网页设计》课堂实践 · <a href="index.html">返回首页</a></p>
+</div>
+
+<script>
+(function(){
+    /* ---------- 影评数据 ---------- */
+    const lh_reviews = [
+        {
+            poster:'img/review2.webp',
+            title:'不困幻影，不负真心',
+            author:'Protostell_',
+            movie:'冬天的故事',
+            stars:4,
+            text:'侯麦又在对"人类情感执念"做的一场冷酷恐怖的心理实验了。 看这片不能被帕斯卡的"赌注"理论带跑。 帕斯卡说，赌灵魂不朽，胜算虽低，一旦赢了收益无限。那就觉得菲利茜就是一个极端的赌徒，用五年的青春做筹码…'
+        },
+        {
+            poster:'img/review4.webp',
+            title:'我并不想成为play的一环',
+            author:'Finrod',
+            movie:'你能看到一切',
+            stars:3,
+            text:'看完了，不喜欢。 先承认它真的非常entertaining，节奏、笑点、信息揭示、人物关系、真实素材和重演之间的切换，都做得很流畅（…以至于technically我甚至不太确定该不该把它算成纪录片，虽然它用了大量纪录片素材…'
+        },
+        {
+            poster:'img/review3.webp',
+            title:'一些我喜欢的理论',
+            author:'EVEz',
+            movie:'逃出布迪秀',
+            stars:3.5,
+            text:'超级喜欢这种可以有很多理论供大家讨论的电影！堆一些我比较喜欢的在这里，大部分来源都是reddit，或者有一些我在TikTok/YouTube刷到的，或者我自己补充的；注：以下理论均非官方，仅供娱乐参考。如果你觉得牵强…'
+        },
+        {
+            poster:'img/review1.webp',
+            title:'《三星堆：未来往事》：首部AI院线片，和它来不及更新的两年',
+            author:'吉阳',
+            movie:'三星堆：未来往事',
+            stars:0,
+            text:'《三星堆：未来往事》10月23日上映。 上映前，猫眼想看不足6000人。双平台预约约14.4万，灯塔预测总票房216.9万。而它的制作成本，对外口径是1000万。 这几个数字放在一起，很多人第一反应是算账：1000万花在哪了…'
+        }
+    ];
+
+    /* ---------- 星级渲染：支持整数与 .5 ---------- */
+    function lh_stars(n){
+        let lh_html = '';
+        for(let i = 1; i <= 5; i++){
+            if(n >= i){
+                lh_html += '<span>★</span>';
+            }else if(n >= i - 0.5){
+                lh_html += '<span class="lh_half">★</span>';
+            }else{
+                lh_html += '<span class="lh_off">★</span>';
+            }
+        }
+        return lh_html;
+    }
+
+    /* ---------- 渲染列表 ---------- */
+    const lh_list = document.querySelector('.lh_list');
+    let lh_html = '';
+    lh_reviews.forEach(function(r, i){
+        lh_html += '<div class="lh_review" style="animation-delay:' + (i * 80) + 'ms">'
+                 +   '<div class="lh_poster"><img src="' + r.poster + '" alt="' + r.movie + '"></div>'
+                 +   '<div class="lh_body">'
+                 +     '<a class="lh_title" href="javascript:void(0)">' + r.title + '</a>'
+                 +     '<div class="lh_meta">'
+                 +       '<span class="lh_author">' + r.author + '</span> 评论 '
+                 +       '<a class="lh_movie" href="javascript:void(0)">《' + r.movie + '》</a>'
+                 +       (r.stars > 0 ? '<span class="lh_stars">' + lh_stars(r.stars) + '</span>' : '')
+                 +     '</div>'
+                 +     '<p class="lh_text">' + r.text + '… <a class="lh_full" href="javascript:void(0)">(全文)</a></p>'
+                 +   '</div>'
+                 + '</div>';
+    });
+    lh_list.innerHTML = lh_html;
+})();
+</script>
+</body>
+</html>

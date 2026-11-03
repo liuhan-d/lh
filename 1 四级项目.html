@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<!-- 姓名：刘晗，建立时间：2026-11-02，使用的大模型：GLM-5.3，功能名称：仿视频网站"一周口碑榜"小组件 -->
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>1 四级项目 · 一周口碑榜</title>
+<link rel="stylesheet" href="css.css">
+<style>
+:root{
+    --lh-text:#333; --lh-muted:#999;
+    --lh-link:#3377AA; --lh-line:#ededed;
+    --lh-blue-icon:#5b8bd0;
+}
+*{box-sizing:border-box}
+/* 页面基础样式（字体/配色/留白/页脚）统一在全局 css.css 的 body.lh_page 中定义 */
+.lh_wrap{width:420px; margin:0 auto}
+
+/* ---------- 一周口碑榜组件（无边框白底面板） ---------- */
+.lh_rank{background:#fff}
+.lh_rank_head{
+    display:flex; align-items:baseline; gap:16px;
+    padding:6px 24px 22px;
+}
+.lh_rank_head h2{
+    margin:0; font-size:21px; font-weight:700; color:#000; letter-spacing:1px;
+}
+.lh_more{
+    font-size:16px; color:#666699; text-decoration:none;
+    transition:color .2s;
+}
+.lh_more b{color:#666699; font-weight:400; margin-left:1px}
+.lh_more:hover{color:var(--lh-link)}
+
+/* ---------- 榜单列表：分割线左右内缩 ---------- */
+.lh_list{list-style:none; margin:0; padding:0}
+.lh_list li{border-top:1px solid var(--lh-line); margin:0 28px 0 22px}
+.lh_list li:last-child{border-bottom:1px solid var(--lh-line)}
+.lh_item{
+    display:flex; align-items:center; gap:18px;
+    padding:22px 0; text-decoration:none;
+    transition:background .15s;
+}
+.lh_no{
+    flex:none; width:14px; text-align:center;
+    font-family:Arial, sans-serif; font-size:12px; color:#333;
+}
+.lh_name{
+    font-size:16px; color:var(--lh-link);
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+    transition:color .15s;
+}
+.lh_item:hover .lh_name{color:var(--lh-red, #e42112)}
+</style>
+</head>
+<body class="lh_page">
+<div class="lh_wrap">
+
+    <!-- 一周口碑榜 -->
+    <div class="lh_rank">
+        <div class="lh_rank_head">
+            <h2>一周口碑榜</h2>
+            <a class="lh_more" href="javascript:void(0)">更多榜单<b>»</b></a>
+        </div>
+        <ul class="lh_list"></ul>
+    </div>
+
+    <p class="lh_copy">© 刘晗的《高级网页设计》课堂实践 · <a style="color:#c0c6d2;text-decoration:none" href="index.html">返回首页</a></p>
+</div>
+
+<script>
+(function(){
+    /* ---------- 榜单数据 ---------- */
+    const lh_movies = [
+        '生日快乐',
+        '登峰传奇：丹增诺盖',
+        '害群之马',
+        '杯雪·一战成名',
+        '逃出布迪秀',
+        '生化危机：爆发夜',
+        '一个夜晚与三个夏天',
+        '野兽之心',
+        '万人之上：冬攀乔戈里峰',
+        '眩晕'
+    ];
+
+    const lh_list = document.querySelector('.lh_list');
+    let lh_html = '';
+    lh_movies.forEach(function(name, i){
+        lh_html += '<li>'
+                 +   '<a class="lh_item" href="javascript:void(0)">'
+                 +     '<span class="lh_no">' + (i + 1) + '</span>'
+                 +     '<span class="lh_name">' + name + '</span>'
+                 +   '</a>'
+                 + '</li>';
+    });
+    lh_list.innerHTML = lh_html;
+})();
+</script>
+</body>
+</html>

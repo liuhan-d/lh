@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<!-- 姓名：刘晗，建立时间：2026-11-03，使用的大模型：GLM-5.3，功能名称：仿视频网站"正在热映"电影卡片组件 -->
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>3 四级项目 · 正在热映</title>
+<link rel="stylesheet" href="css.css">
+<style>
+:root{
+    --lh-muted:#111111; --lh-grey:#666;
+    --lh-blue-icon:#5b8bd0; --lh-btn:#6D99D2;
+    --lh-star:#ffac2d; --lh-star-empty:#ddd; --lh-line:#f0f0f0;
+}
+*{box-sizing:border-box}
+/* 页面基础样式统一用全局 css.css 的 body.lh_page，这里只做本页微调 */
+body{padding:50px 16px 60px}
+
+/* ---------- 头部 ---------- */
+.lh_head{
+    display:flex; align-items:center; gap:16px;
+    padding-bottom:14px; border-bottom:1px solid var(--lh-line);
+}
+.lh_head h1{
+    margin:0; font-size:20px; font-weight:700; color:#111111; letter-spacing:.5px;
+}
+.lh_head a{
+    font-size:14px; color:var(--lh-grey); text-decoration:none; transition:color .2s;
+}
+.lh_head a b{color:var(--lh-blue-icon); font-weight:400; margin-left:1px}
+.lh_head a.lh_link_all{color:#666699}
+.lh_head a.lh_link_all:hover{color:#666699}
+.lh_head a.lh_link_soon{color:#3377AA}
+.lh_head a.lh_link_soon:hover{color:#3377AA}
+/* 右侧：页码 + 翻页箭头 */
+.lh_pager{margin-left:auto; display:flex; align-items:center; gap:16px}
+.lh_page_no{font-size:15px; color:var(--lh-muted); font-family:Arial, sans-serif}
+.lh_arrow{
+    width:28px; height:28px; border-radius:50%; border:none; cursor:pointer;
+    background:#6D99D2; color:#FFFFFF; font-size:15px; font-weight:700; line-height:1;
+    display:flex; align-items:center; justify-content:center;
+    font-family:Consolas,Monaco,monospace;
+    transition:background .2s, transform .15s;
+}
+.lh_arrow + .lh_arrow{margin-left:8px}
+.lh_arrow:hover{background:#5D8AC2; transform:scale(1.08)}
+.lh_arrow:active{transform:scale(.92)}
+/* 上一页箭头 */
+.lh_arrow.lh_dim{background:#6D99D2}
+.lh_arrow.lh_dim:hover{background:#5D8AC2; transform:none}
+
+/* ---------- 电影卡片 ---------- */
+.lh_row{
+    display:flex; gap:26px; padding-top:24px;
+}
+.lh_movie{
+    width:150px; text-align:center;
+    animation:lh_pop .4s ease both;
+}
+@keyframes lh_pop{
+    0%{opacity:0; transform:translateY(8px)}
+    100%{opacity:1; transform:translateY(0)}
+}
+.lh_poster{
+    width:150px; height:210px; border-radius:4px; overflow:hidden;
+    box-shadow:0 2px 10px rgba(0,0,0,0.14); cursor:pointer;
+}
+.lh_poster img{
+    width:100%; height:100%; object-fit:cover; display:block; transition:transform .3s;
+}
+.lh_movie:hover .lh_poster img{transform:scale(1.06)}
+.lh_name{
+    display:block; margin-top:12px; font-size:15px; color:#000; text-decoration:none;
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+    transition:color .15s;
+}
+.lh_name:hover{color:var(--lh-btn)}
+.lh_score_row{
+    margin-top:8px; height:20px;
+    display:flex; align-items:center; justify-content:center; gap:6px;
+}
+.lh_stars{font-size:15px; letter-spacing:1px; color:var(--lh-star)}
+.lh_stars .lh_off{color:var(--lh-star-empty)}
+.lh_stars .lh_half{
+    background:linear-gradient(90deg, var(--lh-star) 50%, var(--lh-star-empty) 50%);
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+.lh_score{font-size:14px; color:var(--lh-star); font-family:Arial, sans-serif}
+.lh_no_score{font-size:13px; color:var(--lh-muted)}
+.lh_buy{
+    display:inline-block; margin-top:12px;
+    width:118px; padding:7px 0; text-align:center;
+    font-size:14px; color:#FFFFFF; text-decoration:none;
+    background:#268DCD; border-radius:3px;
+    transition:background .2s, transform .15s;
+}
+.lh_buy:hover{background:#1F77B0; transform:translateY(-1px)}
+
+.lh_copy{margin-top:30px}
+</style>
+</head>
+<body class="lh_page">
+<div class="lh_wrap" style="width:880px; max-width:100%; margin:0 auto">
+
+    <!-- 头部：正在热映 -->
+    <div class="lh_head">
+        <h1>正在热映</h1>
+        <a class="lh_link_all" href="javascript:void(0)">全部正在热映<b>»</b></a>
+        <a class="lh_link_soon" href="javascript:void(0)">即将上映<b>»</b></a>
+        <div class="lh_pager">
+            <span class="lh_page_no" id="lh_page_no"></span>
+            <button class="lh_arrow lh_dim" id="lh_prev" title="上一页">‹</button>
+            <button class="lh_arrow" id="lh_next" title="下一页">›</button>
+        </div>
+    </div>
+
+    <!-- 电影卡片（JS 渲染） -->
+    <div class="lh_row" id="lh_row"></div>
+
+    <p class="lh_copy">© 刘晗的《高级网页设计》课堂实践 · <a href="index.html">返回首页</a></p>
+</div>
+
+<script>
+(function(){
+    /* ---------- 电影数据：stars 支持 .5，为 0 时显示"暂无评分" ---------- */
+    const lh_movies = [
+        { poster:'img/movie4.webp', name:'欢迎来龙餐馆',   stars:4.5, score:'8.7' },
+        { poster:'img/movie5.webp', name:'敦煌英雄',       stars:3,   score:'6.0' },
+        { poster:'img/movie2.webp', name:'奥德赛',         stars:4.5, score:'8.6' },
+        { poster:'img/movie3.webp', name:'痴迷',           stars:4,   score:'7.6' },
+        { poster:'img/movie1.webp', name:'勇敢女孩合唱团', stars:0,   score:''    }
+    ];
+    const lh_TOTAL_PAGES = 9;
+    let lh_page = 4; 
+
+    const lh_row = document.querySelector('.lh_row');
+    const lh_pageNo = document.querySelector('.lh_page_no');
+    const lh_prev = document.getElementById('lh_prev');
+    const lh_next = document.getElementById('lh_next');
+
+    /* ---------- 星级渲染：支持整数与 .5 ---------- */
+    function lh_stars(n){
+        let lh_html = '';
+        for(let i = 1; i <= 5; i++){
+            if(n >= i){
+                lh_html += '<span>★</span>';
+            }else if(n >= i - 0.5){
+                lh_html += '<span class="lh_half">★</span>';
+            }else{
+                lh_html += '<span class="lh_off">★</span>';
+            }
+        }
+        return lh_html;
+    }
+
+    /* ---------- 渲染电影卡片 ---------- */
+    function lh_render(){
+        let lh_html = '';
+        lh_movies.forEach(function(m, i){
+            const lh_score_html = m.stars > 0
+                ? '<span class="lh_stars">' + lh_stars(m.stars) + '</span>'
+                  + '<span class="lh_score">' + m.score + '</span>'
+                : '<span class="lh_no_score">暂无评分</span>';
+            lh_html += '<div class="lh_movie" style="animation-delay:' + (i * 70) + 'ms">'
+                     +   '<div class="lh_poster"><img src="' + m.poster + '" alt="' + m.name + '"></div>'
+                     +   '<a class="lh_name" href="javascript:void(0)">' + m.name + '</a>'
+                     +   '<div class="lh_score_row">' + lh_score_html + '</div>'
+                     +   '<a class="lh_buy" href="javascript:void(0)">选座购票</a>'
+                     + '</div>';
+        });
+        lh_row.innerHTML = lh_html;
+        lh_pageNo.textContent = lh_page + ' / ' + lh_TOTAL_PAGES;
+    }
+
+    /* ---------- 翻页箭头：切换页码指示（卡片做一次淡入刷新动画） ---------- */
+    lh_prev.addEventListener('click', function(){
+        if(lh_page <= 1) return;
+        lh_page--;
+        lh_pageNo.textContent = lh_page + ' / ' + lh_TOTAL_PAGES;
+        lh_render();
+    });
+    lh_next.addEventListener('click', function(){
+        if(lh_page >= lh_TOTAL_PAGES) return;
+        lh_page++;
+        lh_pageNo.textContent = lh_page + ' / ' + lh_TOTAL_PAGES;
+        lh_render();
+    });
+
+    lh_render();
+})();
+</script>
+</body>
+</html>
