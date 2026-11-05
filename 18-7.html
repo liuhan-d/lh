@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<!-- 姓名：刘晗，建立时间：2026-11-05，使用的大模型：GLM-5.3-Flash，功能名称：基于 Three.js 的 3D 数据可视化（3D 柱状图 + 3D 散点图），three.min.js 已下载到本地 cdn 目录引用 -->
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>18-7 基于 Three.js 的 3D 数据可视化</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: "Microsoft YaHei", sans-serif; background: #f5f6fa; padding: 24px 16px 48px; }
+  .lh_header { text-align: center; margin-bottom: 24px; }
+  .lh_header h1 { font-size: 26px; color: #2c3e50; }
+  .lh_header p { color: #7f8c9b; font-size: 14px; margin-top: 6px; }
+  .lh_card { max-width: 1100px; margin: 0 auto 28px; background: #fff; border-radius: 12px; padding: 24px; box-shadow: 0 2px 10px rgba(0,0,0,.06); }
+  .lh_card h2 { font-size: 18px; color: #34495e; border-left: 4px solid #e67e22; padding-left: 10px; margin-bottom: 8px; }
+  .lh_tip { font-size: 13px; color: #95a5a6; margin-bottom: 12px; }
+  .lh_scene { width: 100%; height: 460px; border-radius: 8px; overflow: hidden; background: #fafbfc; cursor: grab; }
+  .lh_scene:active { cursor: grabbing; }
+  .lh_back { display: block; width: 140px; margin: 0 auto; text-align: center; text-decoration: none; color: #e67e22; border: 1px solid #e67e22; border-radius: 20px; padding: 8px 0; font-size: 14px; }
+  .lh_back:hover { background: #e67e22; color: #fff; }
+</style>
+<!-- 本地引用 three.js：cdn 文件已下载到目录下 -->
+<script src="cdn/three.min.js"></script>
+</head>
+<body>
+  <header class="lh_header">
+    <h1>基于 Three.js 的 3D 数据可视化</h1>
+    <p>图一：3D 柱状图（某城市全年降水量）　图二：3D 散点图（螺旋数据分布）</p>
+  </header>
+
+  <section class="lh_card">
+    <h2>图一　3D 柱状图</h2>
+    <p class="lh_tip">按住鼠标左键拖动可旋转视角，滚轮缩放</p>
+    <div id="lh_scene_bar" class="lh_scene"></div>
+  </section>
+
+  <section class="lh_card">
+    <h2>图二　3D 散点图</h2>
+    <p class="lh_tip">按住鼠标左键拖动可旋转视角，滚轮缩放</p>
+    <div id="lh_scene_scatter" class="lh_scene"></div>
+  </section>
+
+  <a class="lh_back" href="index.html">返回首页</a>
+
+<script>
+(function () {
+  // 通用场景工厂：创建渲染器、相机、灯光、地面网格
+  function lh_createScene(lh_container) {
+    var lh_width = lh_container.clientWidth;
+    var lh_height = lh_container.clientHeight;
+
+    var lh_scene = new THREE.Scene();
+    lh_scene.background = new THREE.Color(0xfafbfc);
+
+    var lh_camera = new THREE.PerspectiveCamera(45, lh_width / lh_height, 0.1, 2000);
+    lh_camera.position.set(120, 90, 160);
+    lh_camera.lookAt(0, 0, 0);
+
+    var lh_renderer = new THREE.WebGLRenderer({ antialias: true });
+    lh_renderer.setSize(lh_width, lh_height);
+    lh_renderer.setPixelRatio(window.devicePixelRatio);
+    lh_container.appendChild(lh_renderer.domElement);
+
+    lh_scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+    var lh_light = new THREE.DirectionalLight(0xffffff, 0.8);
+    lh_light.position.set(80, 120, 60);
+    lh_scene.add(lh_light);
+
+    // 地面参考网格
+    var lh_grid = new THREE.GridHelper(200, 20, 0xbdc3c7, 0xe0e4e8);
+    lh_scene.add(lh_grid);
+
+    return { scene: lh_scene, camera: lh_camera, renderer: lh_renderer, container: lh_container };
+  }
+
+  // 通用交互：鼠标拖动旋转 + 滚轮缩放（原生实现，不依赖 OrbitControls）
+  function lh_bindControl(lh_view, lh_target) {
+    var lh_dragging = false;
+    var lh_lastX = 0, lh_lastY = 0;
+    var lh_radius = lh_view.camera.position.length();
+    var lh_theta = Math.atan2(lh_view.camera.position.z, lh_view.camera.position.x);
+    var lh_phi = Math.acos(lh_view.camera.position.y / lh_radius);
+
+    lh_view.container.addEventListener('mousedown', function (lh_e) {
+      lh_dragging = true; lh_lastX = lh_e.clientX; lh_lastY = lh_e.clientY;
+    });
+    window.addEventListener('mouseup', function () { lh_dragging = false; });
+    lh_view.container.addEventListener('mousemove', function (lh_e) {
+      if (!lh_dragging) return;
+      lh_theta -= (lh_e.clientX - lh_lastX) * 0.008;
+      lh_phi -= (lh_e.clientY - lh_lastY) * 0.008;
+      lh_phi = Math.max(0.15, Math.min(Math.PI / 2 - 0.05, lh_phi));
+      lh_lastX = lh_e.clientX; lh_lastY = lh_e.clientY;
+    });
+    lh_view.container.addEventListener('wheel', function (lh_e) {
+      lh_e.preventDefault();
+      lh_radius = Math.max(80, Math.min(500, lh_radius + lh_e.deltaY * 0.2));
+    }, { passive: false });
+
+    lh_view.update = function () {
+      if (!lh_dragging) lh_theta += 0.0025; // 无操作时缓慢自转
+      lh_view.camera.position.set(
+        lh_radius * Math.sin(lh_phi) * Math.cos(lh_theta),
+        lh_radius * Math.cos(lh_phi),
+        lh_radius * Math.sin(lh_phi) * Math.sin(lh_theta)
+      );
+      lh_view.camera.lookAt(lh_target);
+    };
+  }
+
+  // ---------- 图一：3D 柱状图（12 个月降水量） ----------
+  var lh_barView = lh_createScene(document.getElementById('lh_scene_bar'));
+
+  var lh_months = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+  var lh_rain = [22, 30, 55, 78, 102, 158, 186, 142, 96, 60, 35, 24];
+  var lh_barGap = 15, lh_barW = 10;
+  var lh_startX = -(lh_months.length - 1) * lh_barGap / 2;
+
+  for (var lh_i = 0; lh_i < lh_rain.length; lh_i++) {
+    var lh_h = lh_rain[lh_i] * 0.6;
+    // 降水量越大颜色越暖（蓝→红渐变）
+    var lh_color = new THREE.Color().setHSL(0.62 - 0.62 * lh_rain[lh_i] / 200, 0.75, 0.55);
+    var lh_bar = new THREE.Mesh(
+      new THREE.BoxGeometry(lh_barW, lh_h, lh_barW),
+      new THREE.MeshLambertMaterial({ color: lh_color })
+    );
+    lh_bar.position.set(lh_startX + lh_i * lh_barGap, lh_h / 2, 0);
+    lh_barView.scene.add(lh_bar);
+
+    // 数值标签用 Sprite 简易实现
+    var lh_canvas = document.createElement('canvas');
+    lh_canvas.width = 128; lh_canvas.height = 64;
+    var lh_ctx = lh_canvas.getContext('2d');
+    lh_ctx.font = '28px Microsoft YaHei';
+    lh_ctx.fillStyle = '#34495e';
+    lh_ctx.textAlign = 'center';
+    lh_ctx.fillText(lh_rain[lh_i], 64, 30);
+    lh_ctx.fillText(lh_months[lh_i], 64, 58);
+    var lh_label = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(lh_canvas) }));
+    lh_label.scale.set(16, 8, 1);
+    lh_label.position.set(lh_bar.position.x, lh_h + 6, 0);
+    lh_barView.scene.add(lh_label);
+  }
+  lh_bindControl(lh_barView, new THREE.Vector3(0, 30, 0));
+
+  // ---------- 图二：3D 散点图（螺旋数据分布） ----------
+  var lh_scatterView = lh_createScene(document.getElementById('lh_scene_scatter'));
+
+  var lh_pointGroup = new THREE.Group();
+  for (var lh_j = 0; lh_j < 600; lh_j++) {
+    var lh_t = lh_j / 600 * Math.PI * 12;          // 螺旋角度
+    var lh_r = 8 + lh_j / 600 * 55;                // 螺旋半径
+    var lh_jitter = (Math.random() - 0.5) * 10;    // 随机抖动模拟真实数据
+    var lh_px = Math.cos(lh_t) * lh_r + lh_jitter;
+    var lh_pz = Math.sin(lh_t) * lh_r + lh_jitter;
+    var lh_py = lh_j / 600 * 60 + (Math.random() - 0.5) * 8;
+
+    var lh_dot = new THREE.Mesh(
+      new THREE.SphereGeometry(1.1, 12, 12),
+      new THREE.MeshLambertMaterial({ color: new THREE.Color().setHSL(lh_j / 600 * 0.75, 0.8, 0.55) })
+    );
+    lh_dot.position.set(lh_px, lh_py, lh_pz);
+    lh_pointGroup.add(lh_dot);
+  }
+  lh_scatterView.scene.add(lh_pointGroup);
+  lh_bindControl(lh_scatterView, new THREE.Vector3(0, 25, 0));
+
+  // ---------- 渲染循环 ----------
+  function lh_animate() {
+    requestAnimationFrame(lh_animate);
+    lh_barView.update();
+    lh_barView.renderer.render(lh_barView.scene, lh_barView.camera);
+    lh_scatterView.update();
+    lh_scatterView.renderer.render(lh_scatterView.scene, lh_scatterView.camera);
+  }
+  lh_animate();
+
+  // 窗口尺寸变化时自适应
+  window.addEventListener('resize', function () {
+    [lh_barView, lh_scatterView].forEach(function (lh_v) {
+      var lh_w = lh_v.container.clientWidth, lh_h2 = lh_v.container.clientHeight;
+      lh_v.camera.aspect = lh_w / lh_h2;
+      lh_v.camera.updateProjectionMatrix();
+      lh_v.renderer.setSize(lh_w, lh_h2);
+    });
+  });
+})();
+</script>
+</body>
+</html>

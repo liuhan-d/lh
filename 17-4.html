@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<!-- 姓名：刘晗，建立时间：2026-11-05，使用的大模型：GLM-5.3，功能名称：远程数据接口测试工具（支持 GET/POST/PUT/PATCH/DELETE） -->
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>17-4 接口测试工具</title>
+<link rel="stylesheet" href="font/iconfont.css">
+<style>
+:root{
+    --lh-bg:#f6f8fc; --lh-card:#ffffff;
+    --lh-main:#4f6ef7; --lh-main2:#7c9bff;
+    --lh-text:#1f2937; --lh-muted:#8a94a6;
+    --lh-line:#eef0f5; --lh-green:#12b76a; --lh-red:#ef4444;
+    --lh-orange:#f59e0b; --lh-purple:#8b5cf6;
+    --lh-shadow:0 2px 14px rgba(79,110,247,0.09);
+    --lh-shadow-lg:0 10px 30px rgba(79,110,247,0.16);
+}
+*{box-sizing:border-box}
+body{
+    margin:0; padding:36px 16px 64px;
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Microsoft YaHei",Arial;
+    color:var(--lh-text); line-height:1.65;
+    background:
+        radial-gradient(700px 320px at 12% -5%, rgba(124,155,255,0.16), transparent 60%),
+        radial-gradient(600px 300px at 92% 0%, rgba(18,183,106,0.07), transparent 60%),
+        var(--lh-bg);
+    min-height:100vh;
+}
+.lh_wrap{max-width:900px; margin:0 auto}
+
+/* ---------- 头部 ---------- */
+.lh_header{display:flex; align-items:center; gap:16px; margin-bottom:6px}
+.lh_logo{
+    width:58px; height:58px; border-radius:18px; flex:none;
+    background:linear-gradient(135deg, var(--lh-main), var(--lh-main2));
+    display:flex; align-items:center; justify-content:center;
+    font-weight:800; font-size:17px; color:#fff;
+    box-shadow:var(--lh-shadow-lg);
+}
+.lh_header h1{margin:0; font-size:24px; letter-spacing:.5px}
+.lh_sub{margin:2px 0 0; font-size:13px; color:var(--lh-muted)}
+.lh_back{
+    margin-left:auto; flex:none; display:inline-flex; align-items:center; gap:6px;
+    padding:8px 16px; border-radius:999px; text-decoration:none;
+    color:var(--lh-main); font-size:13px; font-weight:700;
+    border:1px solid rgba(79,110,247,0.25); background:#fff;
+    box-shadow:var(--lh-shadow);
+    transition:transform .18s, box-shadow .18s;
+}
+.lh_back:hover{transform:translateY(-2px); box-shadow:var(--lh-shadow-lg)}
+.lh_back .iconfont{font-size:14px}
+
+/* ---------- 卡片通用 ---------- */
+.lh_card{
+    margin-top:16px; padding:18px 20px; border-radius:16px;
+    background:var(--lh-card); border:1px solid var(--lh-line);
+    box-shadow:var(--lh-shadow);
+}
+.lh_card_title{
+    display:flex; align-items:center; gap:8px;
+    font-size:14px; font-weight:700; margin-bottom:12px;
+}
+.lh_card_title .iconfont{color:var(--lh-main)}
+.lh_card_title small{margin-left:auto; font-weight:400; color:var(--lh-muted); font-size:12px}
+
+/* ---------- 请求区 ---------- */
+.lh_req_row{display:flex; gap:10px}
+.lh_method{
+    flex:none; padding:10px 14px; border-radius:10px; cursor:pointer;
+    border:1px solid var(--lh-line); background:#f3f5fa; outline:none;
+    font-size:14px; font-weight:800; color:var(--lh-main);
+    font-family:Consolas,Monaco,monospace;
+    transition:border-color .2s;
+}
+.lh_method:focus{border-color:var(--lh-main)}
+.lh_url{
+    flex:1; min-width:0; padding:10px 14px; border-radius:10px;
+    border:1px solid var(--lh-line); background:#fafbfd; outline:none;
+    font-family:Consolas,Monaco,monospace; font-size:13px; color:var(--lh-text);
+    transition:border-color .2s;
+}
+.lh_url:focus{border-color:var(--lh-main)}
+.lh_btn{
+    flex:none; padding:10px 24px; border:none; border-radius:10px; cursor:pointer;
+    font-size:14px; font-weight:700; color:#fff;
+    background:linear-gradient(135deg, var(--lh-main), var(--lh-main2));
+    box-shadow:var(--lh-shadow);
+    transition:transform .18s, box-shadow .18s, opacity .2s;
+    display:inline-flex; align-items:center; gap:7px;
+}
+.lh_btn .iconfont{font-size:13px}
+.lh_btn:hover{transform:translateY(-2px); box-shadow:var(--lh-shadow-lg)}
+.lh_btn:disabled{opacity:.55; cursor:not-allowed; transform:none; box-shadow:none}
+
+.lh_body_label{font-size:12px; color:var(--lh-muted); margin:14px 0 6px}
+.lh_body_area{
+    width:100%; height:130px; resize:vertical; border-radius:10px;
+    border:1px solid var(--lh-line); background:#fafbfd; color:#47536b;
+    font-family:Consolas,Monaco,monospace; font-size:13px; line-height:1.6;
+    padding:12px; outline:none; transition:border-color .2s;
+}
+.lh_body_area:focus{border-color:var(--lh-main)}
+
+/* ---------- 示例快捷按钮 ---------- */
+.lh_presets{display:flex; flex-wrap:wrap; gap:10px; margin-top:12px}
+.lh_preset{
+    padding:6px 14px; border-radius:999px; cursor:pointer; font-size:12.5px;
+    color:var(--lh-main); background:rgba(79,110,247,0.07);
+    border:1px solid rgba(79,110,247,0.22); font-weight:700;
+    font-family:Consolas,Monaco,monospace;
+    transition:background .2s, transform .15s;
+}
+.lh_preset:hover{background:rgba(79,110,247,0.14); transform:translateY(-1px)}
+
+/* ---------- 状态行 ---------- */
+.lh_status_row{
+    display:flex; flex-wrap:wrap; align-items:center; gap:10px 16px;
+    margin-bottom:12px; font-size:13px; color:var(--lh-muted);
+    font-family:Consolas,Monaco,monospace; min-height:26px;
+}
+.lh_code{
+    display:inline-flex; align-items:center; gap:6px;
+    padding:4px 12px; border-radius:999px; font-weight:800; font-size:13px;
+}
+.lh_code.ok{background:rgba(18,183,106,0.1); color:var(--lh-green); border:1px solid rgba(18,183,106,0.35)}
+.lh_code.warn{background:rgba(245,158,11,0.1); color:var(--lh-orange); border:1px solid rgba(245,158,11,0.35)}
+.lh_code.err{background:rgba(239,68,68,0.09); color:var(--lh-red); border:1px solid rgba(239,68,68,0.32)}
+.lh_code.none{background:#f3f5fa; color:var(--lh-muted); border:1px solid var(--lh-line)}
+
+@keyframes lh_spin{to{transform:rotate(360deg)}}
+.lh_spinner{
+    width:14px; height:14px; border-radius:50%;
+    border:2px solid rgba(79,110,247,0.2); border-top-color:var(--lh-main);
+    animation:lh_spin .8s linear infinite;
+}
+
+/* ---------- 响应体 ---------- */
+.lh_res_box{
+    border-radius:12px; border:1px solid var(--lh-line); background:#fbfcfe;
+    padding:14px 16px; max-height:420px; overflow:auto;
+    font-family:Consolas,Monaco,monospace; font-size:13px; line-height:1.75;
+    white-space:pre; word-break:break-all;
+}
+.lh_key{color:#4f6ef7}
+.lh_str{color:#12b76a}
+.lh_num{color:#f59e0b}
+.lh_bool{color:#8b5cf6}
+.lh_null{color:#8a94a6}
+.lh_res_hint{color:var(--lh-muted); font-size:12.5px; text-align:center; padding:40px 0; font-family:inherit}
+
+/* ---------- 错误信息 ---------- */
+.lh_error{
+    display:none; margin-bottom:12px; padding:12px 16px; border-radius:12px;
+    background:#fef2f2; border:1px solid rgba(239,68,68,0.3);
+    font-size:13px; color:#b91c1c;
+}
+.lh_error .lh_error_head{
+    display:flex; align-items:center; gap:8px; font-weight:800; margin-bottom:6px; color:var(--lh-red);
+}
+.lh_error .lh_error_head .iconfont{font-size:14px}
+.lh_error .lh_error_tip{color:#9f5757; font-size:12px; margin-top:4px}
+
+/* ---------- 请求历史 ---------- */
+.lh_history{padding:0; list-style:none; margin:0}
+.lh_history li{
+    display:flex; align-items:center; gap:12px;
+    padding:10px 6px; border-bottom:1px solid var(--lh-line);
+    cursor:pointer; font-family:Consolas,Monaco,monospace; font-size:12.5px;
+    transition:background .15s;
+}
+.lh_history li:hover{background:#f7f9fe}
+.lh_history li:last-child{border-bottom:none}
+.lh_hm{
+    flex:none; font-weight:800; padding:2px 8px; border-radius:5px; font-size:11.5px;
+}
+.lh_hm.get{color:var(--lh-green); background:rgba(18,183,106,0.1)}
+.lh_hm.post{color:var(--lh-orange); background:rgba(245,158,11,0.12)}
+.lh_hm.put{color:var(--lh-blue, #3b82f6); background:rgba(59,130,246,0.1)}
+.lh_hm.patch{color:var(--lh-purple); background:rgba(139,92,246,0.1)}
+.lh_hm.delete{color:var(--lh-red); background:rgba(239,68,68,0.1)}
+.lh_hurl{flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:var(--lh-text)}
+.lh_hstat{flex:none; font-weight:700}
+.lh_hstat.ok{color:var(--lh-green)}
+.lh_hstat.err{color:var(--lh-red)}
+.lh_ftime{flex:none; color:var(--lh-muted)}
+.lh_history .lh_empty{
+    border:none; cursor:default; justify-content:center; color:var(--lh-muted);
+    font-family:inherit; padding:18px 0;
+}
+.lh_history .lh_empty:hover{background:transparent}
+
+.lh_footer{margin-top:30px; text-align:center; font-size:12px; color:#c0c6d2}
+@media (max-width:560px){
+    body{padding:24px 10px 48px}
+    .lh_header h1{font-size:19px}
+    .lh_req_row{flex-wrap:wrap}
+    .lh_url{flex:1 1 100%}
+    .lh_btn{flex:1}
+}
+</style>
+</head>
+<body>
+<div class="lh_wrap">
+
+    <header class="lh_header">
+        <div class="lh_logo">17-4</div>
+        <div>
+            <h1>远程数据接口测试工具</h1>
+            <p class="lh_sub">原生 fetch · 支持 GET / POST / PUT / PATCH / DELETE · 展示响应数据与错误信息</p>
+        </div>
+        <a class="lh_back" href="index.html"><i class="iconfont">&#xe600;</i>返回首页</a>
+    </header>
+
+    <!-- 请求构建区 -->
+    <section class="lh_card">
+        <div class="lh_card_title">
+            <i class="iconfont">&#xe64a;</i>请求<small>填好方法和地址后点「发送请求」</small>
+        </div>
+        <div class="lh_req_row">
+            <select class="lh_method" id="lh_method">
+                <option>GET</option>
+                <option selected>POST</option>
+                <option>PUT</option>
+                <option>PATCH</option>
+                <option>DELETE</option>
+            </select>
+            <input class="lh_url" id="lh_url" value="https://jsonplaceholder.typicode.com/posts" spellcheck="false" placeholder="https://jsonplaceholder.typicode.com/posts">
+            <button class="lh_btn" id="lh_send"><i class="iconfont">&#xe8a3;</i>发送请求</button>
+        </div>
+        <div class="lh_body_label">请求体（JSON，POST / PUT / PATCH 有效，GET / DELETE 忽略）</div>
+        <textarea class="lh_body_area" id="lh_body" spellcheck="false">{
+  "title": "17-4 接口测试",
+  "body": "这是用 POST 请求创建的数据",
+  "userId": 1
+}</textarea>
+        <div class="lh_presets">
+            <span class="lh_preset" data-preset="get-posts">GET posts/1 查一条</span>
+            <span class="lh_preset" data-preset="post-posts">POST posts 新建（示例）</span>
+            <span class="lh_preset" data-preset="put-posts">PUT posts/1 更新</span>
+            <span class="lh_preset" data-preset="delete-posts">DELETE posts/1 删除</span>
+            <span class="lh_preset" data-preset="bad-url">GET 错误地址（看报错）</span>
+            <span class="lh_preset" data-preset="bad-json">POST 请求体非法 JSON</span>
+        </div>
+    </section>
+
+    <!-- 响应区 -->
+    <section class="lh_card">
+        <div class="lh_card_title">
+            <i class="iconfont">&#xe631;</i>响应<small id="lh_res_summary"></small>
+        </div>
+        <div class="lh_error" id="lh_error">
+            <div class="lh_error_head"><i class="iconfont">&#xe662;</i><span id="lh_error_text"></span></div>
+            <div class="lh_error_tip" id="lh_error_tip"></div>
+        </div>
+        <div class="lh_status_row" id="lh_status_row">
+            <span class="lh_code none" id="lh_code">待请求</span>
+        </div>
+        <div class="lh_res_box" id="lh_res"><div class="lh_res_hint">响应内容会显示在这里…</div></div>
+    </section>
+
+    <!-- 请求历史 -->
+    <section class="lh_card">
+        <div class="lh_card_title">
+            <i class="iconfont">&#xe65e;</i>请求历史<small>点击一条可回填到上方重新发送</small>
+        </div>
+        <ul class="lh_history" id="lh_history">
+            <li class="lh_empty">还没有发出过请求</li>
+        </ul>
+    </section>
+
+    <footer class="lh_footer">© 刘晗的《高级网页设计》课堂实践 · 17-4 接口测试工具</footer>
+</div>
+
+<script>
+(function(){
+    const lh_API_BASE = 'https://jsonplaceholder.typicode.com';
+    const lh_methodSel = document.getElementById('lh_method');
+    const lh_urlInput  = document.getElementById('lh_url');
+    const lh_bodyInput = document.getElementById('lh_body');
+    const lh_sendBtn   = document.getElementById('lh_send');
+    const lh_errorBox  = document.getElementById('lh_error');
+    const lh_errorText = document.getElementById('lh_error_text');
+    const lh_errorTip  = document.getElementById('lh_error_tip');
+    const lh_statusRow = document.getElementById('lh_status_row');
+    const lh_codeTag   = document.getElementById('lh_code');
+    const lh_resBox    = document.getElementById('lh_res');
+    const lh_resSummary= document.getElementById('lh_res_summary');
+    const lh_historyEl = document.getElementById('lh_history');
+
+    /* ---------- 工具函数 ---------- */
+    function lh_esc(s){
+        return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;')
+                        .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+    /* JSON 语法着色：键蓝、字符串绿、数字橙、布尔紫、null 灰 */
+    function lh_colorize(json){
+        let h = lh_esc(json);
+        h = h.replace(/&quot;((?:[^&\\]|\\.)*)&quot;(\s*:)?/g, function(all, inner, colon){
+            const cls = colon ? 'lh_key' : 'lh_str';
+            return '<span class="' + cls + '">&quot;' + inner + '&quot;</span>' + (colon || '');
+        });
+        h = h.replace(/\b(true|false)\b/g, '<span class="lh_bool">$1</span>');
+        h = h.replace(/\bnull\b/g, '<span class="lh_null">null</span>');
+        h = h.replace(/(:\s*)(-?\d+(?:\.\d+)?)/g, '$1<span class="lh_num">$2</span>');
+        return h;
+    }
+    function lh_showError(title, tip){
+        lh_errorBox.style.display = 'block';
+        lh_errorText.textContent = title;
+        lh_errorTip.textContent = tip || '';
+    }
+    function lh_hideError(){ lh_errorBox.style.display = 'none'; }
+    function lh_setStatus(code, text, cls){
+        lh_codeTag.className = 'lh_code ' + cls;
+        lh_codeTag.textContent = code + ' ' + (text || '');
+    }
+    function lh_renderRes(content, isHtml){
+        const old = lh_resBox.querySelector('.lh_res_hint');
+        if(old) old.remove();
+        if(isHtml){ lh_resBox.innerHTML = content; }
+        else{ lh_resBox.textContent = content; }
+    }
+
+    /* ---------- 状态码分类 ---------- */
+    function lh_statusClass(code){
+        if(code >= 200 && code < 300) return 'ok';
+        if(code >= 300 && code < 400) return 'warn';
+        return 'err';
+    }
+    function lh_statusText(code, fallback){
+        const map = {200:'OK', 201:'Created', 204:'No Content', 301:'Moved Permanently',
+                     400:'Bad Request', 401:'Unauthorized', 403:'Forbidden',
+                     404:'Not Found', 405:'Method Not Allowed', 500:'Internal Server Error'};
+        return fallback && fallback.trim() ? fallback : (map[code] || '');
+    }
+
+    /* ---------- 请求历史 ---------- */
+    const lh_history = [];
+    function lh_addHistory(method, url, body, code, ms){
+        lh_history.unshift({ method:method, url:url, body:body, code:code, ms:ms });
+        if(lh_history.length > 12) lh_history.pop();
+        lh_renderHistory();
+    }
+    function lh_renderHistory(){
+        const empty = lh_historyEl.querySelector('.lh_empty');
+        if(lh_history.length === 0){
+            if(!empty) lh_historyEl.innerHTML = '<li class="lh_empty">还没有发出过请求</li>';
+            return;
+        }
+        let html = '';
+        lh_history.forEach(function(h){
+            const cls = h.code === null ? 'err' : lh_statusClass(h.code);
+            html += '<li data-i="' + lh_history.indexOf(h) + '">'
+                  +   '<span class="lh_hm ' + h.method.toLowerCase() + '">' + h.method + '</span>'
+                  +   '<span class="lh_hurl">' + lh_esc(h.url) + '</span>'
+                  +   '<span class="lh_hstat ' + cls + '">' + (h.code === null ? '失败' : h.code) + '</span>'
+                  +   '<span class="lh_ftime">' + h.ms + 'ms</span>'
+                  + '</li>';
+        });
+        lh_historyEl.innerHTML = html;
+    }
+    lh_historyEl.addEventListener('click', function(e){
+        const li = e.target.closest('li');
+        if(!li || li.classList.contains('lh_empty')) return;
+        const h = lh_history[Number(li.dataset.i)];
+        if(!h) return;
+        lh_methodSel.value = h.method;
+        lh_urlInput.value = h.url;
+        if(h.body) lh_bodyInput.value = h.body;
+        window.scrollTo({ top:0, behavior:'smooth' });
+    });
+
+    /* ---------- 发送请求（async/await + try/catch/finally） ---------- */
+    async function lh_send(){
+        const lh_method = lh_methodSel.value;
+        const lh_url = lh_urlInput.value.trim();
+        lh_hideError();
+
+        if(!lh_url){
+            lh_showError('接口地址不能为空', '请先填写 URL，例如 ' + lh_API_BASE + '/posts');
+            return;
+        }
+        /* 需要请求体的方法先校验 JSON 格式 */
+        let lh_body = null;
+        if(lh_method === 'POST' || lh_method === 'PUT' || lh_method === 'PATCH'){
+            const lh_raw = lh_bodyInput.value.trim();
+            if(lh_raw){
+                try{ lh_body = JSON.parse(lh_raw); }
+                catch(err){
+                    lh_showError('请求体不是合法的 JSON：' + err.message,
+                                 '请检查引号、逗号是否完整 —— 点击上方「POST 请求体非法 JSON」示例可复现这个错误');
+                    lh_setStatus('400', 'Bad Request（本地拦截）', 'err');
+                    return;
+                }
+            }
+        }
+
+        const lh_opts = { method: lh_method, headers: { 'Content-Type': 'application/json' } };
+        if(lh_body !== null) lh_opts.body = JSON.stringify(lh_body);
+
+        lh_sendBtn.disabled = true;
+        lh_sendBtn.innerHTML = '<span class="lh_spinner"></span>请求中…';
+        lh_setStatus('···', '请求中', 'none');
+
+        const lh_start = performance.now();
+        try{
+            const lh_res = await fetch(lh_url, lh_opts);        // 1. 发请求
+            const lh_text = await lh_res.text();                // 2. 先拿文本
+            const lh_ms = Math.round(performance.now() - lh_start);
+
+            let lh_display, lh_isJson = false;
+            try{                                                    // 3. 尝试按 JSON 美化
+                lh_display = JSON.stringify(JSON.parse(lh_text), null, 2);
+                lh_isJson = true;
+            }catch(e){ lh_display = lh_text || '（空响应体）'; }
+
+            lh_setStatus(lh_res.status, lh_statusText(lh_res.status, lh_res.statusText), lh_statusClass(lh_res.status));
+            lh_renderRes(lh_isJson ? lh_colorize(lh_display) : lh_esc(lh_display), true);
+            lh_resSummary.textContent = lh_ms + ' ms · ' + (lh_text.length ? (lh_text.length / 1024).toFixed(1) + ' KB' : '0 B')
+                                      + (lh_isJson ? ' · JSON' : ' · 文本');
+
+            if(!lh_res.ok){                                          // 4. HTTP 4xx/5xx：fetch 不会 reject，要自己判断
+                lh_showError('HTTP 错误：' + lh_res.status + ' ' + lh_statusText(lh_res.status, lh_res.statusText),
+                             '服务器有响应但返回了错误状态码（fetch 只有网络故障才会 reject，4xx/5xx 需通过 res.ok 判断）');
+            }
+            lh_addHistory(lh_method, lh_url, lh_body !== null ? lh_bodyInput.value.trim() : '', lh_res.status, lh_ms);
+        }catch(err){                                                 // 网络层错误（断网 / 域名不存在 / CORS）
+            const lh_ms = Math.round(performance.now() - lh_start);
+            lh_setStatus('失败', 'Network Error', 'err');
+            lh_renderRes('（无响应数据）', false);
+            lh_resSummary.textContent = lh_ms + ' ms · 0 B';
+            lh_showError('网络错误：' + err.message,
+                         '常见原因：① 未联网或域名不存在；② 目标接口不支持跨域（CORS）；③ URL 协议拼写错误（如 htpt://）');
+            lh_addHistory(lh_method, lh_url, '', null, lh_ms);
+        }finally{
+            lh_sendBtn.disabled = false;
+            lh_sendBtn.innerHTML = '<i class="iconfont">&#xe8a3;</i>发送请求';
+        }
+    }
+
+    /* ---------- 示例快捷按钮 ---------- */
+    const lh_presets = {
+        'get-posts':    { method:'GET',    url: lh_API_BASE + '/posts/1', body:'' },
+        'post-posts':   { method:'POST',   url: lh_API_BASE + '/posts',
+                          body:'{\n  "title": "17-4 接口测试",\n  "body": "这是用 POST 请求创建的数据",\n  "userId": 1\n}' },
+        'put-posts':    { method:'PUT',    url: lh_API_BASE + '/posts/1',
+                          body:'{\n  "id": 1,\n  "title": "更新后的标题",\n  "body": "PUT 请求更新后的内容",\n  "userId": 1\n}' },
+        'delete-posts': { method:'DELETE', url: lh_API_BASE + '/posts/1', body:'' },
+        'bad-url':      { method:'GET',    url: 'https://no-such-domain-abc123.com/api', body:'' },
+        'bad-json':     { method:'POST',   url: lh_API_BASE + '/posts', body:'{ title: 缺少引号, }' }
+    };
+    document.querySelector('.lh_presets').addEventListener('click', function(e){
+        const p = e.target.closest('.lh_preset');
+        if(!p) return;
+        const cfg = lh_presets[p.dataset.preset];
+        if(!cfg) return;
+        lh_methodSel.value = cfg.method;
+        lh_urlInput.value = cfg.url;
+        lh_bodyInput.value = cfg.body;
+        lh_send();
+    });
+
+    /* ---------- 绑定与初始状态 ---------- */
+    lh_sendBtn.addEventListener('click', lh_send);
+    lh_urlInput.addEventListener('keydown', function(e){
+        if(e.key === 'Enter') lh_send();
+    });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<!-- 姓名：刘晗，建立时间：2026-11-05，使用的大模型：GLM-5.3，功能名称：JavaScript 两种定时器（setTimeout / setInterval）交互演示 -->
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>17-5 JavaScript 定时器</title>
+<link rel="stylesheet" href="font/iconfont.css">
+<style>
+:root{
+    --lh-bg:#f6f8fc; --lh-card:#ffffff;
+    --lh-main:#4f6ef7; --lh-main2:#7c9bff;
+    --lh-text:#1f2937; --lh-muted:#8a94a6;
+    --lh-line:#eef0f5; --lh-green:#12b76a; --lh-red:#ef4444;
+    --lh-orange:#f59e0b;
+    --lh-shadow:0 2px 14px rgba(79,110,247,0.09);
+    --lh-shadow-lg:0 10px 30px rgba(79,110,247,0.16);
+}
+*{box-sizing:border-box}
+body{
+    margin:0; padding:36px 16px 64px;
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Microsoft YaHei",Arial;
+    color:var(--lh-text); line-height:1.65;
+    background:
+        radial-gradient(700px 320px at 12% -5%, rgba(124,155,255,0.16), transparent 60%),
+        radial-gradient(600px 300px at 92% 0%, rgba(18,183,106,0.07), transparent 60%),
+        var(--lh-bg);
+    min-height:100vh;
+}
+.lh_wrap{max-width:900px; margin:0 auto}
+
+/* ---------- 头部 ---------- */
+.lh_header{display:flex; align-items:center; gap:16px; margin-bottom:6px}
+.lh_logo{
+    width:58px; height:58px; border-radius:18px; flex:none;
+    background:linear-gradient(135deg, var(--lh-main), var(--lh-main2));
+    display:flex; align-items:center; justify-content:center;
+    font-weight:800; font-size:17px; color:#fff;
+    box-shadow:var(--lh-shadow-lg);
+}
+.lh_header h1{margin:0; font-size:24px; letter-spacing:.5px}
+.lh_sub{margin:2px 0 0; font-size:13px; color:var(--lh-muted)}
+.lh_back{
+    margin-left:auto; flex:none; display:inline-flex; align-items:center; gap:6px;
+    padding:8px 16px; border-radius:999px; text-decoration:none;
+    color:var(--lh-main); font-size:13px; font-weight:700;
+    border:1px solid rgba(79,110,247,0.25); background:#fff;
+    box-shadow:var(--lh-shadow);
+    transition:transform .18s, box-shadow .18s;
+}
+.lh_back:hover{transform:translateY(-2px); box-shadow:var(--lh-shadow-lg)}
+.lh_back .iconfont{font-size:14px}
+
+.lh_h2{
+    margin:26px 0 12px; font-size:15px; padding-left:10px;
+    border-left:3px solid var(--lh-main);
+}
+.lh_h2 small{color:var(--lh-muted); font-weight:400; font-size:12px; margin-left:8px}
+
+/* ---------- 对比卡片 ---------- */
+.lh_compare{display:grid; grid-template-columns:1fr 1fr; gap:14px}
+@media (max-width:640px){ .lh_compare{grid-template-columns:1fr} }
+.lh_type_card{
+    border-radius:16px; padding:18px 20px;
+    background:var(--lh-card); border:1px solid var(--lh-line);
+    box-shadow:var(--lh-shadow); transition:transform .2s, box-shadow .2s;
+}
+.lh_type_card:hover{transform:translateY(-4px); box-shadow:var(--lh-shadow-lg)}
+.lh_type_head{display:flex; align-items:center; gap:10px}
+.lh_type_head .iconfont{
+    font-size:22px; color:#fff; width:40px; height:40px; border-radius:12px;
+    background:linear-gradient(135deg, var(--lh-main), var(--lh-main2));
+    display:flex; align-items:center; justify-content:center;
+}
+.lh_type_card.interval .lh_type_head .iconfont{
+    background:linear-gradient(135deg, var(--lh-green), #34d399);
+}
+.lh_type_head b{font-family:Consolas,Monaco,monospace; font-size:16px; color:var(--lh-main)}
+.lh_type_card.interval .lh_type_head b{color:var(--lh-green)}
+.lh_type_desc{font-size:13px; color:var(--lh-muted); margin:10px 0 12px}
+.lh_code{
+    margin:0; padding:12px 14px; border-radius:10px; overflow-x:auto;
+    background:#fbfcfe; border:1px solid var(--lh-line);
+    font-family:Consolas,Monaco,monospace; font-size:12.5px; color:#47536b; line-height:1.7;
+}
+.lh_code .c1{color:var(--lh-main); font-weight:700}
+.lh_code .c2{color:var(--lh-green); font-weight:700}
+.lh_code .c3{color:var(--lh-red)}
+.lh_code .c4{color:var(--lh-muted)}
+
+/* ---------- 演练场卡片 ---------- */
+.lh_card{
+    padding:18px 20px; border-radius:16px;
+    background:var(--lh-card); border:1px solid var(--lh-line);
+    box-shadow:var(--lh-shadow);
+}
+.lh_card_title{
+    display:flex; align-items:center; gap:8px;
+    font-size:14px; font-weight:700; margin-bottom:14px;
+}
+.lh_card_title .iconfont{color:var(--lh-main)}
+.lh_card_title small{margin-left:auto; font-weight:400; color:var(--lh-muted); font-size:12px}
+
+.lh_btn{
+    padding:10px 22px; border:none; border-radius:10px; cursor:pointer;
+    font-size:13px; font-weight:700; color:#fff;
+    background:linear-gradient(135deg, var(--lh-main), var(--lh-main2));
+    box-shadow:var(--lh-shadow);
+    transition:transform .18s, box-shadow .18s, opacity .2s;
+    display:inline-flex; align-items:center; gap:7px;
+}
+.lh_btn .iconfont{font-size:13px}
+.lh_btn:hover{transform:translateY(-2px); box-shadow:var(--lh-shadow-lg)}
+.lh_btn:disabled{opacity:.5; cursor:not-allowed; transform:none; box-shadow:none}
+.lh_btn.green{background:linear-gradient(135deg, var(--lh-green), #34d399)}
+.lh_btn.red{background:linear-gradient(135deg, #f87171, var(--lh-red))}
+.lh_btn.ghost{
+    background:#fff; color:var(--lh-main); border:1px solid rgba(79,110,247,0.3);
+}
+
+/* ---------- setTimeout 闹钟 ---------- */
+.lh_alarm_row{display:flex; flex-wrap:wrap; gap:12px; align-items:center}
+.lh_sec_input{
+    width:80px; padding:10px 12px; border-radius:10px; outline:none;
+    border:1px solid var(--lh-line); background:#fafbfd;
+    font-family:Consolas,Monaco,monospace; font-size:15px; color:var(--lh-text);
+    text-align:center;
+}
+.lh_sec_input:focus{border-color:var(--lh-main)}
+.lh_sec_input::-webkit-inner-spin-button{opacity:1}
+.lh_alarm_stage{
+    margin-top:16px; border-radius:14px; padding:22px;
+    border:1px dashed #dfe3ec; text-align:center;
+    transition:background .3s, border-color .3s;
+}
+.lh_alarm_stage.waiting{background:rgba(79,110,247,0.05); border-color:rgba(79,110,247,0.4)}
+.lh_alarm_stage.ringing{background:rgba(18,183,106,0.08); border-color:rgba(18,183,106,0.5)}
+.lh_alarm_icon{font-size:44px; color:var(--lh-muted)}
+.lh_alarm_stage.waiting .lh_alarm_icon{color:var(--lh-main); animation:lh_tick 1s ease infinite}
+@keyframes lh_tick{
+    0%,100%{transform:rotate(0)}
+    20%{transform:rotate(-12deg)}
+    80%{transform:rotate(12deg)}
+}
+.lh_alarm_stage.ringing .lh_alarm_icon{color:var(--lh-green); animation:lh_shake .5s ease infinite}
+@keyframes lh_shake{
+    0%,100%{transform:rotate(0) scale(1)}
+    25%{transform:rotate(-10deg) scale(1.12)}
+    75%{transform:rotate(10deg) scale(1.12)}
+}
+.lh_alarm_text{margin-top:8px; font-size:14px; color:var(--lh-muted)}
+.lh_alarm_text b{color:var(--lh-main); font-family:Consolas,Monaco,monospace; font-size:22px}
+.lh_alarm_stage.ringing .lh_alarm_text{color:var(--lh-green)}
+
+/* ---------- setInterval 秒表 + 时钟 ---------- */
+.lh_interval_grid{display:grid; grid-template-columns:1fr 1fr; gap:16px}
+@media (max-width:640px){ .lh_interval_grid{grid-template-columns:1fr} }
+.lh_watch_display{
+    border-radius:14px; padding:26px 12px; text-align:center;
+    background:linear-gradient(160deg, rgba(18,183,106,0.06), rgba(52,211,153,0.03));
+    border:1px solid rgba(18,183,106,0.25);
+    font-family:Consolas,Monaco,monospace; font-size:44px; font-weight:800;
+    color:var(--lh-green); letter-spacing:2px;
+    transition:opacity .2s;
+}
+.lh_watch_display.paused{opacity:.55}
+.lh_watch_display small{font-size:14px; color:var(--lh-muted); font-weight:400}
+.lh_watch_btns{display:flex; gap:10px; margin-top:14px; justify-content:center; flex-wrap:wrap}
+.lh_clock_display{
+    border-radius:14px; padding:26px 12px; text-align:center;
+    background:linear-gradient(160deg, rgba(79,110,247,0.07), rgba(124,155,255,0.03));
+    border:1px solid rgba(79,110,247,0.25);
+    font-family:Consolas,Monaco,monospace; font-size:36px; font-weight:800;
+    color:var(--lh-main); letter-spacing:2px;
+}
+.lh_clock_display small{display:block; font-size:13px; color:var(--lh-muted); font-weight:400; margin-top:6px; letter-spacing:0}
+.lh_clock_blink{animation:lh_blink 1s step-end infinite}
+@keyframes lh_blink{50%{opacity:.25}}
+
+/* ---------- 控制台 ---------- */
+.lh_console{
+    margin-top:16px; height:220px; overflow-y:auto; border-radius:12px; padding:12px 14px;
+    background:#fbfcfe; border:1px solid var(--lh-line);
+    font-family:Consolas,Monaco,monospace; font-size:12.5px;
+}
+.lh_log{
+    padding:8px 12px; border-radius:10px; margin-bottom:8px;
+    border:1px solid var(--lh-line); background:#fff;
+    animation:lh_pop .3s ease;
+}
+.lh_log.err{border-color:rgba(239,68,68,0.3); background:#fef2f2}
+.lh_log.ok{border-color:rgba(18,183,106,0.3); background:rgba(18,183,106,0.04)}
+.lh_log .lh_code_line{color:#47536b}
+.lh_log .lh_code_line::before{content:'> '; color:var(--lh-main)}
+.lh_log.err .lh_code_line::before{content:'× '; color:var(--lh-red)}
+.lh_log .lh_ret{margin-top:4px; color:var(--lh-muted); word-break:break-all}
+.lh_log .lh_ret b{color:var(--lh-main); font-weight:700}
+.lh_log.err .lh_ret b{color:var(--lh-red)}
+@keyframes lh_pop{
+    0%{opacity:0; transform:translateY(6px)}
+    100%{opacity:1; transform:translateY(0)}
+}
+.lh_hint{color:var(--lh-muted); font-size:12px; text-align:center; padding:30px 0}
+
+.lh_footer{margin-top:30px; text-align:center; font-size:12px; color:#c0c6d2}
+</style>
+</head>
+<body>
+<div class="lh_wrap">
+
+    <header class="lh_header">
+        <div class="lh_logo">17-5</div>
+        <div>
+            <h1>JavaScript 两种定时器</h1>
+            <p class="lh_sub">setTimeout（延时一次性）与 setInterval（周期循环）—— 交互演示</p>
+        </div>
+        <a class="lh_back" href="index.html"><i class="iconfont">&#xe600;</i>返回首页</a>
+    </header>
+
+    <!-- ① 对比 -->
+    <h2 class="lh_h2">① 两种定时器对比 <small>一个是闹钟，一个是心跳</small></h2>
+    <div class="lh_compare">
+        <div class="lh_type_card">
+            <div class="lh_type_head"><i class="iconfont">&#xe759;</i><b>setTimeout</b></div>
+            <div class="lh_type_desc">像<b>闹钟</b>：定好时间，到点只响一次就结束。返回一个定时器 ID，可用 clearTimeout(id) 提前取消。</div>
+            <pre class="lh_code"><span class="c1">const</span> id = <span class="c2">setTimeout</span>(() =&gt; {
+  console.log(<span class="c4">'3 秒后执行，只执行这一次'</span>);
+}, <span class="c4">3000</span>);
+
+<span class="c1">clearTimeout</span>(id); <span class="c4">// 反悔，不执行了</span></pre>
+        </div>
+        <div class="lh_type_card interval">
+            <div class="lh_type_head"><i class="iconfont">&#xe62c;</i><b>setInterval</b></div>
+            <div class="lh_type_desc">像<b>心跳</b>：每隔固定时间跳一次，永不停止，直到 clearInterval(id) 叫停。适合时钟、轮询、动画。</div>
+            <pre class="lh_code"><span class="c1">const</span> id = <span class="c2">setInterval</span>(() =&gt; {
+  console.log(<span class="c4">'每 1 秒执行一次'</span>);
+}, <span class="c4">1000</span>);
+
+<span class="c1">clearInterval</span>(id); <span class="c4">// 停止循环</span></pre>
+        </div>
+    </div>
+
+    <!-- ② setTimeout 演练场 -->
+    <h2 class="lh_h2">② setTimeout 演练场：延时小闹钟 <small>倒计时显示用 interval，真正的动作由 setTimeout 触发</small></h2>
+    <div class="lh_card">
+        <div class="lh_alarm_row">
+            <input type="number" class="lh_sec_input" id="lh_sec_input" value="3" min="1" max="60">
+            <span style="font-size:13px;color:var(--lh-muted)">秒后响铃</span>
+            <button class="lh_btn" id="lh_alarm_start"><i class="iconfont">&#xe8a3;</i>setTimeout 启动</button>
+            <button class="lh_btn red" id="lh_alarm_cancel" disabled><i class="iconfont">&#xe662;</i>clearTimeout 取消</button>
+        </div>
+        <div class="lh_alarm_stage" id="lh_alarm_stage">
+            <i class="iconfont lh_alarm_icon">&#xe759;</i>
+            <div class="lh_alarm_text" id="lh_alarm_text">设定秒数后，闹钟只响一次（ring 一次就结束）</div>
+        </div>
+    </div>
+
+    <!-- ③ setInterval 演练场 -->
+    <h2 class="lh_h2">③ setInterval 演练场：秒表 + 实时时钟 <small>左：手动启停体会循环；右：页面打开后一直在跳的 interval</small></h2>
+    <div class="lh_card">
+        <div class="lh_interval_grid">
+            <div>
+                <div class="lh_watch_display" id="lh_watch">00:00.0<small id="lh_watch_id">定时器 ID：未启动</small></div>
+                <div class="lh_watch_btns">
+                    <button class="lh_btn green" id="lh_watch_start"><i class="iconfont">&#xe8a3;</i>启动 interval</button>
+                    <button class="lh_btn red" id="lh_watch_stop" disabled><i class="iconfont">&#xe662;</i>clearInterval 停止</button>
+                    <button class="lh_btn ghost" id="lh_watch_reset">归零</button>
+                </div>
+            </div>
+            <div>
+                <div class="lh_clock_display" id="lh_clock">--:--:--<small>每 1000ms 由 setInterval 刷新（冒号在闪烁）</small></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 控制台 -->
+    <h2 class="lh_h2">控制台输出 <small>所有定时器的启动 / 触发 / 取消都会记录在这里</small></h2>
+    <div class="lh_console" id="lh_console">
+        <div class="lh_hint">点击上方按钮试试…</div>
+    </div>
+
+    <footer class="lh_footer">© 刘晗的《高级网页设计》课堂实践 · 17-5 JavaScript 定时器</footer>
+</div>
+
+<script>
+(function(){
+    const lh_console = document.getElementById('lh_console');
+    let lh_timerCount = 0; // 模拟浏览器分配的定时器 ID 计数
+
+    /* ---------- 控制台日志 ---------- */
+    function lh_log(code, ret, cls){
+        const h = lh_console.querySelector('.lh_hint');
+        if(h) h.remove();
+        const e = document.createElement('div');
+        e.className = 'lh_log' + (cls ? ' ' + cls : '');
+        e.innerHTML = '<div class="lh_code_line"></div><div class="lh_ret"></div>';
+        e.querySelector('.lh_code_line').textContent = code;
+        e.querySelector('.lh_ret').innerHTML = ret;
+        lh_console.prepend(e); // 最新在最上面
+    }
+
+    /* ================= setTimeout：延时小闹钟 ================= */
+    const lh_secInput   = document.getElementById('lh_sec_input');
+    const lh_alarmStart = document.getElementById('lh_alarm_start');
+    const lh_alarmCancel= document.getElementById('lh_alarm_cancel');
+    const lh_alarmStage = document.getElementById('lh_alarm_stage');
+    const lh_alarmText  = document.getElementById('lh_alarm_text');
+    let lh_timeoutId = null;      // setTimeout 返回的定时器 ID
+    let lh_countId  = null;       // 倒计时显示用的 interval
+    let lh_leftSec  = 0;
+
+    function lh_resetAlarmStage(){
+        lh_alarmStage.className = 'lh_alarm_stage';
+        lh_alarmText.innerHTML = '设定秒数后，闹钟只响一次（ring 一次就结束）';
+    }
+
+    lh_alarmStart.addEventListener('click', function(){
+        const lh_sec = Math.max(1, Math.min(60, Number(lh_secInput.value) || 3));
+        if(lh_timeoutId !== null){ // 防止重复启动
+            lh_log('setTimeout(...)', '上一次闹钟还没响，请先取消或等它结束', 'err');
+            return;
+        }
+        lh_leftSec = lh_sec;
+        const lh_startTime = Date.now();
+        lh_alarmStart.disabled = true;
+        lh_alarmCancel.disabled = false;
+        lh_alarmStage.className = 'lh_alarm_stage waiting';
+
+        /* 倒计时数字显示：每秒刷新（interval 只负责"显示"） */
+        lh_countId = setInterval(function(){
+            lh_leftSec--;
+            lh_alarmText.innerHTML = '<b>' + Math.max(0, lh_leftSec) + '</b> 秒后响铃…（等待中）';
+            if(lh_leftSec <= 0) clearInterval(lh_countId);
+        }, 1000);
+        lh_alarmText.innerHTML = '<b>' + lh_leftSec + '</b> 秒后响铃…（等待中）';
+
+        /* 真正的动作：延时 sec 秒后只执行一次 */
+        lh_timeoutId = setTimeout(function(){
+            const lh_real = ((Date.now() - lh_startTime) / 1000).toFixed(2);
+            lh_alarmStage.className = 'lh_alarm_stage ringing';
+            lh_alarmText.innerHTML = '叮！闹钟响了 —— 实际延时 <b>' + lh_real + '</b> 秒（只响一次，自动结束）';
+            lh_log('setTimeout(() => ring(), ' + (lh_sec * 1000) + ')',
+                '闹钟触发！定时器 <b>#' + lh_timeoutId + '</b> 已执行完毕，实际经过 <b>' + lh_real + '</b> 秒', 'ok');
+            lh_timeoutId = null;
+            lh_alarmStart.disabled = false;
+            lh_alarmCancel.disabled = true;
+        }, lh_sec * 1000);
+
+        lh_log('const lh_timeoutId = setTimeout(() => ring(), ' + (lh_sec * 1000) + ')',
+            '启动成功，返回定时器 ID：<b>#' + lh_timeoutId + '</b>，' + lh_sec + ' 秒后触发且只触发一次');
+    });
+
+    lh_alarmCancel.addEventListener('click', function(){
+        if(lh_timeoutId === null) return;
+        clearTimeout(lh_timeoutId);            // 取消还没执行的 timeout
+        if(lh_countId !== null) clearInterval(lh_countId); // 顺手停掉倒计时显示
+        lh_log('clearTimeout(lh_timeoutId)',
+            '已取消定时器 <b>#' + lh_timeoutId + '</b> —— 它永远不会再触发了', 'err');
+        lh_timeoutId = null;
+        lh_alarmStart.disabled = false;
+        lh_alarmCancel.disabled = true;
+        lh_resetAlarmStage();
+    });
+
+    /* ================= setInterval：秒表 ================= */
+    const lh_watchDisplay = document.getElementById('lh_watch');
+    const lh_watchIdEl    = document.getElementById('lh_watch_id');
+    const lh_watchStart   = document.getElementById('lh_watch_start');
+    const lh_watchStop    = document.getElementById('lh_watch_stop');
+    const lh_watchReset   = document.getElementById('lh_watch_reset');
+    let lh_intervalId = null;   // setInterval 返回的定时器 ID
+    let lh_elapsed = 0;         // 累计毫秒
+
+    function lh_fmt(ms){
+        const lh_m = Math.floor(ms / 60000);
+        const lh_s = Math.floor(ms % 60000 / 1000);
+        const lh_d = Math.floor(ms % 1000 / 100);
+        return (lh_m < 10 ? '0' : '') + lh_m + ':' + (lh_s < 10 ? '0' : '') + lh_s + '.' + lh_d;
+    }
+    function lh_renderWatch(){
+        lh_watchDisplay.childNodes[0].nodeValue = lh_fmt(lh_elapsed);
+    }
+
+    lh_watchStart.addEventListener('click', function(){
+        if(lh_intervalId !== null){
+            lh_log('setInterval(...)', '秒表已经在跑了，不能重复启动', 'err');
+            return;
+        }
+        /* 每 100ms 累加真实流逝时间并重绘（用 Date.now() 差值累加，避免定时器漂移） */
+        let lh_last = Date.now();
+        lh_intervalId = setInterval(function(){
+            const lh_now = Date.now();
+            lh_elapsed += lh_now - lh_last;
+            lh_last = lh_now;
+            lh_renderWatch();
+        }, 100);
+
+        lh_watchDisplay.classList.remove('paused');
+        lh_watchIdEl.textContent = '定时器 ID：#' + lh_intervalId + '（每 100ms 跳一次）';
+        lh_watchStart.disabled = true;
+        lh_watchStop.disabled = false;
+        lh_log('const lh_intervalId = setInterval(() => tick(), 100)',
+            '秒表启动！返回定时器 ID：<b>#' + lh_intervalId + '</b>，每 100 毫秒执行一次，直到 clearInterval');
+    });
+
+    lh_watchStop.addEventListener('click', function(){
+        if(lh_intervalId === null) return;
+        clearInterval(lh_intervalId);
+        lh_log('clearInterval(lh_intervalId)',
+            '秒表停止在 <b>' + lh_fmt(lh_elapsed) + '</b>，定时器 <b>#' + lh_intervalId + '</b> 已被清除');
+        lh_intervalId = null;
+        lh_watchDisplay.classList.add('paused');
+        lh_watchIdEl.textContent = '定时器 ID：已停止（累计 ' + lh_fmt(lh_elapsed) + '）';
+        lh_watchStart.disabled = false;
+        lh_watchStop.disabled = true;
+    });
+
+    lh_watchReset.addEventListener('click', function(){
+        if(lh_intervalId !== null){
+            lh_log('归零', '请先停止秒表再归零', 'err');
+            return;
+        }
+        lh_elapsed = 0;
+        lh_renderWatch();
+        lh_watchIdEl.textContent = '定时器 ID：未启动';
+        lh_log('lh_elapsed = 0', '秒表已归零，随时可以重新启动');
+    });
+
+    /* ================= setInterval：实时时钟（页面打开即运行） ================= */
+    const lh_clock = document.getElementById('lh_clock');
+    function lh_renderClock(){
+        const lh_now = new Date();
+        const lh_pad = function(n){ return n < 10 ? '0' + n : '' + n; };
+        lh_clock.innerHTML = lh_pad(lh_now.getHours())
+            + '<span class="lh_clock_blink">:</span>' + lh_pad(lh_now.getMinutes())
+            + '<span class="lh_clock_blink">:</span>' + lh_pad(lh_now.getSeconds())
+            + '<small>每 1000ms 由 setInterval 刷新（冒号在闪烁）</small>';
+    }
+    lh_renderClock();
+    const lh_clockId = setInterval(lh_renderClock, 1000);
+    lh_log('const lh_clockId = setInterval(lh_renderClock, 1000)',
+        '实时时钟已随页面启动，定时器 ID：<b>#' + lh_clockId + '</b>，将一直运行（本页没有给它 clearInterval）');
+
+})();
+</script>
+</body>
+</html>

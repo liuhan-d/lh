@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<!-- 姓名：刘晗，建立时间：2026-11-05，使用的大模型：GLM-5.3，功能名称：Canvas 粒子动画（文字"刘晗"聚合、鼠标驱散、拖尾着色） -->
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>18-1 Canvas 动画 · 刘晗</title>
+<link rel="stylesheet" href="font/iconfont.css">
+<style>
+:root{
+    --lh-bg:#f6f8fc; --lh-card:#ffffff;
+    --lh-main:#4f6ef7; --lh-main2:#7c9bff;
+    --lh-text:#1f2937; --lh-muted:#8a94a6;
+    --lh-line:#eef0f5;
+    --lh-shadow:0 2px 14px rgba(79,110,247,0.09);
+    --lh-shadow-lg:0 10px 30px rgba(79,110,247,0.16);
+}
+*{box-sizing:border-box}
+body{
+    margin:0; padding:36px 16px 64px;
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Microsoft YaHei",Arial;
+    color:var(--lh-text); line-height:1.65;
+    background:
+        radial-gradient(700px 320px at 12% -5%, rgba(124,155,255,0.16), transparent 60%),
+        radial-gradient(600px 300px at 92% 0%, rgba(18,183,106,0.07), transparent 60%),
+        var(--lh-bg);
+    min-height:100vh;
+}
+.lh_wrap{max-width:900px; margin:0 auto}
+
+.lh_header{display:flex; align-items:center; gap:16px; margin-bottom:6px}
+.lh_logo{
+    width:58px; height:58px; border-radius:18px; flex:none;
+    background:linear-gradient(135deg, var(--lh-main), var(--lh-main2));
+    display:flex; align-items:center; justify-content:center;
+    font-weight:800; font-size:17px; color:#fff;
+    box-shadow:var(--lh-shadow-lg);
+}
+.lh_header h1{margin:0; font-size:24px; letter-spacing:.5px}
+.lh_sub{margin:2px 0 0; font-size:13px; color:var(--lh-muted)}
+.lh_back{
+    margin-left:auto; flex:none; display:inline-flex; align-items:center; gap:6px;
+    padding:8px 16px; border-radius:999px; text-decoration:none;
+    color:var(--lh-main); font-size:13px; font-weight:700;
+    border:1px solid rgba(79,110,247,0.25); background:#fff;
+    box-shadow:var(--lh-shadow);
+    transition:transform .18s, box-shadow .18s;
+}
+.lh_back:hover{transform:translateY(-2px); box-shadow:var(--lh-shadow-lg)}
+.lh_back .iconfont{font-size:14px}
+
+.lh_card{
+    margin-top:16px; padding:18px 20px; border-radius:16px;
+    background:var(--lh-card); border:1px solid var(--lh-line);
+    box-shadow:var(--lh-shadow);
+}
+.lh_ctrl{display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-bottom:14px}
+.lh_btn{
+    padding:9px 20px; border:none; border-radius:10px; cursor:pointer;
+    font-size:13px; font-weight:700; color:#fff;
+    background:linear-gradient(135deg, var(--lh-main), var(--lh-main2));
+    box-shadow:var(--lh-shadow);
+    transition:transform .18s, box-shadow .18s;
+    display:inline-flex; align-items:center; gap:7px;
+}
+.lh_btn .iconfont{font-size:13px}
+.lh_btn:hover{transform:translateY(-2px); box-shadow:var(--lh-shadow-lg)}
+.lh_btn.ghost{background:#fff; color:var(--lh-main); border:1px solid rgba(79,110,247,0.3)}
+.lh_tip{margin-left:auto; font-size:12px; color:var(--lh-muted)}
+
+.lh_stage{
+    border-radius:14px; overflow:hidden; background:#0b1230;
+    border:1px solid #1c2a55;
+}
+.lh_canvas{
+    display:block; width:100%; aspect-ratio:860/420; cursor:crosshair;
+}
+
+.lh_info{
+    margin-top:12px; display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+    gap:10px; font-size:12.5px; color:var(--lh-muted);
+}
+.lh_info div{
+    background:#fafbfd; border:1px solid var(--lh-line);
+    border-radius:10px; padding:10px 14px;
+}
+.lh_info b{color:var(--lh-main)}
+
+.lh_footer{margin-top:30px; text-align:center; font-size:12px; color:#c0c6d2}
+</style>
+</head>
+<body>
+<div class="lh_wrap">
+
+    <header class="lh_header">
+        <div class="lh_logo">18-1</div>
+        <div>
+            <h1>Canvas 动画：粒子文字</h1>
+            <p class="lh_sub">几千个粒子从四面八方飞来，聚成"刘晗"两个字 —— 鼠标划过去会把它们吓跑</p>
+        </div>
+        <a class="lh_back" href="index.html"><i class="iconfont">&#xe600;</i>返回首页</a>
+    </header>
+
+    <div class="lh_card">
+        <div class="lh_ctrl">
+            <button class="lh_btn" id="lh_scatter"><i class="iconfont">&#xe8a3;</i>打散重聚</button>
+            <button class="lh_btn ghost" id="lh_text_btn">切换文字</button>
+            <button class="lh_btn ghost" id="lh_pause">暂停 / 继续</button>
+            <span class="lh_tip">鼠标悬停驱散 · 点击画面引爆</span>
+        </div>
+        <div class="lh_stage">
+            <canvas class="lh_canvas" id="lh_canvas"></canvas>
+        </div>
+        <div class="lh_info">
+            <div>当前文字：<b id="lh_cur_text">刘晗</b></div>
+            <div>粒子数量：<b id="lh_count">-</b></div>
+            <div>状态：<b id="lh_state">运行中</b></div>
+        </div>
+    </div>
+
+    <footer class="lh_footer">© 刘晗的《高级网页设计》课堂实践 · 18-1 Canvas 粒子动画</footer>
+</div>
+
+<script>
+(function(){
+    const lh_canvas = document.getElementById('lh_canvas');
+    const lh_ctx = lh_canvas.getContext('2d');
+    const lh_W = 860, lh_H = 420;
+    const lh_texts = ['刘晗', 'LIU HAN', '刘晗·2026'];
+    let lh_textIdx = 0;
+
+    /* ---------- 高分屏适配 ---------- */
+    const lh_dpr = Math.min(2, window.devicePixelRatio || 1);
+    lh_canvas.width = lh_W * lh_dpr;
+    lh_canvas.height = lh_H * lh_dpr;
+    lh_ctx.setTransform(lh_dpr, 0, 0, lh_dpr, 0, 0);
+
+    let lh_particles = [];
+    const lh_mouse = { x:-999, y:-999 };
+    let lh_running = true;
+
+    /* ---------- 1. 离屏画布：把文字画出来再采样像素点 ---------- */
+    function lh_sample(text){
+        const lh_off = document.createElement('canvas');
+        lh_off.width = lh_W; lh_off.height = lh_H;
+        const c = lh_off.getContext('2d');
+        let fs = 200;
+        c.font = '900 ' + fs + 'px "Microsoft YaHei", "PingFang SC", sans-serif';
+        while(c.measureText(text).width > lh_W - 80 && fs > 30){
+            fs -= 8;
+            c.font = '900 ' + fs + 'px "Microsoft YaHei", "PingFang SC", sans-serif';
+        }
+        c.textAlign = 'center';
+        c.textBaseline = 'middle';
+        c.fillStyle = '#fff';
+        c.fillText(text, lh_W / 2, lh_H / 2);
+
+        const lh_data = c.getImageData(0, 0, lh_W, lh_H).data;
+        const lh_targets = [];
+        const gap = fs > 110 ? 4 : 3;               /* 大字采样稀一点，小字密一点 */
+        for(let y = 0; y < lh_H; y += gap){
+            for(let x = 0; x < lh_W; x += gap){
+                if(lh_data[(y * lh_W + x) * 4 + 3] > 128){
+                    lh_targets.push({ x:x, y:y });
+                }
+            }
+        }
+        return lh_targets;
+    }
+
+    /* ---------- 2. 生成粒子：随机出生位置 + 目标位置 ---------- */
+    function lh_init(){
+        const lh_targets = lh_sample(lh_texts[lh_textIdx]);
+        lh_particles = lh_targets.map(function(t){
+            return {
+                x: Math.random() * lh_W,
+                y: Math.random() * lh_H,
+                tx: t.x, ty: t.y,
+                vx: 0, vy: 0,
+                hue: 185 + (t.x / lh_W) * 150,        /* 从左到右：蓝 → 紫 */
+                r: 1.1 + Math.random() * 1.3
+            };
+        });
+        document.getElementById('lh_count').textContent = lh_particles.length;
+        document.getElementById('lh_cur_text').textContent = lh_texts[lh_textIdx];
+    }
+
+    /* ---------- 3. 动画主循环 ---------- */
+    function lh_frame(){
+        if(lh_running){
+            /* 半透明覆盖形成拖尾 */
+            lh_ctx.fillStyle = 'rgba(11,18,48,0.38)';
+            lh_ctx.fillRect(0, 0, lh_W, lh_H);
+
+            for(let i = 0; i < lh_particles.length; i++){
+                const p = lh_particles[i];
+
+                /* 弹簧力：把粒子拉向目标点 */
+                let ax = (p.tx - p.x) * 0.014;
+                let ay = (p.ty - p.y) * 0.014;
+
+                /* 鼠标斥力：靠近光标的粒子被推开 */
+                const dx = p.x - lh_mouse.x, dy = p.y - lh_mouse.y;
+                const d2 = dx * dx + dy * dy;
+                if(d2 < 5600 && d2 > 0.01){
+                    const d = Math.sqrt(d2);
+                    const f = (75 - d) / 75 * 2.4;
+                    ax += (dx / d) * f;
+                    ay += (dy / d) * f;
+                }
+
+                p.vx = (p.vx + ax) * 0.86;
+                p.vy = (p.vy + ay) * 0.86;
+                p.x += p.vx;
+                p.y += p.vy;
+
+                lh_ctx.fillStyle = 'hsla(' + p.hue + ', 85%, 65%, 0.9)';
+                lh_ctx.beginPath();
+                lh_ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                lh_ctx.fill();
+            }
+        }
+        requestAnimationFrame(lh_frame);
+    }
+
+    /* ---------- 4. 交互 ---------- */
+    function lh_localXY(e){
+        const rect = lh_canvas.getBoundingClientRect();
+        return { x:(e.clientX - rect.left) * lh_W / rect.width,
+                 y:(e.clientY - rect.top) * lh_H / rect.height };
+    }
+    lh_canvas.addEventListener('mousemove', function(e){
+        const p = lh_localXY(e);
+        lh_mouse.x = p.x; lh_mouse.y = p.y;
+    });
+    lh_canvas.addEventListener('mouseleave', function(){
+        lh_mouse.x = -999; lh_mouse.y = -999;
+    });
+    /* 点击引爆：给所有粒子一个随机冲量 */
+    lh_canvas.addEventListener('click', function(){
+        for(let i = 0; i < lh_particles.length; i++){
+            const p = lh_particles[i];
+            p.vx += (Math.random() - 0.5) * 22;
+            p.vy += (Math.random() - 0.5) * 22;
+        }
+    });
+
+    document.getElementById('lh_scatter').addEventListener('click', lh_init);
+    document.getElementById('lh_text_btn').addEventListener('click', function(){
+        lh_textIdx = (lh_textIdx + 1) % lh_texts.length;
+        lh_init();
+    });
+    document.getElementById('lh_pause').addEventListener('click', function(){
+        lh_running = !lh_running;
+        document.getElementById('lh_state').textContent = lh_running ? '运行中' : '已暂停';
+    });
+
+    /* ---------- 启动 ---------- */
+    lh_init();
+    lh_frame();
+})();
+</script>
+</body>
+</html>

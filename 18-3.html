@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<!-- 姓名：刘晗，建立时间：2026-11-05，使用的大模型：GLM-5.3，功能名称：SVG 绘制基于知识库的智能客服系统架构图（科研论文风格 · 含在线/离线链路高亮） -->
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>18-3 SVG 架构图 · 基于知识库的智能客服系统</title>
+<link rel="stylesheet" href="font/iconfont.css">
+<style>
+:root{
+    --lh-bg:#f6f8fc; --lh-card:#ffffff;
+    --lh-main:#4f6ef7; --lh-main2:#7c9bff;
+    --lh-text:#1f2937; --lh-muted:#8a94a6;
+    --lh-line:#eef0f5; --lh-blue:#2563eb; --lh-grey:#6b7280;
+    --lh-shadow:0 2px 14px rgba(79,110,247,0.09);
+    --lh-shadow-lg:0 10px 30px rgba(79,110,247,0.16);
+}
+*{box-sizing:border-box}
+body{
+    margin:0; padding:36px 16px 64px;
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Microsoft YaHei",Arial;
+    color:var(--lh-text); line-height:1.65;
+    background:
+        radial-gradient(700px 320px at 12% -5%, rgba(124,155,255,0.16), transparent 60%),
+        radial-gradient(600px 300px at 92% 0%, rgba(18,183,106,0.07), transparent 60%),
+        var(--lh-bg);
+    min-height:100vh;
+}
+.lh_wrap{max-width:960px; margin:0 auto}
+
+.lh_header{display:flex; align-items:center; gap:16px; margin-bottom:6px}
+.lh_logo{
+    width:58px; height:58px; border-radius:18px; flex:none;
+    background:linear-gradient(135deg, var(--lh-main), var(--lh-main2));
+    display:flex; align-items:center; justify-content:center;
+    font-weight:800; font-size:17px; color:#fff;
+    box-shadow:var(--lh-shadow-lg);
+}
+.lh_header h1{margin:0; font-size:24px; letter-spacing:.5px}
+.lh_sub{margin:2px 0 0; font-size:13px; color:var(--lh-muted)}
+.lh_back{
+    margin-left:auto; flex:none; display:inline-flex; align-items:center; gap:6px;
+    padding:8px 16px; border-radius:999px; text-decoration:none;
+    color:var(--lh-main); font-size:13px; font-weight:700;
+    border:1px solid rgba(79,110,247,0.25); background:#fff;
+    box-shadow:var(--lh-shadow);
+    transition:transform .18s, box-shadow .18s;
+}
+.lh_back:hover{transform:translateY(-2px); box-shadow:var(--lh-shadow-lg)}
+.lh_back .iconfont{font-size:14px}
+
+.lh_card{
+    margin-top:16px; padding:22px 24px 18px; border-radius:16px;
+    background:var(--lh-card); border:1px solid var(--lh-line);
+    box-shadow:var(--lh-shadow);
+}
+.lh_ctrl{display:flex; flex-wrap:wrap; gap:10px; margin-bottom:14px; align-items:center}
+.lh_btn{
+    padding:8px 18px; border:none; border-radius:8px; cursor:pointer;
+    font-size:13px; font-weight:700; color:#fff;
+    background:linear-gradient(135deg, var(--lh-main), var(--lh-main2));
+    box-shadow:var(--lh-shadow);
+    transition:transform .18s, box-shadow .18s, opacity .2s;
+    display:inline-flex; align-items:center; gap:6px;
+}
+.lh_btn .iconfont{font-size:12px}
+.lh_btn:hover{transform:translateY(-2px); box-shadow:var(--lh-shadow-lg)}
+.lh_btn.active{opacity:1; outline:2px solid rgba(79,110,247,0.4)}
+.lh_btn.ghost{background:#fff; color:var(--lh-main); border:1px solid rgba(79,110,247,0.3)}
+.lh_btn.active.ghost{background:rgba(79,110,247,0.08)}
+.lh_tip{margin-left:auto; font-size:12px; color:var(--lh-muted)}
+
+/* ---------- SVG 论文图风格 ---------- */
+.lh_figure{background:#fff; border:1px solid #e2e5ea; border-radius:6px; padding:18px 14px 6px}
+.lh_svg{display:block; width:100%; height:auto}
+.lh_svg text{
+    font-family:"Times New Roman","SimSun","STSong",serif;
+    fill:#222;
+}
+.lh_svg .lh_box{transition:stroke .2s, stroke-width .2s; cursor:default}
+.lh_svg .lh_box:hover{stroke:var(--lh-blue); stroke-width:2}
+.lh_svg .lh_g_online, .lh_svg .lh_g_offline, .lh_svg .lh_band{transition:opacity .35s}
+
+/* 图注 */
+.lh_caption{
+    margin-top:14px; text-align:center;
+    font-family:"Times New Roman","SimSun","STSong",serif;
+    font-size:14px; color:#333;
+}
+.lh_caption .lh_fig_en{display:block; font-size:12px; color:#555; margin-top:4px}
+.lh_caption b{font-weight:700}
+
+.lh_legend{
+    margin-top:12px; display:flex; flex-wrap:wrap; gap:16px; justify-content:center;
+    font-size:12.5px; color:var(--lh-muted); align-items:center;
+}
+.lh_line{display:inline-block; width:28px; height:0; border-top:2px solid var(--lh-blue); margin-right:5px; vertical-align:middle}
+.lh_line.dash{border-top:2px dashed var(--lh-grey)}
+
+.lh_info{
+    margin-top:14px; font-size:12.5px; color:var(--lh-muted);
+    background:#fafbfd; border:1px solid var(--lh-line);
+    border-radius:10px; padding:12px 16px; line-height:1.8;
+}
+.lh_info b{color:var(--lh-main)}
+.lh_info .lh_off{color:var(--lh-grey)}
+
+.lh_footer{margin-top:30px; text-align:center; font-size:12px; color:#c0c6d2}
+</style>
+</head>
+<body>
+<div class="lh_wrap">
+
+    <header class="lh_header">
+        <div class="lh_logo">18-3</div>
+        <div>
+            <h1>SVG 架构图：基于知识库的智能客服系统</h1>
+            <p class="lh_sub">科研论文插图风格 · RAG 检索增强生成 · 在线问答 / 离线知识构建双链路</p>
+        </div>
+        <a class="lh_back" href="index.html"><i class="iconfont">&#xe600;</i>返回首页</a>
+    </header>
+
+    <div class="lh_card">
+        <div class="lh_ctrl">
+            <button class="lh_mode_btn lh_btn active" data-mode="all"><i class="iconfont">&#xe631;</i>整体视图</button>
+            <button class="lh_mode_btn lh_btn ghost" data-mode="online"><i class="iconfont">&#xe86e;</i>在线问答链路</button>
+            <button class="lh_mode_btn lh_btn ghost" data-mode="offline"><i class="iconfont">&#xe64a;</i>离线知识构建链路</button>
+            <span class="lh_tip">悬停模块可高亮 · 切换按钮聚焦对应链路</span>
+        </div>
+
+        <div class="lh_figure">
+            <svg class="lh_svg" viewBox="0 0 920 622" role="img" aria-label="基于知识库的智能客服系统架构图">
+                <defs>
+                    <marker class="lh_marker" id="lh_ar_on" viewBox="0 0 10 10" refX="9" refY="5"
+                            markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                        <path d="M0,0 L10,5 L0,10 z" fill="#2563eb"/>
+                    </marker>
+                    <marker id="lh_ar_off" viewBox="0 0 10 10" refX="9" refY="5"
+                            markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                        <path d="M0,0 L10,5 L0,10 z" fill="#6b7280"/>
+                    </marker>
+                </defs>
+
+                <!-- ===== L1 用户交互层 ===== -->
+                <g class="lh_band" data-band="1">
+                    <rect x="70" y="20" width="780" height="70" rx="3" fill="rgba(0,0,0,0.02)" stroke="#d5d9e0" stroke-width="1"/>
+                    <text x="115" y="55" text-anchor="middle" dominant-baseline="central" font-size="15" font-weight="700">用户交互层</text>
+                    <rect class="lh_box" x="175" y="38" width="150" height="34" rx="3" fill="#fff" stroke="#4b5563" stroke-width="1.2"/>
+                    <text x="250" y="55" text-anchor="middle" dominant-baseline="central" font-size="13">Web 客户端</text>
+                    <rect class="lh_box" x="347" y="38" width="150" height="34" rx="3" fill="#fff" stroke="#4b5563" stroke-width="1.2"/>
+                    <text x="422" y="55" text-anchor="middle" dominant-baseline="central" font-size="13">移动端 APP</text>
+                    <rect class="lh_box" x="519" y="38" width="150" height="34" rx="3" fill="#fff" stroke="#4b5563" stroke-width="1.2"/>
+                    <text x="594" y="55" text-anchor="middle" dominant-baseline="central" font-size="13">企业微信</text>
+                    <rect class="lh_box" x="691" y="38" width="150" height="34" rx="3" fill="#fff" stroke="#4b5563" stroke-width="1.2"/>
+                    <text x="766" y="55" text-anchor="middle" dominant-baseline="central" font-size="13">开放 API</text>
+                </g>
+
+                <!-- ===== L2 应用服务层 ===== -->
+                <g class="lh_band" data-band="2">
+                    <rect x="70" y="110" width="780" height="90" rx="3" fill="rgba(0,0,0,0.02)" stroke="#d5d9e0" stroke-width="1"/>
+                    <text x="115" y="155" text-anchor="middle" dominant-baseline="central" font-size="15" font-weight="700">应用服务层</text>
+                    <rect class="lh_box" x="175" y="122" width="666" height="34" rx="3" fill="rgba(37,99,235,0.06)" stroke="#34538f" stroke-width="1.4"/>
+                    <text x="508" y="139" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="700">智能客服对话引擎</text>
+                    <rect class="lh_box" x="184" y="164" width="150" height="26" rx="3" fill="#fff" stroke="#4b5563" stroke-width="1.1"/>
+                    <text x="259" y="177" text-anchor="middle" dominant-baseline="central" font-size="12">多轮对话管理</text>
+                    <rect class="lh_box" x="347" y="164" width="150" height="26" rx="3" fill="#fff" stroke="#4b5563" stroke-width="1.1"/>
+                    <text x="422" y="177" text-anchor="middle" dominant-baseline="central" font-size="12">意图识别</text>
+                    <rect class="lh_box" x="510" y="164" width="150" height="26" rx="3" fill="#fff" stroke="#4b5563" stroke-width="1.1"/>
+                    <text x="585" y="177" text-anchor="middle" dominant-baseline="central" font-size="12">答案生成与引用溯源</text>
+                    <rect class="lh_box" x="673" y="164" width="150" height="26" rx="3" fill="#fff" stroke="#4b5563" stroke-width="1.1"/>
+                    <text x="748" y="177" text-anchor="middle" dominant-baseline="central" font-size="12">人工兜底转接</text>
+                </g>
+
+                <!-- ===== L3 模型与检索层（RAG 核心） ===== -->
+                <g class="lh_band" data-band="3">
+                    <rect x="70" y="222" width="780" height="100" rx="3" fill="rgba(37,99,235,0.03)" stroke="#d5d9e0" stroke-width="1"/>
+                    <text x="115" y="272" text-anchor="middle" dominant-baseline="central" font-size="15" font-weight="700">模型检索层</text>
+                    <text x="508" y="240" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#34538f">检索增强生成（RAG）核心</text>
+                    <rect class="lh_box" x="175" y="254" width="155" height="48" rx="3" fill="#fff" stroke="#4b5563" stroke-width="1.2"/>
+                    <text x="252.5" y="278" text-anchor="middle" dominant-baseline="central" font-size="13">向量召回<tspan font-size="11" fill="#555">(相似度检索)</tspan></text>
+                    <rect class="lh_box" x="344" y="254" width="155" height="48" rx="3" fill="#fff" stroke="#4b5563" stroke-width="1.2"/>
+                    <text x="421.5" y="278" text-anchor="middle" dominant-baseline="central" font-size="13">关键词检索<tspan font-size="11" fill="#555">(BM25)</tspan></text>
+                    <rect class="lh_box" x="513" y="254" width="155" height="48" rx="3" fill="#fff" stroke="#4b5563" stroke-width="1.2"/>
+                    <text x="590.5" y="278" text-anchor="middle" dominant-baseline="central" font-size="13">重排序<tspan font-size="11" fill="#555">(Rerank)</tspan></text>
+                    <rect class="lh_box" x="682" y="254" width="155" height="48" rx="3" fill="#fff" stroke="#4b5563" stroke-width="1.2"/>
+                    <text x="759.5" y="278" text-anchor="middle" dominant-baseline="central" font-size="13">大语言模型<tspan font-size="11" fill="#555">(LLM 生成)</tspan></text>
+                </g>
+
+                <!-- ===== L4 知识存储层 ===== -->
+                <g class="lh_band" data-band="4">
+                    <rect x="70" y="344" width="780" height="70" rx="3" fill="rgba(0,0,0,0.02)" stroke="#d5d9e0" stroke-width="1"/>
+                    <text x="115" y="379" text-anchor="middle" dominant-baseline="central" font-size="15" font-weight="700">知识存储层</text>
+                    <rect class="lh_box" x="175" y="362" width="200" height="34" rx="3" fill="#fff" stroke="#4b5563" stroke-width="1.2"/>
+                    <text x="275" y="379" text-anchor="middle" dominant-baseline="central" font-size="13">向量数据库</text>
+                    <rect class="lh_box" x="405" y="362" width="200" height="34" rx="3" fill="#fff" stroke="#4b5563" stroke-width="1.2"/>
+                    <text x="505" y="379" text-anchor="middle" dominant-baseline="central" font-size="13">倒排索引</text>
+                    <rect class="lh_box" x="635" y="362" width="200" height="34" rx="3" fill="#fff" stroke="#4b5563" stroke-width="1.2"/>
+                    <text x="735" y="379" text-anchor="middle" dominant-baseline="central" font-size="13">知识图谱</text>
+                </g>
+
+                <!-- ===== L5 知识构建层 ===== -->
+                <g class="lh_band" data-band="5">
+                    <rect x="70" y="438" width="780" height="70" rx="3" fill="rgba(0,0,0,0.02)" stroke="#d5d9e0" stroke-width="1"/>
+                    <text x="115" y="473" text-anchor="middle" dominant-baseline="central" font-size="15" font-weight="700">知识构建层</text>
+                    <rect class="lh_box" x="195" y="456" width="180" height="34" rx="3" fill="#fff" stroke="#4b5563" stroke-width="1.2"/>
+                    <text x="285" y="473" text-anchor="middle" dominant-baseline="central" font-size="13">文档解析</text>
+                    <rect class="lh_box" x="415" y="456" width="180" height="34" rx="3" fill="#fff" stroke="#4b5563" stroke-width="1.2"/>
+                    <text x="505" y="473" text-anchor="middle" dominant-baseline="central" font-size="13">文本分块</text>
+                    <rect class="lh_box" x="635" y="456" width="180" height="34" rx="3" fill="#fff" stroke="#4b5563" stroke-width="1.2"/>
+                    <text x="725" y="473" text-anchor="middle" dominant-baseline="central" font-size="13">向量化嵌入</text>
+                    <!-- 构建流水线内部箭头 -->
+                    <g class="lh_g_offline">
+                        <line x1="377" y1="473" x2="411" y2="473" stroke="#6b7280" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#lh_ar_off)"/>
+                        <line x1="597" y1="473" x2="631" y2="473" stroke="#6b7280" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#lh_ar_off)"/>
+                    </g>
+                </g>
+
+                <!-- ===== L6 数据源层 ===== -->
+                <g class="lh_band" data-band="6">
+                    <rect x="70" y="532" width="780" height="70" rx="3" fill="rgba(0,0,0,0.02)" stroke="#d5d9e0" stroke-width="1"/>
+                    <text x="115" y="567" text-anchor="middle" dominant-baseline="central" font-size="15" font-weight="700">数据源层</text>
+                    <rect class="lh_box" x="175" y="550" width="150" height="34" rx="3" fill="#fff" stroke="#4b5563" stroke-width="1.2"/>
+                    <text x="250" y="567" text-anchor="middle" dominant-baseline="central" font-size="13">产品文档</text>
+                    <rect class="lh_box" x="347" y="550" width="150" height="34" rx="3" fill="#fff" stroke="#4b5563" stroke-width="1.2"/>
+                    <text x="422" y="567" text-anchor="middle" dominant-baseline="central" font-size="13">FAQ 库</text>
+                    <rect class="lh_box" x="519" y="550" width="150" height="34" rx="3" fill="#fff" stroke="#4b5563" stroke-width="1.2"/>
+                    <text x="594" y="567" text-anchor="middle" dominant-baseline="central" font-size="13">历史工单</text>
+                    <rect class="lh_box" x="691" y="550" width="150" height="34" rx="3" fill="#fff" stroke="#4b5563" stroke-width="1.2"/>
+                    <text x="766" y="567" text-anchor="middle" dominant-baseline="central" font-size="13">网页知识</text>
+                </g>
+
+                <!-- 层名区与模块区的学术风格分隔虚线 -->
+                <line x1="160" y1="24" x2="160" y2="598" stroke="#d5d9e0" stroke-width="1" stroke-dasharray="4 4"/>
+
+                <!-- ===== 在线链路箭头（蓝色实线） ===== -->
+                <g class="lh_g_online" stroke="#2563eb" stroke-width="1.8">
+                    <!-- L1 → L2：用户提问 -->
+                    <line x1="250"  y1="92"  x2="250"  y2="106" marker-end="url(#lh_ar_on)"/>
+                    <line x1="422"  y1="92"  x2="422"  y2="106" marker-end="url(#lh_ar_on)"/>
+                    <line x1="594"  y1="92"  x2="594"  y2="106" marker-end="url(#lh_ar_on)"/>
+                    <line x1="766"  y1="92"  x2="766"  y2="106" marker-end="url(#lh_ar_on)"/>
+                    <!-- L2 → L1：答案返回 -->
+                    <line x1="336"  y1="108" x2="336"  y2="94"  marker-end="url(#lh_ar_on)"/>
+                    <line x1="680"  y1="108" x2="680"  y2="94"  marker-end="url(#lh_ar_on)"/>
+                    <!-- L2 → L3：查询请求 / 结果回传 -->
+                    <line x1="350"  y1="202" x2="350"  y2="218" marker-end="url(#lh_ar_on)"/>
+                    <line x1="700"  y1="202" x2="700"  y2="218" marker-end="url(#lh_ar_on)"/>
+                    <line x1="480"  y1="220" x2="480"  y2="204" marker-end="url(#lh_ar_on)"/>
+                    <!-- L3 → L4：向量 / 关键词 / 图谱查询 -->
+                    <line x1="275"  y1="324" x2="275"  y2="338" marker-end="url(#lh_ar_on)"/>
+                    <line x1="505"  y1="324" x2="505"  y2="338" marker-end="url(#lh_ar_on)"/>
+                    <line x1="735"  y1="324" x2="735"  y2="338" marker-end="url(#lh_ar_on)"/>
+                    <!-- L4 → L3：召回结果 -->
+                    <line x1="345"  y1="342" x2="345"  y2="326" marker-end="url(#lh_ar_on)"/>
+                    <line x1="575"  y1="342" x2="575"  y2="326" marker-end="url(#lh_ar_on)"/>
+                </g>
+
+                <!-- ===== 离线链路箭头（灰色虚线） ===== -->
+                <g class="lh_g_offline" stroke="#6b7280" stroke-width="1.6" stroke-dasharray="6 4">
+                    <!-- L5 → L4：向量化结果写入存储 -->
+                    <line x1="285"  y1="436" x2="285"  y2="420" marker-end="url(#lh_ar_off)"/>
+                    <line x1="505"  y1="436" x2="505"  y2="420" marker-end="url(#lh_ar_off)"/>
+                    <line x1="725"  y1="436" x2="725"  y2="420" marker-end="url(#lh_ar_off)"/>
+                    <!-- L6 → L5：原始数据抽取 -->
+                    <line x1="250"  y1="530" x2="250"  y2="512" marker-end="url(#lh_ar_off)"/>
+                    <line x1="422"  y1="530" x2="422"  y2="512" marker-end="url(#lh_ar_off)"/>
+                    <line x1="594"  y1="530" x2="594"  y2="512" marker-end="url(#lh_ar_off)"/>
+                    <line x1="766"  y1="530" x2="766"  y2="512" marker-end="url(#lh_ar_off)"/>
+                </g>
+            </svg>
+
+            <p class="lh_caption">
+                <b>图 1</b>&nbsp;&nbsp;基于知识库的智能客服系统总体架构
+                <span class="lh_fig_en"><b>Fig. 1</b>&nbsp;&nbsp;Overall architecture of the knowledge-base-oriented intelligent customer service system</span>
+            </p>
+        </div>
+
+        <div class="lh_legend">
+            <span><span class="lh_line"></span>在线问答链路（查询 / 召回 / 生成）</span>
+            <span><span class="lh_line dash"></span>离线知识构建链路（抽取 / 构建 / 入库）</span>
+        </div>
+
+        <div class="lh_info">
+            <b>在线链路</b>：用户提问 → 意图识别 → <b>向量召回 + BM25 关键词检索</b>双路召回 → 重排序精选 →
+            LLM 结合提示模板与召回知识生成答案 → 附引用溯源返回，无法解决时转人工。
+            <span class="lh_off"><b>离线链路</b>：原始文档 / FAQ / 工单先经解析、分块与向量化嵌入，再写入向量数据库、
+            倒排索引与知识图谱，为在线检索提供知识底座。</span>
+        </div>
+    </div>
+
+    <footer class="lh_footer">© 刘晗的《高级网页设计》课堂实践 · 18-3 SVG 系统架构图</footer>
+</div>
+
+<script>
+(function(){
+    /* ---------- 链路高亮切换（不使用 id 选择器，全部用类选择器） ---------- */
+    const lh_buttons = document.querySelectorAll('.lh_mode_btn');
+    const lh_online  = document.querySelector('.lh_g_online');
+    const lh_offline = document.querySelectorAll('.lh_g_offline');
+    const lh_bands   = document.querySelectorAll('.lh_band');
+
+    /* 在线链路涉及 1-4 层，离线链路涉及 4-6 层 */
+    const lh_onlineBands  = ['1', '2', '3', '4'];
+    const lh_offlineBands = ['4', '5', '6'];
+
+    function lh_setMode(mode){
+        /* 箭头显隐 */
+        lh_online.style.opacity  = mode === 'offline' ? '0.12' : '1';
+        lh_offline.forEach(function(g){ g.style.opacity = mode === 'online' ? '0.12' : '1'; });
+
+        /* 层带聚焦：不属于当前链路的层淡化 */
+        lh_bands.forEach(function(band){
+            const n = band.dataset.band;
+            let keep = true;
+            if(mode === 'online')  keep = lh_onlineBands.indexOf(n) > -1;
+            if(mode === 'offline') keep = lh_offlineBands.indexOf(n) > -1;
+            band.style.opacity = keep ? '1' : '0.22';
+        });
+
+        /* 按钮激活态 */
+        lh_buttons.forEach(function(btn){
+            const ghost = btn.classList.contains('ghost');
+            const active = btn.dataset.mode === mode;
+            btn.classList.toggle('active', active);
+            btn.classList.toggle('ghost', ghost && !active);
+        });
+    }
+
+    lh_buttons.forEach(function(btn){
+        btn.addEventListener('click', function(){ lh_setMode(btn.dataset.mode); });
+    });
+})();
+</script>
+</body>
+</html>

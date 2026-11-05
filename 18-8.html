@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<!-- 姓名：刘晗，建立时间：2026-11-05，使用的大模型：GLM-5.3-Flash，功能名称：基于 ECharts 的数据大屏（三列布局，中上为中国地图地理信息），echarts.min.js 与 china.json 已下载到本地 cdn 目录引用 -->
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>18-8 数据大屏 · 智慧物流监控中心</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: "Microsoft YaHei", sans-serif; background: #050e2d; color: #cfe3ff; min-height: 100vh; padding: 12px; }
+  .lh_title { text-align: center; padding: 10px 0 14px; }
+  .lh_title h1 { font-size: 26px; letter-spacing: 6px; color: #fff;
+    background: linear-gradient(90deg, transparent, rgba(41,128,255,.25), transparent);
+    display: inline-block; padding: 6px 60px; border-top: 1px solid rgba(80,160,255,.4); border-bottom: 1px solid rgba(80,160,255,.4); }
+  .lh_title p { font-size: 12px; color: #6f8fc9; margin-top: 6px; }
+  .lh_back { position: fixed; right: 16px; top: 16px; z-index: 9; text-decoration: none; color: #9fc1ff;
+    border: 1px solid rgba(120,170,255,.5); border-radius: 16px; padding: 4px 14px; font-size: 13px; }
+  .lh_back:hover { background: rgba(80,140,255,.25); }
+
+  /* 三列大屏布局：左右窄、中间宽 */
+  .lh_screen { display: flex; gap: 12px; height: calc(100vh - 96px); min-height: 620px; }
+  .lh_col { display: flex; flex-direction: column; gap: 12px; flex: 1; min-width: 0; }
+  .lh_col_mid { flex: 1.6; }
+  .lh_panel { flex: 1; background: rgba(16,40,90,.45); border: 1px solid rgba(70,130,230,.35);
+    border-radius: 8px; padding: 10px; display: flex; flex-direction: column; min-height: 0; }
+  .lh_panel h2 { font-size: 15px; color: #8fc1ff; border-left: 4px solid #2e7bff; padding-left: 8px; margin-bottom: 6px; }
+  .lh_chart { flex: 1; min-height: 0; }
+</style>
+<!-- 本地引用 echarts：cdn 文件已下载到目录下 -->
+<script src="cdn/echarts.min.js"></script>
+</head>
+<body>
+  <div class="lh_title">
+    <h1>智慧物流数据大屏</h1>
+    <p>DATA VISUALIZATION CENTER · 数据每小时自动更新</p>
+  </div>
+  <a class="lh_back" href="index.html">返回首页</a>
+
+  <div class="lh_screen">
+    <!-- 左列 -->
+    <div class="lh_col">
+      <div class="lh_panel"><h2>月度运输量（万单）</h2><div id="lh_chart_bar" class="lh_chart"></div></div>
+      <div class="lh_panel"><h2>运输方式占比</h2><div id="lh_chart_pie" class="lh_chart"></div></div>
+    </div>
+
+    <!-- 中列：上为地理信息图，下为趋势图 -->
+    <div class="lh_col lh_col_mid">
+      <div class="lh_panel" style="flex:1.5"><h2>全国物流订单分布</h2><div id="lh_chart_map" class="lh_chart"></div></div>
+      <div class="lh_panel"><h2>24 小时订单趋势</h2><div id="lh_chart_line" class="lh_chart"></div></div>
+    </div>
+
+    <!-- 右列 -->
+    <div class="lh_col">
+      <div class="lh_panel"><h2>城市订单量 TOP5</h2><div id="lh_chart_rank" class="lh_chart"></div></div>
+      <div class="lh_panel"><h2>服务质量雷达</h2><div id="lh_chart_radar" class="lh_chart"></div></div>
+    </div>
+  </div>
+
+<script>
+(function () {
+  // 大屏统一配色
+  var lh_axis = { axisLine: { lineStyle: { color: '#3d5f9e' } }, axisLabel: { color: '#8aa9d8' }, splitLine: { lineStyle: { color: 'rgba(61,95,158,.3)' } } };
+
+  // ---------- 左上：柱状图 ----------
+  echarts.init(document.getElementById('lh_chart_bar')).setOption({
+    grid: { left: 40, right: 16, top: 30, bottom: 28 },
+    tooltip: { trigger: 'axis' },
+    xAxis: Object.assign({ type: 'category', data: ['1月','2月','3月','4月','5月','6月'] }, lh_axis),
+    yAxis: Object.assign({ type: 'value' }, lh_axis),
+    series: [{
+      type: 'bar', barWidth: 18, data: [320, 285, 401, 452, 518, 603],
+      itemStyle: { borderRadius: [4, 4, 0, 0], color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{ offset: 0, color: '#37c6ff' }, { offset: 1, color: '#1a55c4' }]) }
+    }]
+  });
+
+  // ---------- 左下：饼图 ----------
+  echarts.init(document.getElementById('lh_chart_pie')).setOption({
+    tooltip: { trigger: 'item' },
+    legend: { bottom: 0, textStyle: { color: '#8aa9d8' }, itemWidth: 12, itemHeight: 8 },
+    series: [{
+      type: 'pie', radius: ['40%', '65%'], center: ['50%', '44%'],
+      label: { color: '#cfe3ff', formatter: '{b} {d}%' },
+      data: [
+        { value: 42, name: '公路' }, { value: 26, name: '铁路' },
+        { value: 18, name: '航空' }, { value: 14, name: '水运' }
+      ],
+      itemStyle: { borderColor: '#050e2d', borderWidth: 2 }
+    }]
+  });
+
+  // ---------- 中下：折线图 ----------
+  var lh_hours = [];
+  for (var lh_h = 0; lh_h < 24; lh_h++) lh_hours.push(lh_h + '时');
+  echarts.init(document.getElementById('lh_chart_line')).setOption({
+    grid: { left: 44, right: 20, top: 30, bottom: 28 },
+    tooltip: { trigger: 'axis' },
+    xAxis: Object.assign({ type: 'category', boundaryGap: false, data: lh_hours }, lh_axis),
+    yAxis: Object.assign({ type: 'value' }, lh_axis),
+    series: [{
+      name: '订单量', type: 'line', smooth: true, symbol: 'none',
+      areaStyle: { color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{ offset: 0, color: 'rgba(46,123,255,.5)' }, { offset: 1, color: 'rgba(46,123,255,0)' }]) },
+      lineStyle: { color: '#37c6ff', width: 2 },
+      data: [820, 640, 420, 300, 260, 380, 720, 1180, 1520, 1680, 1540, 1720, 1860, 1740, 1620, 1480, 1560, 1840, 2100, 1920, 1580, 1240, 980, 860]
+    }]
+  });
+
+  // ---------- 右上：TOP5 条形图 ----------
+  echarts.init(document.getElementById('lh_chart_rank')).setOption({
+    grid: { left: 70, right: 40, top: 16, bottom: 24 },
+    tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+    xAxis: Object.assign({ type: 'value' }, lh_axis),
+    yAxis: Object.assign({ type: 'category', data: ['成都','杭州','广州','上海','北京'] }, lh_axis),
+    series: [{
+      type: 'bar', barWidth: 12, data: [486, 612, 738, 892, 1053],
+      label: { show: true, position: 'right', color: '#cfe3ff' },
+      itemStyle: { borderRadius: [0, 6, 6, 0], color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [{ offset: 0, color: '#1a55c4' }, { offset: 1, color: '#39e6a3' }]) }
+    }]
+  });
+
+  // ---------- 右下：雷达图 ----------
+  echarts.init(document.getElementById('lh_chart_radar')).setOption({
+    tooltip: {},
+    legend: { bottom: 0, textStyle: { color: '#8aa9d8' }, itemWidth: 12, itemHeight: 8 },
+    radar: {
+      indicator: [{ name: '时效', max: 100 }, { name: '完好率', max: 100 }, { name: '准点率', max: 100 }, { name: '满意', max: 100 }, { name: '响应', max: 100 }],
+      radius: '56%', center: ['50%', '46%'],
+      axisName: { color: '#8aa9d8' },
+      splitArea: { areaStyle: { color: ['rgba(40,80,160,.15)', 'rgba(40,80,160,.3)'] } },
+      splitLine: { lineStyle: { color: '#3d5f9e' } },
+      axisLine: { lineStyle: { color: '#3d5f9e' } }
+    },
+    series: [{
+      type: 'radar',
+      data: [
+        { value: [86, 94, 90, 88, 92], name: '本月', areaStyle: { color: 'rgba(55,198,255,.35)' }, lineStyle: { color: '#37c6ff' } },
+        { value: [78, 90, 84, 82, 80], name: '上月', areaStyle: { color: 'rgba(57,230,163,.2)' }, lineStyle: { color: '#39e6a3' } }
+      ]
+    }]
+  });
+
+  // ---------- 中上：中国地图（地理信息图） ----------
+  // china.json 已下载到 cdn 目录，用 fetch 本地加载（需通过 http 服务访问）
+  fetch('cdn/china.json').then(function (lh_res) { return lh_res.json(); }).then(function (lh_geo) {
+    echarts.registerMap('china', lh_geo);
+    echarts.init(document.getElementById('lh_chart_map')).setOption({
+      tooltip: { trigger: 'item', formatter: '{b}<br>订单量：{c} 万单' },
+      visualMap: {
+        min: 0, max: 900, left: 14, bottom: 14,
+        text: ['高', '低'], textStyle: { color: '#8aa9d8' },
+        inRange: { color: ['#123a7a', '#1e6fd9', '#37c6ff'] }
+      },
+      geo: {
+        map: 'china', roam: true,
+        itemStyle: { areaColor: '#12326e', borderColor: '#3d7fe8' },
+        emphasis: { itemStyle: { areaColor: '#39e6a3' }, label: { color: '#fff' } }
+      },
+      series: [{
+        type: 'map', map: 'china', geoIndex: 0,
+        data: [
+          { name: '北京市', value: 912 }, { name: '上海市', value: 876 }, { name: '广东省', value: 834 },
+          { name: '浙江省', value: 702 }, { name: '江苏省', value: 665 }, { name: '四川省', value: 540 },
+          { name: '湖北省', value: 470 }, { name: '山东省', value: 455 }, { name: '河南省', value: 430 },
+          { name: '福建省', value: 388 }, { name: '湖南省', value: 360 }, { name: '陕西省', value: 320 },
+          { name: '安徽省', value: 300 }, { name: '辽宁省', value: 268 }, { name: '重庆市', value: 255 }
+        ]
+      }]
+    });
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<!-- 姓名：刘晗，建立时间：2026-11-05，使用的大模型：GLM-5.3，功能名称：Promise / async-await 异步流程演示（包饺子：含 Promise.all 并行） -->
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>17-6 异步流程演示 · 包饺子</title>
+<link rel="stylesheet" href="font/iconfont.css">
+<style>
+:root{
+    --lh-bg:#f6f8fc; --lh-card:#ffffff;
+    --lh-main:#4f6ef7; --lh-main2:#7c9bff;
+    --lh-text:#1f2937; --lh-muted:#8a94a6;
+    --lh-line:#eef0f5; --lh-green:#12b76a; --lh-red:#ef4444;
+    --lh-orange:#f59e0b;
+    --lh-shadow:0 2px 14px rgba(79,110,247,0.09);
+    --lh-shadow-lg:0 10px 30px rgba(79,110,247,0.16);
+}
+*{box-sizing:border-box}
+body{
+    margin:0; padding:36px 16px 64px;
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Microsoft YaHei",Arial;
+    color:var(--lh-text); line-height:1.65;
+    background:
+        radial-gradient(700px 320px at 12% -5%, rgba(124,155,255,0.16), transparent 60%),
+        radial-gradient(600px 300px at 92% 0%, rgba(18,183,106,0.07), transparent 60%),
+        var(--lh-bg);
+    min-height:100vh;
+}
+.lh_wrap{max-width:860px; margin:0 auto}
+
+/* ---------- 头部 ---------- */
+.lh_header{display:flex; align-items:center; gap:16px; margin-bottom:6px}
+.lh_logo{
+    width:58px; height:58px; border-radius:18px; flex:none;
+    background:linear-gradient(135deg, var(--lh-main), var(--lh-main2));
+    display:flex; align-items:center; justify-content:center;
+    font-weight:800; font-size:17px; color:#fff;
+    box-shadow:var(--lh-shadow-lg);
+}
+.lh_header h1{margin:0; font-size:24px; letter-spacing:.5px}
+.lh_sub{margin:2px 0 0; font-size:13px; color:var(--lh-muted)}
+.lh_back{
+    margin-left:auto; flex:none; display:inline-flex; align-items:center; gap:6px;
+    padding:8px 16px; border-radius:999px; text-decoration:none;
+    color:var(--lh-main); font-size:13px; font-weight:700;
+    border:1px solid rgba(79,110,247,0.25); background:#fff;
+    box-shadow:var(--lh-shadow);
+    transition:transform .18s, box-shadow .18s;
+}
+.lh_back:hover{transform:translateY(-2px); box-shadow:var(--lh-shadow-lg)}
+.lh_back .iconfont{font-size:14px}
+
+.lh_h2{
+    margin:26px 0 12px; font-size:15px; padding-left:10px;
+    border-left:3px solid var(--lh-main);
+}
+.lh_h2 small{color:var(--lh-muted); font-weight:400; font-size:12px; margin-left:8px}
+
+/* ---------- 卡片 ---------- */
+.lh_card{
+    padding:18px 20px; border-radius:16px;
+    background:var(--lh-card); border:1px solid var(--lh-line);
+    box-shadow:var(--lh-shadow);
+}
+
+/* ---------- 代码展示 ---------- */
+.lh_code{
+    margin:0; padding:14px 16px; border-radius:12px; overflow-x:auto;
+    background:#fbfcfe; border:1px solid var(--lh-line);
+    font-family:Consolas,Monaco,monospace; font-size:12.5px; color:#47536b; line-height:1.8;
+}
+.lh_code .c1{color:var(--lh-main); font-weight:700}
+.lh_code .c2{color:var(--lh-green); font-weight:700}
+.lh_code .c3{color:var(--lh-orange)}
+.lh_code .c4{color:var(--lh-muted)}
+
+/* ---------- 控制区 ---------- */
+.lh_ctrl{
+    display:flex; flex-wrap:wrap; gap:12px; align-items:center;
+    margin-bottom:16px;
+}
+.lh_btn{
+    padding:11px 26px; border:none; border-radius:10px; cursor:pointer;
+    font-size:14px; font-weight:700; color:#fff;
+    background:linear-gradient(135deg, var(--lh-main), var(--lh-main2));
+    box-shadow:var(--lh-shadow);
+    transition:transform .18s, box-shadow .18s, opacity .2s;
+    display:inline-flex; align-items:center; gap:7px;
+}
+.lh_btn .iconfont{font-size:13px}
+.lh_btn:hover{transform:translateY(-2px); box-shadow:var(--lh-shadow-lg)}
+.lh_btn:disabled{opacity:.5; cursor:not-allowed; transform:none; box-shadow:none}
+.lh_btn.ghost{
+    background:#fff; color:var(--lh-main); border:1px solid rgba(79,110,247,0.3);
+}
+.lh_total{
+    margin-left:auto; font-family:Consolas,Monaco,monospace; font-size:13px; color:var(--lh-muted);
+}
+.lh_total b{color:var(--lh-main); font-size:17px}
+
+/* ---------- 流程步骤 ---------- */
+.lh_step{
+    display:flex; align-items:center; gap:14px;
+    padding:14px 16px; border-radius:14px; margin-bottom:10px;
+    background:#fafbfd; border:1px solid var(--lh-line);
+    transition:border-color .3s, background .3s;
+}
+.lh_step.running{background:rgba(79,110,247,0.05); border-color:rgba(79,110,247,0.4)}
+.lh_step.done{background:rgba(18,183,106,0.05); border-color:rgba(18,183,106,0.4)}
+.lh_step_icon{
+    flex:none; width:44px; height:44px; border-radius:14px;
+    background:#eef1f8; color:var(--lh-muted);
+    display:flex; align-items:center; justify-content:center;
+    transition:background .3s, color .3s;
+}
+.lh_step_icon .iconfont{font-size:22px}
+.lh_step.running .lh_step_icon{background:linear-gradient(135deg, var(--lh-main), var(--lh-main2)); color:#fff}
+.lh_step.done .lh_step_icon{background:linear-gradient(135deg, var(--lh-green), #34d399); color:#fff}
+@keyframes lh_tick{0%,100%{transform:rotate(0)}25%{transform:rotate(-8deg)}75%{transform:rotate(8deg)}}
+.lh_step.running .lh_step_icon .iconfont{animation:lh_tick 1s ease infinite}
+
+.lh_step_body{flex:1; min-width:0}
+.lh_step_name{font-size:14px; font-weight:700}
+.lh_step_name .lh_ms{
+    font-family:Consolas,Monaco,monospace; font-weight:400; font-size:12px;
+    color:var(--lh-muted); margin-left:8px;
+}
+.lh_step_status{
+    font-size:12px; color:var(--lh-muted); margin-top:2px;
+    display:flex; align-items:center; gap:6px;
+}
+.lh_step.running .lh_step_status{color:var(--lh-main)}
+.lh_step.done .lh_step_status{color:var(--lh-green)}
+@keyframes lh_spin{to{transform:rotate(360deg)}}
+.lh_step_status .lh_spin{
+    width:11px; height:11px; border-radius:50%; flex:none;
+    border:2px solid rgba(79,110,247,0.25); border-top-color:var(--lh-main);
+    animation:lh_spin .8s linear infinite;
+}
+.lh_step_status .iconfont{font-size:12px}
+
+/* 进度条 */
+.lh_bar{
+    flex:none; width:220px; height:10px; border-radius:999px;
+    background:#eef1f8; overflow:hidden;
+}
+@media (max-width:640px){ .lh_bar{display:none} }
+.lh_bar_fill{
+    width:0; height:100%; border-radius:999px;
+    background:linear-gradient(90deg, var(--lh-main), var(--lh-main2));
+}
+.lh_step.done .lh_bar_fill{background:linear-gradient(90deg, var(--lh-green), #34d399)}
+
+/* ---------- 并行区 ---------- */
+.lh_parallel{
+    border:2px dashed rgba(79,110,247,0.35); border-radius:16px;
+    padding:14px 14px 4px; margin-bottom:10px; position:relative;
+    background:rgba(79,110,247,0.02);
+    transition:border-color .3s, background .3s;
+}
+.lh_parallel.running{background:rgba(79,110,247,0.05); border-color:rgba(79,110,247,0.6)}
+.lh_parallel.done{border-color:rgba(18,183,106,0.5); background:rgba(18,183,106,0.04)}
+.lh_parallel_tag{
+    position:absolute; top:-12px; left:16px;
+    font-size:11px; font-weight:800; color:#fff;
+    background:linear-gradient(135deg, var(--lh-orange), #fbbf24);
+    padding:3px 12px; border-radius:999px; letter-spacing:.5px;
+}
+.lh_parallel_steps{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+@media (max-width:640px){ .lh_parallel_steps{grid-template-columns:1fr} }
+.lh_parallel_steps .lh_step{margin-bottom:10px}
+.lh_parallel_steps .lh_bar{width:100%; flex:1}
+
+/* ---------- 完成横幅 ---------- */
+.lh_banner{
+    display:none; margin-top:4px; padding:16px 18px; border-radius:14px;
+    background:linear-gradient(135deg, rgba(18,183,106,0.1), rgba(52,211,153,0.05));
+    border:1px solid rgba(18,183,106,0.35);
+    font-size:14px; color:var(--lh-green); font-weight:700;
+    text-align:center; animation:lh_pop .4s ease;
+}
+.lh_banner .iconfont{font-size:18px; margin-right:6px}
+@keyframes lh_pop{
+    0%{opacity:0; transform:translateY(8px)}
+    100%{opacity:1; transform:translateY(0)}
+}
+
+/* ---------- 控制台 ---------- */
+.lh_console{
+    height:230px; overflow-y:auto; border-radius:12px; padding:12px 14px;
+    background:#fbfcfe; border:1px solid var(--lh-line);
+    font-family:Consolas,Monaco,monospace; font-size:12.5px;
+}
+.lh_log{
+    padding:8px 12px; border-radius:10px; margin-bottom:8px;
+    border:1px solid var(--lh-line); background:#fff;
+    animation:lh_pop .3s ease;
+}
+.lh_log.ok{border-color:rgba(18,183,106,0.3); background:rgba(18,183,106,0.04)}
+.lh_log .lh_code_line{color:#47536b}
+.lh_log .lh_code_line::before{content:'> '; color:var(--lh-main)}
+.lh_log .lh_ret{margin-top:4px; color:var(--lh-muted); word-break:break-all}
+.lh_log .lh_ret b{color:var(--lh-main); font-weight:700}
+.lh_log.ok .lh_ret b{color:var(--lh-green)}
+.lh_hint{color:var(--lh-muted); font-size:12px; text-align:center; padding:30px 0}
+
+.lh_footer{margin-top:30px; text-align:center; font-size:12px; color:#c0c6d2}
+</style>
+</head>
+<body>
+<div class="lh_wrap">
+
+    <header class="lh_header">
+        <div class="lh_logo">17-6</div>
+        <div>
+            <h1>异步流程演示：包饺子</h1>
+            <p class="lh_sub">Promise + async/await · setTimeout 模拟每步耗时 · 和面 / 和馅 用 Promise.all 并行</p>
+        </div>
+        <a class="lh_back" href="index.html"><i class="iconfont">&#xe600;</i>返回首页</a>
+    </header>
+
+    <!-- ① 代码思路 -->
+    <h2 class="lh_h2">① 实现思路 <small>把每个流程包装成一个 Promise</small></h2>
+    <div class="lh_card">
+        <pre class="lh_code"><span class="c1">const</span> lh_task = (name, ms) =&gt; <span class="c1">new</span> <span class="c2">Promise</span>(resolve =&gt;
+  <span class="c2">setTimeout</span>(() =&gt; resolve(name), ms)   <span class="c4">// setTimeout 模拟耗时</span>
+);
+
+<span class="c1">async function</span> <span class="c2">lh_cook</span>() {
+  <span class="c1">await</span> lh_task(<span class="c4">'买原料'</span>, 6000);              <span class="c3">// 依次：等它做完才走下一步</span>
+  <span class="c1">await</span> lh_task(<span class="c4">'取原料'</span>, 2000);
+  <span class="c1">await</span> <span class="c2">Promise.all</span>([                       <span class="c3">// 并行：同时开跑，都完成才继续</span>
+    lh_task(<span class="c4">'和面'</span>, 5000),
+    lh_task(<span class="c4">'和馅'</span>, 3000)
+  ]);
+  <span class="c1">await</span> lh_task(<span class="c4">'包饺子'</span>, 4000);
+  <span class="c1">await</span> lh_task(<span class="c4">'吃饺子'</span>, 1000);
+}</pre>
+    </div>
+
+    <!-- ② 流程演示 -->
+    <h2 class="lh_h2">② 流程演示 <small>总耗时 ≈ 6+2+5+4+1 = 18 秒（并行只算较慢的和面）</small></h2>
+    <div class="lh_card">
+        <div class="lh_ctrl">
+            <button class="lh_btn" id="lh_start"><i class="iconfont">&#xe8a3;</i>开始包饺子</button>
+            <button class="lh_btn ghost" id="lh_reset">重置流程</button>
+            <div class="lh_total">总用时 <b id="lh_total">0.0</b> s</div>
+        </div>
+
+        <div id="lh_steps">
+            <div class="lh_step" data-step="buy">
+                <div class="lh_step_icon"><i class="iconfont">&#xe86e;</i></div>
+                <div class="lh_step_body">
+                    <div class="lh_step_name">① 买原料<span class="lh_ms">6000ms</span></div>
+                    <div class="lh_step_status">等待开始</div>
+                </div>
+                <div class="lh_bar"><div class="lh_bar_fill"></div></div>
+            </div>
+
+            <div class="lh_step" data-step="take">
+                <div class="lh_step_icon"><i class="iconfont">&#xe699;</i></div>
+                <div class="lh_step_body">
+                    <div class="lh_step_name">② 取原料<span class="lh_ms">2000ms</span></div>
+                    <div class="lh_step_status">等待开始</div>
+                </div>
+                <div class="lh_bar"><div class="lh_bar_fill"></div></div>
+            </div>
+
+            <div class="lh_parallel" id="lh_parallel">
+                <span class="lh_parallel_tag">Promise.all 并行区（同时进行）</span>
+                <div class="lh_parallel_steps">
+                    <div class="lh_step" data-step="dough">
+                        <div class="lh_step_icon"><i class="iconfont">&#xe64a;</i></div>
+                        <div class="lh_step_body">
+                            <div class="lh_step_name">③-A 和面<span class="lh_ms">5000ms</span></div>
+                            <div class="lh_step_status">等待开始</div>
+                        </div>
+                        <div class="lh_bar"><div class="lh_bar_fill"></div></div>
+                    </div>
+                    <div class="lh_step" data-step="filling">
+                        <div class="lh_step_icon"><i class="iconfont">&#xe927;</i></div>
+                        <div class="lh_step_body">
+                            <div class="lh_step_name">③-B 和馅<span class="lh_ms">3000ms</span></div>
+                            <div class="lh_step_status">等待开始</div>
+                        </div>
+                        <div class="lh_bar"><div class="lh_bar_fill"></div></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="lh_step" data-step="wrap">
+                <div class="lh_step_icon"><i class="iconfont">&#xe8c0;</i></div>
+                <div class="lh_step_body">
+                    <div class="lh_step_name">④ 包饺子<span class="lh_ms">4000ms</span></div>
+                    <div class="lh_step_status">等待开始</div>
+                </div>
+                <div class="lh_bar"><div class="lh_bar_fill"></div></div>
+            </div>
+
+            <div class="lh_step" data-step="eat">
+                <div class="lh_step_icon"><i class="iconfont">&#xec7f;</i></div>
+                <div class="lh_step_body">
+                    <div class="lh_step_name">⑤ 吃饺子<span class="lh_ms">1000ms</span></div>
+                    <div class="lh_step_status">等待开始</div>
+                </div>
+                <div class="lh_bar"><div class="lh_bar_fill"></div></div>
+            </div>
+        </div>
+
+        <div class="lh_banner" id="lh_banner"><i class="iconfont">&#xec7f;</i>饺子吃完啦！全部流程耗时约 18 秒 —— 串行的步骤相加，并行的步骤只算最慢的那个</div>
+    </div>
+
+    <!-- 控制台 -->
+    <h2 class="lh_h2">控制台输出 <small>每一步的 await 挂起 / 完成时间点</small></h2>
+    <div class="lh_console" id="lh_console">
+        <div class="lh_hint">点击「开始包饺子」，观察每一步的执行顺序与并行效果…</div>
+    </div>
+
+    <footer class="lh_footer">© 刘晗的《高级网页设计》课堂实践 · 17-6 Promise / async 异步流程演示</footer>
+</div>
+
+<script>
+(function(){
+    const lh_console = document.getElementById('lh_console');
+    const lh_startBtn = document.getElementById('lh_start');
+    const lh_resetBtn = document.getElementById('lh_reset');
+    const lh_totalEl  = document.getElementById('lh_total');
+    const lh_banner   = document.getElementById('lh_banner');
+    const lh_parallel = document.getElementById('lh_parallel');
+    let lh_running = false;
+    let lh_totalTimer = null;
+    let lh_cookStart = 0;
+
+    /* ---------- 把一个流程包装成 Promise（setTimeout 模拟耗时） ---------- */
+    function lh_task(name, ms){
+        return new Promise(function(resolve){
+            setTimeout(function(){ resolve(name); }, ms);
+        });
+    }
+
+    /* ---------- 控制台日志 ---------- */
+    function lh_log(code, ret, ok){
+        const h = lh_console.querySelector('.lh_hint');
+        if(h) h.remove();
+        const e = document.createElement('div');
+        e.className = 'lh_log' + (ok ? ' ok' : '');
+        e.innerHTML = '<div class="lh_code_line"></div><div class="lh_ret"></div>';
+        e.querySelector('.lh_code_line').textContent = code;
+        e.querySelector('.lh_ret').innerHTML = ret;
+        lh_console.prepend(e);
+    }
+    function lh_nowSec(){
+        return ((Date.now() - lh_cookStart) / 1000).toFixed(1);
+    }
+
+    /* ---------- 步骤 UI 控制 ---------- */
+    function lh_getStep(key){
+        return document.querySelector('.lh_step[data-step="' + key + '"]');
+    }
+    function lh_stepRunning(key, text){
+        const el = lh_getStep(key);
+        el.className = 'lh_step running';
+        const st = el.querySelector('.lh_step_status');
+        st.innerHTML = '<span class="lh_spin"></span>' + text;
+        /* 进度条按耗时线性动画 */
+        const fill = el.querySelector('.lh_bar_fill');
+        fill.style.transition = 'none'; fill.style.width = '0';
+        void fill.offsetWidth;
+        const ms = Number(el.querySelector('.lh_ms').textContent.replace('ms', ''));
+        fill.style.transition = 'width ' + ms + 'ms linear';
+        fill.style.width = '100%';
+    }
+    function lh_stepDone(key, text){
+        const el = lh_getStep(key);
+        el.className = 'lh_step done';
+        const st = el.querySelector('.lh_step_status');
+        st.innerHTML = '<i class="iconfont">&#xec7f;</i>' + text;
+    }
+    function lh_stepReset(){
+        document.querySelectorAll('.lh_step').forEach(function(el){
+            el.className = 'lh_step';
+            el.querySelector('.lh_step_status').textContent = '等待开始';
+            const fill = el.querySelector('.lh_bar_fill');
+            fill.style.transition = 'none'; fill.style.width = '0';
+        });
+        lh_parallel.className = 'lh_parallel';
+        lh_banner.style.display = 'none';
+    }
+
+    /* ---------- 带界面更新的任务：await 它就像等这道工序完成 ---------- */
+    function lh_run(key, name, ms){
+        lh_stepRunning(key, name + '中…（' + (ms / 1000) + 's）');
+        lh_log('await lh_task(\'' + name + '\', ' + ms + ')',
+            '【' + lh_nowSec() + 's】' + name + '开始，Promise 处于 pending，主流程挂起等待');
+        return lh_task(name, ms).then(function(){
+            lh_stepDone(key, name + '完成 ✔（' + (ms / 1000) + 's）');
+            lh_log(name + ' resolved',
+                '【' + lh_nowSec() + 's】' + name + '完成，Promise 变为 <b>fulfilled</b>，继续往下执行', true);
+        });
+    }
+
+    /* ---------- 主流程：async 函数 ---------- */
+    async function lh_cook(){
+        if(lh_running) return;
+        lh_running = true;
+        lh_startBtn.disabled = true;
+        lh_cookStart = Date.now();
+
+        /* 总计时器 */
+        lh_totalTimer = setInterval(function(){
+            lh_totalEl.textContent = ((Date.now() - lh_cookStart) / 1000).toFixed(1);
+        }, 100);
+
+        await lh_run('buy', '买原料', 6000);        /* ① 串行 */
+        await lh_run('take', '取原料', 2000);       /* ② 串行 */
+
+        /* ③ 并行：和面 + 和馅 同时进行 */
+        lh_parallel.classList.add('running');
+        lh_log('await Promise.all([和面(5000), 和馅(3000)])',
+            '【' + lh_nowSec() + 's】两件事<b>同时开始</b>，谁先完成谁先 resolve，' +
+            'Promise.all 等到<b>全部完成</b>才放行 —— 总耗时只算较慢的和面 5s');
+        await Promise.all([
+            lh_run('dough', '和面', 5000),
+            lh_run('filling', '和馅', 3000)
+        ]);
+        lh_parallel.classList.remove('running');
+        lh_parallel.classList.add('done');
+
+        await lh_run('wrap', '包饺子', 4000);       /* ④ 串行 */
+        await lh_run('eat', '吃饺子', 1000);        /* ⑤ 串行 */
+
+        clearInterval(lh_totalTimer);
+        lh_totalEl.textContent = ((Date.now() - lh_cookStart) / 1000).toFixed(1);
+        lh_banner.style.display = 'block';
+        lh_log('async function lh_cook() 执行完毕',
+            '【' + lh_nowSec() + 's】全流程结束！串行 6+2+4+1=13s，并行区 5s，合计约 <b>18s</b>', true);
+
+        lh_running = false;
+        lh_startBtn.disabled = false;
+    }
+
+    /* ---------- 事件绑定 ---------- */
+    lh_startBtn.addEventListener('click', lh_cook);
+    lh_resetBtn.addEventListener('click', function(){
+        if(lh_running){
+            lh_log('重置', '流程正在跑，请等它结束再重置', false);
+            return;
+        }
+        lh_stepReset();
+        lh_totalEl.textContent = '0.0';
+        lh_console.innerHTML = '<div class="lh_hint">已重置，点击「开始包饺子」重新来一遍…</div>';
+    });
+})();
+</script>
+</body>
+</html>

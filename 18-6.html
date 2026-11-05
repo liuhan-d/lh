@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<!-- 姓名：刘晗，建立时间：2026-11-05，使用的大模型：GLM-5.3-Flash，功能名称：基于 Mermaid 的智能客服系统（流程图 + ER 图），mermaid.min.js 已下载到本地 cdn 目录引用 -->
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>18-6 基于 Mermaid 的智能客服系统</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: "Microsoft YaHei", sans-serif; background: #f5f6fa; padding: 24px 16px 48px; }
+  .lh_header { text-align: center; margin-bottom: 24px; }
+  .lh_header h1 { font-size: 26px; color: #2c3e50; }
+  .lh_header p { color: #7f8c9b; font-size: 14px; margin-top: 6px; }
+  .lh_card { max-width: 1100px; margin: 0 auto 28px; background: #fff; border-radius: 12px; padding: 24px; box-shadow: 0 2px 10px rgba(0,0,0,.06); }
+  .lh_card h2 { font-size: 18px; color: #34495e; border-left: 4px solid #9b59b6; padding-left: 10px; margin-bottom: 14px; }
+  .lh_diagram { width: 100%; overflow-x: auto; display: flex; justify-content: center; }
+  .lh_mermaid { background: #fff; }
+  .lh_back { display: block; width: 140px; margin: 0 auto; text-align: center; text-decoration: none; color: #9b59b6; border: 1px solid #9b59b6; border-radius: 20px; padding: 8px 0; font-size: 14px; }
+  .lh_back:hover { background: #9b59b6; color: #fff; }
+  .lh_error { color: #c0392b; font-size: 14px; text-align: center; }
+</style>
+<!-- 本地引用 mermaid：cdn 文件已下载到目录下 -->
+<script src="cdn/mermaid.min.js"></script>
+</head>
+<body>
+  <header class="lh_header">
+    <h1>基于 Mermaid 的智能客服系统</h1>
+    <p>图一：智能客服系统业务流程图　图二：智能客服系统数据库 ER 图</p>
+  </header>
+
+  <section class="lh_card">
+    <h2>图一　智能客服系统流程图</h2>
+    <div id="lh_flow_wrap" class="lh_diagram">
+      <pre class="lh_mermaid" id="lh_flow">
+flowchart TD
+    A([用户进入客服系统]) --> B[/输入问题/]
+    B --> C[输入预处理<br>分词 / 去噪 / 拼写纠正]
+    C --> D{意图识别}
+    D -->|常见业务咨询| E[知识库检索]
+    D -->|投诉建议| H
+    E --> F{是否命中答案}
+    F -->|是| G[生成并返回回答]
+    F -->|否| H[转接人工坐席]
+    G --> I{用户是否满意}
+    I -->|满意| J([会话结束<br>记录日志])
+    I -->|不满意| H
+    H --> K[人工处理并回复]
+    K --> J
+    J --> L[(会话数据入库<br>用于模型优化)]
+      </pre>
+    </div>
+  </section>
+
+  <section class="lh_card">
+    <h2>图二　智能客服系统 ER 图</h2>
+    <div id="lh_er_wrap" class="lh_diagram">
+      <pre class="lh_mermaid" id="lh_er">
+erDiagram
+    CUSTOMER ||--o{ CONVERSATION : "发起"
+    AGENT ||--o{ CONVERSATION : "接待"
+    CONVERSATION ||--|{ MESSAGE : "包含"
+    CONVERSATION ||--o| TICKET : "生成"
+    KB_ARTICLE ||--o{ MESSAGE : "命中引用"
+    CUSTOMER {
+        bigint customer_id PK "客户编号"
+        varchar nickname "昵称"
+        varchar phone "手机号"
+        datetime register_time "注册时间"
+    }
+    AGENT {
+        bigint agent_id PK "坐席编号"
+        varchar name "坐席姓名"
+        varchar group_name "业务分组"
+        int status "在线状态"
+    }
+    CONVERSATION {
+        bigint conversation_id PK "会话编号"
+        bigint customer_id FK "客户编号"
+        bigint agent_id FK "坐席编号"
+        tinyint channel "来源渠道"
+        tinyint type "机器人或人工"
+        datetime start_time "开始时间"
+        datetime end_time "结束时间"
+    }
+    MESSAGE {
+        bigint message_id PK "消息编号"
+        bigint conversation_id FK "会话编号"
+        tinyint sender "发送方"
+        varchar content "消息内容"
+        bigint kb_id FK "命中的知识条目"
+        datetime send_time "发送时间"
+    }
+    KB_ARTICLE {
+        bigint kb_id PK "知识条目编号"
+        varchar title "问题标题"
+        text answer "标准答案"
+        varchar intent "所属意图"
+        int hit_count "命中次数"
+    }
+    TICKET {
+        bigint ticket_id PK "工单编号"
+        bigint conversation_id FK "会话编号"
+        varchar title "工单标题"
+        tinyint status "处理状态"
+        varchar result "处理结果"
+        datetime create_time "创建时间"
+    }
+      </pre>
+    </div>
+  </section>
+
+  <a class="lh_back" href="index.html">返回首页</a>
+
+<script>
+  // 本地 mermaid 初始化，手动渲染两张图
+  mermaid.initialize({
+    startOnLoad: false,
+    theme: 'default',
+    securityLevel: 'loose',
+    flowchart: { htmlLabels: true, curve: 'basis' },
+    er: { useMaxWidth: true }
+  });
+
+  (function () {
+    var lh_nodes = [document.getElementById('lh_flow'), document.getElementById('lh_er')];
+    mermaid.run({ nodes: lh_nodes }).catch(function (lh_err) {
+      var lh_tips = document.querySelectorAll('.lh_diagram');
+      for (var lh_i = 0; lh_i < lh_tips.length; lh_i++) {
+        if (!lh_tips[lh_i].querySelector('svg')) {
+          lh_tips[lh_i].innerHTML = '<p class="lh_error">图表渲染失败：' + lh_err.message + '</p>';
+        }
+      }
+    });
+  })();
+</script>
+</body>
+</html>

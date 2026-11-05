@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<!-- 姓名：刘晗，建立时间：2026-11-05，使用的大模型：GLM-5.3，功能名称：Canvas 绘制二手商品销售系统全栈系统架构图（含数据流动画） -->
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>18-2 Canvas 架构图 · 二手商品销售系统</title>
+<link rel="stylesheet" href="font/iconfont.css">
+<style>
+:root{
+    --lh-bg:#f6f8fc; --lh-card:#ffffff;
+    --lh-main:#4f6ef7; --lh-main2:#7c9bff;
+    --lh-text:#1f2937; --lh-muted:#8a94a6;
+    --lh-line:#eef0f5; --lh-green:#12b76a;
+    --lh-shadow:0 2px 14px rgba(79,110,247,0.09);
+    --lh-shadow-lg:0 10px 30px rgba(79,110,247,0.16);
+}
+*{box-sizing:border-box}
+body{
+    margin:0; padding:36px 16px 64px;
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Microsoft YaHei",Arial;
+    color:var(--lh-text); line-height:1.65;
+    background:
+        radial-gradient(700px 320px at 12% -5%, rgba(124,155,255,0.16), transparent 60%),
+        radial-gradient(600px 300px at 92% 0%, rgba(18,183,106,0.07), transparent 60%),
+        var(--lh-bg);
+    min-height:100vh;
+}
+.lh_wrap{max-width:980px; margin:0 auto}
+
+.lh_header{display:flex; align-items:center; gap:16px; margin-bottom:6px}
+.lh_logo{
+    width:58px; height:58px; border-radius:18px; flex:none;
+    background:linear-gradient(135deg, var(--lh-main), var(--lh-main2));
+    display:flex; align-items:center; justify-content:center;
+    font-weight:800; font-size:17px; color:#fff;
+    box-shadow:var(--lh-shadow-lg);
+}
+.lh_header h1{margin:0; font-size:24px; letter-spacing:.5px}
+.lh_sub{margin:2px 0 0; font-size:13px; color:var(--lh-muted)}
+.lh_back{
+    margin-left:auto; flex:none; display:inline-flex; align-items:center; gap:6px;
+    padding:8px 16px; border-radius:999px; text-decoration:none;
+    color:var(--lh-main); font-size:13px; font-weight:700;
+    border:1px solid rgba(79,110,247,0.25); background:#fff;
+    box-shadow:var(--lh-shadow);
+    transition:transform .18s, box-shadow .18s;
+}
+.lh_back:hover{transform:translateY(-2px); box-shadow:var(--lh-shadow-lg)}
+.lh_back .iconfont{font-size:14px}
+
+.lh_card{
+    margin-top:16px; padding:18px 20px; border-radius:16px;
+    background:var(--lh-card); border:1px solid var(--lh-line);
+    box-shadow:var(--lh-shadow);
+}
+.lh_canvas{
+    display:block; width:100%; aspect-ratio:900/660;
+    background:#fff; border:1px solid var(--lh-line); border-radius:14px;
+}
+.lh_legend{
+    margin-top:12px; display:flex; flex-wrap:wrap; gap:14px;
+    font-size:12.5px; color:var(--lh-muted); align-items:center;
+}
+.lh_dot{width:10px; height:10px; border-radius:50%; display:inline-block; margin-right:5px}
+.lh_info{
+    margin-top:12px; font-size:12.5px; color:var(--lh-muted);
+    background:#fafbfd; border:1px solid var(--lh-line);
+    border-radius:10px; padding:12px 16px;
+}
+.lh_info b{color:var(--lh-main)}
+
+.lh_footer{margin-top:30px; text-align:center; font-size:12px; color:#c0c6d2}
+</style>
+</head>
+<body>
+<div class="lh_wrap">
+
+    <header class="lh_header">
+        <div class="lh_logo">18-2</div>
+        <div>
+            <h1>Canvas 系统架构图</h1>
+            <p class="lh_sub">二手商品销售系统 · 全栈架构（纯 Canvas API 绘制，箭头上有流动的数据动画）</p>
+        </div>
+        <a class="lh_back" href="index.html"><i class="iconfont">&#xe600;</i>返回首页</a>
+    </header>
+
+    <div class="lh_card">
+        <canvas class="lh_canvas" id="lh_canvas"></canvas>
+        <div class="lh_legend">
+            <span><span class="lh_dot" style="background:#4f6ef7"></span>蓝色下行箭头：请求数据流</span>
+            <span><span class="lh_dot" style="background:#12b76a"></span>绿色上行箭头：响应数据流</span>
+            <span><span class="lh_dot" style="background:#f59e0b"></span>橙色虚线：服务间调用</span>
+        </div>
+        <div class="lh_info">
+            架构说明：用户在 <b>客户端</b> 发起操作，页面由 <b>前端表现层</b> 渲染，请求经 <b>网络通信层</b> 送达 <b>应用服务层</b>；
+            服务端与 <b>数据存储层</b>（MySQL / Redis / 文件存储）交互，并调用 <b>第三方服务</b> 完成支付与短信，最后把结果沿响应箭头返回前端。
+        </div>
+    </div>
+
+    <footer class="lh_footer">© 刘晗的《高级网页设计》课堂实践 · 18-2 Canvas 系统架构图</footer>
+</div>
+
+<script>
+(function(){
+    const lh_canvas = document.getElementById('lh_canvas');
+    const lh_ctx = lh_canvas.getContext('2d');
+    const lh_W = 900, lh_H = 660;
+
+    /* ---------- 高分屏适配 ---------- */
+    const lh_dpr = Math.min(2, window.devicePixelRatio || 1);
+    lh_canvas.width = lh_W * lh_dpr;
+    lh_canvas.height = lh_H * lh_dpr;
+    lh_ctx.setTransform(lh_dpr, 0, 0, lh_dpr, 0, 0);
+
+    /* ---------- 绘图工具函数 ---------- */
+    function lh_roundRect(x, y, w, h, r){
+        lh_ctx.beginPath();
+        lh_ctx.moveTo(x + r, y);
+        lh_ctx.arcTo(x + w, y, x + w, y + h, r);
+        lh_ctx.arcTo(x + w, y + h, x, y + h, r);
+        lh_ctx.arcTo(x, y + h, x, y, r);
+        lh_ctx.arcTo(x, y, x + w, y, r);
+        lh_ctx.closePath();
+    }
+    function lh_box(x, y, w, h, text, opts){
+        opts = opts || {};
+        lh_ctx.fillStyle = opts.fill || '#ffffff';
+        lh_ctx.strokeStyle = opts.stroke || 'rgba(79,110,247,0.5)';
+        lh_ctx.lineWidth = opts.lw || 1.4;
+        lh_roundRect(x, y, w, h, opts.r || 8);
+        lh_ctx.fill();
+        lh_ctx.stroke();
+        lh_ctx.fillStyle = opts.color || '#1f2937';
+        lh_ctx.font = (opts.bold ? '700 ' : '') + (opts.fs || 13) + 'px "Microsoft YaHei", sans-serif';
+        lh_ctx.textAlign = 'center';
+        lh_ctx.textBaseline = 'middle';
+        lh_ctx.fillText(text, x + w / 2, y + h / 2);
+    }
+    /* 垂直箭头（可带动画偏移） */
+    function lh_varrow(x, y1, y2, color, dashOffset){
+        lh_ctx.strokeStyle = color;
+        lh_ctx.lineWidth = 2;
+        lh_ctx.setLineDash([7, 5]);
+        lh_ctx.lineDashOffset = dashOffset || 0;
+        lh_ctx.beginPath();
+        lh_ctx.moveTo(x, y1);
+        lh_ctx.lineTo(x, y2 - 8);
+        lh_ctx.stroke();
+        lh_ctx.setLineDash([]);
+        /* 箭头头部 */
+        lh_ctx.fillStyle = color;
+        lh_ctx.beginPath();
+        lh_ctx.moveTo(x, y2);
+        lh_ctx.lineTo(x - 5, y2 - 9);
+        lh_ctx.lineTo(x + 5, y2 - 9);
+        lh_ctx.closePath();
+        lh_ctx.fill();
+    }
+    /* 沿箭头运动的数据光点 */
+    function lh_dot(x, y, color){
+        lh_ctx.fillStyle = color;
+        lh_ctx.beginPath();
+        lh_ctx.arc(x, y, 3.2, 0, Math.PI * 2);
+        lh_ctx.fill();
+    }
+
+    /* ---------- 架构分层定义 ---------- */
+    const lh_layers = [
+        { y:56,   h:74,  label:'客户端层',   boxes:['PC 浏览器', '移动端 H5', '微信小程序'] },
+        { y:158,  h:74,  label:'前端表现层', boxes:['HTML5 + CSS3', 'JavaScript / Vue', 'Canvas · 图表'] },
+        { y:262,  h:58,  label:'网络通信层', wide:'HTTPS 加密传输 · REST API 接口 · JSON 数据格式' },
+        { y:346,  h:116, label:'应用服务层', app:true },
+        { y:486,  h:74,  label:'数据存储层', boxes:['MySQL 数据库', 'Redis 缓存', '文件 / OSS 存储'] },
+        { y:586,  h:74,  label:'第三方服务', boxes:['支付网关', '短信验证码', '全文搜索服务'] }
+    ];
+    const lh_modules = ['用户模块', '商品模块', '订单模块', '支付模块', '评价模块', '消息模块'];
+    const lh_cols = [225, 450, 675];              /* 三条主数据流所在的列 */
+
+    /* ---------- 静态部分 ---------- */
+    function lh_drawStatic(){
+        lh_ctx.clearRect(0, 0, lh_W, lh_H);
+
+        /* 标题 */
+        lh_ctx.fillStyle = '#1f2937';
+        lh_ctx.font = '700 20px "Microsoft YaHei", sans-serif';
+        lh_ctx.textAlign = 'center';
+        lh_ctx.fillText('二手商品销售系统 · 全栈系统架构图', lh_W / 2, 30);
+
+        const lh_pad = 20;
+        lh_layers.forEach(function(layer){
+            /* 分层背景带 */
+            lh_ctx.fillStyle = 'rgba(79,110,247,0.045)';
+            lh_roundRect(lh_pad, layer.y, lh_W - lh_pad * 2, layer.h, 12);
+            lh_ctx.fill();
+            /* 层标签（左侧竖排小字） */
+            lh_ctx.fillStyle = 'rgba(79,110,247,0.85)';
+            lh_ctx.font = '700 12px "Microsoft YaHei", sans-serif';
+            lh_ctx.textAlign = 'left';
+            lh_ctx.fillText(layer.label, lh_pad + 12, layer.y + 18);
+
+            if(layer.wide){
+                /* 单个通栏盒子（网络通信层） */
+                lh_box(lh_pad + 96, layer.y + 26, lh_W - lh_pad * 2 - 120, 32, layer.wide,
+                       { fill:'rgba(255,255,255,0.9)', color:'#47536b', fs:12.5 });
+            }else if(layer.app){
+                /* 应用服务层：大盒子 + 六个业务模块 */
+                lh_box(lh_pad + 96, layer.y + 26, lh_W - lh_pad * 2 - 120, 34,
+                       'Node.js + Express 应用服务（业务逻辑）',
+                       { fill:'rgba(79,110,247,0.10)', stroke:'rgba(79,110,247,0.7)', bold:true });
+                const mw = 200, mh = 24;
+                const mx0 = lh_pad + 130, gap = 14;
+                lh_modules.forEach(function(m, i){
+                    const row = Math.floor(i / 3), col = i % 3;
+                    lh_box(mx0 + col * (mw + gap), layer.y + 72 + row * (mh + 8), mw, mh, m,
+                           { fill:'#ffffff', stroke:'rgba(18,183,106,0.45)', fs:12, r:6 });
+                });
+            }else{
+                /* 每层三个盒子 */
+                const bw = 232, bh = 34;
+                layer.boxes.forEach(function(b, i){
+                    const bx = lh_cols[i] - bw / 2 + 44;
+                    lh_box(bx, layer.y + 28, bw, bh, b, { fill:'#ffffff' });
+                });
+            }
+        });
+
+        /* 应用服务层 → 第三方服务：橙色虚线调用 */
+        lh_ctx.strokeStyle = 'rgba(245,158,11,0.8)';
+        lh_ctx.lineWidth = 1.8;
+        lh_ctx.setLineDash([5, 5]);
+        [[70, 500], [lh_W - 70, 500]].forEach(function(pt){
+            lh_ctx.beginPath();
+            lh_ctx.moveTo(pt[0], 462);          /* 应用层底部 */
+            lh_ctx.bezierCurveTo(pt[0], 540, pt[0], 540, pt[0], 586);
+            lh_ctx.stroke();
+        });
+        lh_ctx.setLineDash([]);
+        lh_ctx.fillStyle = 'rgba(245,158,11,1)';
+        lh_ctx.font = '12px "Microsoft YaHei", sans-serif';
+        lh_ctx.textAlign = 'left';
+        lh_ctx.fillText('服务调用', 78, 545);
+        lh_ctx.textAlign = 'right';
+        lh_ctx.fillText('服务调用', lh_W - 78, 545);
+    }
+
+    /* ---------- 动画部分：层间箭头 + 流动光点 ---------- */
+    let lh_t = 0;
+    function lh_drawDynamic(){
+        /* 清掉动态区域（整幅重画更简单：先静态再动态） */
+        lh_drawStatic();
+
+        const lh_dash = -(lh_t * 0.6) % 12;    /* 虚线流动偏移 */
+
+        /* 各层之间的上行 / 下行箭头 */
+        const lh_links = [ [130, 158], [232, 262], [320, 346], [462, 486] ];  /* [上边界的下沿, 下一层顶部] */
+        lh_links.forEach(function(l){
+            lh_cols.forEach(function(x, i){
+                /* 下行请求箭头（左侧列） */
+                lh_varrow(x - 22, l[0], l[1], 'rgba(79,110,247,0.75)', lh_dash);
+                /* 上行响应箭头（右侧列） */
+                lh_varrow(x + 22, l[1] - 2, l[0] + 2, 'rgba(18,183,106,0.75)', -lh_dash);
+            });
+        });
+
+        /* 沿三条主链流动的光点：下行蓝点、上行绿点 */
+        lh_links.forEach(function(l, li){
+            const span = l[1] - l[0];
+            lh_cols.forEach(function(x){
+                /* 请求：周期 60 帧 */
+                const ph = ((lh_t / 60) + li * 0.25 + x / 3000) % 1;
+                lh_dot(x - 22, l[0] + ph * span, 'rgba(79,110,247,1)');
+                /* 响应：错开半个周期 */
+                const ph2 = ((lh_t / 60) + 0.5 + li * 0.25 + x / 3000) % 1;
+                lh_dot(x + 22, l[1] - ph2 * span, 'rgba(18,183,106,1)');
+            });
+        });
+    }
+
+    function lh_frame(){
+        lh_t++;
+        lh_drawDynamic();
+        requestAnimationFrame(lh_frame);
+    }
+
+    lh_frame();
+})();
+</script>
+</body>
+</html>
